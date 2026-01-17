@@ -90,7 +90,7 @@ function loadProgressions() {
     // Define display order: requested descending groups
     const displayOrder = ['7','b7','6','b6','5','#4','4','3','b3','2','b2','1'];
     
-    displayOrder.forEach(key => {
+    displayOrder.forEach((key, displayIdx) => {
         if (groups[key] && groups[key].length > 0) {
             // Create single box for entire group
             const groupBox = document.createElement('div');
@@ -99,8 +99,8 @@ function loadProgressions() {
             // Create container for all progressions in this group
             const progContainer = document.createElement('div');
             progContainer.className = 'progressions-in-group';
-            const encodedKey = encodeGroupKey(key);
-            progContainer.id = `group-${encodedKey}`;
+            progContainer.id = `group-${displayIdx}`;
+            progContainer.setAttribute('data-group-key', key);
             
             // Create ONE single box for all progressions in this group
             const groupContentBox = document.createElement('div');
@@ -110,7 +110,7 @@ function loadProgressions() {
             const customNames = JSON.parse(localStorage.getItem('groupCustomNames')) || {};
             const groupTitleText = customNames[key] || key;
             
-            let allContent = `<h2 class="group-title" id="group-title-${encodedKey}">${escapeHtml(groupTitleText)}</h2>`;
+            let allContent = `<h2 class="group-title" data-group-key="${key}">${escapeHtml(groupTitleText)}</h2>`;
             
             groups[key].forEach((prog, idx) => {
                 const contentLines = prog.content.split('\n');
@@ -137,7 +137,7 @@ function loadProgressions() {
             
             // Make group title clickable to edit name if owner mode
             if (isOwnerMode()) {
-                allContent = allContent.replace(`id="group-title-${encodedKey}">`, `id="group-title-${encodedKey}" style="cursor: pointer;" onclick="editGroupTitle('${key}')">`);
+                allContent = allContent.replace(`data-group-key="${key}">`, `data-group-key="${key}" style="cursor: pointer;" onclick="editGroupTitle('${key}')">`);
             }
             
             groupContentBox.innerHTML = allContent;
@@ -177,8 +177,7 @@ function startInlineEdit(index) {
     `;
     
     // Insert edit form before the group box
-    const encodedGroupKey = encodeGroupKey(groupKey);
-    const groupBox = document.querySelector(`[id="group-${encodedGroupKey}"]`).parentElement;
+    const groupBox = document.querySelector(`[data-group-key="${groupKey}"]`).closest('.group-box');
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = editHtml;
     groupBox.parentElement.insertBefore(tempDiv.firstElementChild, groupBox);
@@ -220,8 +219,7 @@ function startGroupEdit(groupKey) {
     if (!isOwnerMode()) return;
     
     const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
-    const encodedKey = encodeGroupKey(groupKey);
-    const progContainer = document.getElementById(`group-${encodedKey}`);
+    const progContainer = document.querySelector(`[data-group-key="${groupKey}"]`).closest('.progressions-in-group');
     
     // Filter progressions that belong to this group
     const groupProgresses = progs.filter(p => {
