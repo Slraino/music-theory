@@ -312,12 +312,32 @@ main {
 .group-content-container::-webkit-scrollbar-thumb {
     background: transparent;
     border-radius: 4px;
-    transition: background 2s ease;
 }
 
 .group-content-container.scrolling::-webkit-scrollbar-thumb {
-    background: #DC143C;
-    background: rgba(220, 20, 60, 0.8);
+    animation: scrollbarFadeIn 0.3s ease forwards;
+}
+
+.group-content-container:not(.scrolling)::-webkit-scrollbar-thumb {
+    animation: scrollbarFadeOut 2s ease forwards;
+}
+
+@keyframes scrollbarFadeIn {
+    from {
+        background: transparent;
+    }
+    to {
+        background: rgba(220, 20, 60, 0.8);
+    }
+}
+
+@keyframes scrollbarFadeOut {
+    from {
+        background: rgba(220, 20, 60, 0.8);
+    }
+    to {
+        background: transparent;
+    }
 }
 
 .group-content-container.collapsed {
