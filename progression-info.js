@@ -34,14 +34,18 @@ function startDetailEdit() {
     if (!isOwnerMode()) return;
     
     const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    const detailContent = progressionDetails[currentLineTitle] || '';
+    const detailData = progressionDetails[currentLineTitle] || { theory: '', music: '' };
     
     document.getElementById('detailContent').innerHTML = `
         <div class="detail-box">
             <div class="detail-edit-form">
                 <div class="progression-edit-row">
-                    <label for="edit-detail-content" style="display: block; margin-bottom: 8px; color: #b0b0b0;">Edit content (use <strong>**text**</strong> to style words):</label>
-                    <textarea class="detail-edit-content" id="edit-detail-content" style="min-height: 300px;">${escapeHtml(detailContent)}</textarea>
+                    <label style="display: block; margin-bottom: 8px; color: #b0b0b0;"><strong>Theory</strong> (use <strong>**text**</strong> to style):</label>
+                    <textarea class="detail-edit-theory" style="min-height: 200px;">${escapeHtml(detailData.theory || '')}</textarea>
+                </div>
+                <div class="progression-edit-row">
+                    <label style="display: block; margin-bottom: 8px; margin-top: 15px; color: #b0b0b0;"><strong>Music</strong> (use <strong>**text**</strong> to style):</label>
+                    <textarea class="detail-edit-music" style="min-height: 200px;">${escapeHtml(detailData.music || '')}</textarea>
                 </div>
                 <div class="detail-edit-controls">
                     <button class="detail-save-btn" onclick="saveDetailEdit()">Save</button>
@@ -55,16 +59,12 @@ function startDetailEdit() {
 
 // Save detail edit
 function saveDetailEdit() {
-    const content = document.getElementById('edit-detail-content').value.trim();
-    
-    console.log('Saving with lineTitle:', currentLineTitle); // Debug
-    console.log('Content:', content); // Debug
+    const theory = document.querySelector('.detail-edit-theory').value.trim();
+    const music = document.querySelector('.detail-edit-music').value.trim();
     
     const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    progressionDetails[currentLineTitle] = content;
+    progressionDetails[currentLineTitle] = { theory, music };
     localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
-    
-    console.log('Saved progressionDetails:', progressionDetails); // Debug
     
     loadDetailView();
 }
@@ -104,29 +104,44 @@ function loadDetailView() {
     
     // Get detail content keyed by line title
     const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    const detailContent = progressionDetails[currentLineTitle] || '';
+    const detailData = progressionDetails[currentLineTitle] || { theory: '', music: '' };
     
-    console.log('Loading detail for:', currentLineTitle); // Debug
-    console.log('All progressionDetails:', progressionDetails); // Debug
-    console.log('Retrieved detailContent:', detailContent); // Debug
+    let theoryHtml = '';
+    let musicHtml = '';
     
-    let sectionsHtml = '';
-    if (detailContent) {
-        const contentLines = detailContent.split('\n').filter(l => l.trim());
-        contentLines.forEach((line, idx) => {
-            // Escape first, then parse **text** for styled sections
+    // Process theory section
+    if (detailData.theory) {
+        const theoryLines = detailData.theory.split('\n').filter(l => l.trim());
+        theoryLines.forEach((line) => {
             const escapedLine = escapeHtml(line);
             const styledLine = escapedLine.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
-            sectionsHtml += `<p class="detail-line">${styledLine}</p>`;
+            theoryHtml += `<p class="detail-line">${styledLine}</p>`;
         });
     } else {
-        sectionsHtml = '<p style="color: #888;">No details yet. Click edit to add content.</p>';
+        theoryHtml = '<p style="color: #888;">No theory content yet.</p>';
+    }
+    
+    // Process music section
+    if (detailData.music) {
+        const musicLines = detailData.music.split('\n').filter(l => l.trim());
+        musicLines.forEach((line) => {
+            const escapedLine = escapeHtml(line);
+            const styledLine = escapedLine.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
+            musicHtml += `<p class="detail-line">${styledLine}</p>`;
+        });
+    } else {
+        musicHtml = '<p style="color: #888;">No music content yet.</p>';
     }
     
     document.getElementById('detailContent').innerHTML = `
         <div class="detail-box">
+            <div class="section-title">● Theory</div>
             <div class="detail-body">
-                ${sectionsHtml}
+                ${theoryHtml}
+            </div>
+            <div class="section-title">● Music</div>
+            <div class="detail-body">
+                ${musicHtml}
             </div>
         </div>
     `;
