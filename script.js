@@ -190,7 +190,8 @@ function startGroupEdit(groupKey) {
     if (!isOwnerMode()) return;
     
     const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
-    const progContainer = document.querySelector(`[data-group-key="${groupKey}"]`).closest('.progressions-in-group');
+    const contentContainer = document.getElementById(`group-content-${groupKey}`);
+    const progContainer = contentContainer.querySelector('.group-content-box');
     
     // Filter progressions that belong to this group
     const groupProgresses = progs.filter(p => {
