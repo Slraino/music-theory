@@ -55,6 +55,14 @@ function loadProgressions() {
     const list = document.getElementById('progressionsList');
     list.innerHTML = '';
     
+    // Add reset button at the top if owner mode
+    if (isOwnerMode()) {
+        const resetBtn = document.createElement('div');
+        resetBtn.style.marginBottom = '20px';
+        resetBtn.innerHTML = `<button onclick="resetToDefaults()" style="padding: 8px 12px; background: #d32f2f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em;">Reset to Defaults</button>`;
+        list.appendChild(resetBtn);
+    }
+    
     // Group progressions by first character(s)
     const groups = {};
     progs.forEach((prog, idx) => {
@@ -143,6 +151,17 @@ function deleteProgression(index) {
         const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
         progs.splice(index, 1);
         localStorage.setItem('musicProgressions', JSON.stringify(progs));
+        loadProgressions();
+    }
+}
+
+// Reset all progressions to defaults
+function resetToDefaults() {
+    if (!isOwnerMode()) return;
+    
+    if (confirm('Are you sure? This will restore all progressions to defaults and erase any edits.')) {
+        localStorage.removeItem('musicProgressions');
+        localStorage.removeItem('groupCustomNames');
         loadProgressions();
     }
 }
