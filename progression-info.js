@@ -106,6 +106,10 @@ function loadDetailView() {
     const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
     const detailContent = progressionDetails[currentLineTitle] || '';
     
+    console.log('Loading detail for:', currentLineTitle); // Debug
+    console.log('All progressionDetails:', progressionDetails); // Debug
+    console.log('Retrieved detailContent:', detailContent); // Debug
+    
     let sectionsHtml = '';
     if (detailContent) {
         const contentLines = detailContent.split('\n').filter(l => l.trim());
