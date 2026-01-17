@@ -1265,3 +1265,51 @@ footer {
         padding: 20px;
     }
 }
+/* Theory Edit Modal */
+.theory-edit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.theory-edit-modal-content {
+    background: #1a1a1a;
+    border: 2px solid #DC143C;
+    border-radius: 8px;
+    padding: 30px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(220, 20, 60, 0.3);
+}
+
+.theory-edit-modal-content h2 {
+    color: #DC143C;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.theory-edit-form {
+    margin-bottom: 20px;
+}
+
+.theory-edit-form label {
+    display: block;
+    color: #d0d0d0;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.theory-edit-modal-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}

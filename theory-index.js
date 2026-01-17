@@ -24,59 +24,59 @@ function startEditTheory(key) {
         ? { theory: progressionDetails[key], music: '' } 
         : (progressionDetails[key] || { theory: '', music: '' });
     
-    // Split title and content
-    const lines = theoryData.theory.split('\n');
-    const title = lines[0] || 'Untitled';
-    const content = lines.slice(1).join('\n');
-    
-    const card = document.querySelector(`[data-theory-key="${key}"]`);
-    card.innerHTML = `
-        <div class="theory-card-left">
-            <input class="theory-edit-title" type="text" value="${escapeHtml(title)}" style="width: 100%; border: 1px solid rgba(220, 20, 60, 0.3); background: rgba(40, 40, 40, 0.9); color: #DC143C; padding: 5px; border-radius: 3px; font-weight: bold; font-size: 1.1em;">
-        </div>
-        <div class="theory-card-right">
-            <div class="theory-card-edit">
-                <div class="theory-edit-row">
-                    <textarea class="theory-edit-theory" placeholder="Content" style="min-height: 150px; width: 100%;">${escapeHtml(content)}</textarea>
-                </div>
-                <div class="theory-edit-controls">
-                    <button class="theory-save-btn" onclick="saveTheory('${key}')">Save</button>
-                    <button class="theory-cancel-btn" onclick="cancelEditTheory('${key}')">Cancel</button>
-                    <button class="theory-delete-btn" onclick="deleteTheory('${key}')">Delete</button>
-                </div>
+    // Show edit modal
+    const modal = document.createElement('div');
+    modal.id = `theory-edit-modal-${key}`;
+    modal.className = 'theory-edit-modal';
+    modal.innerHTML = `
+        <div class="theory-edit-modal-content">
+            <h2>Edit Theory</h2>
+            <div class="theory-edit-form">
+                <label>Content (format: Title on first line, then use "- Subtitle" for subtitles):</label>
+                <textarea id="theory-edit-textarea-${key}" style="width: 100%; min-height: 300px; padding: 10px; border: 1px solid #DC143C; background: #2d2d2d; color: #e0e0e0; border-radius: 3px; font-family: Poppins, sans-serif;">${escapeHtml(theoryData.theory)}</textarea>
+            </div>
+            <div class="theory-edit-modal-controls">
+                <button class="theory-save-btn" onclick="saveTheoryModal('${key}')">Save</button>
+                <button class="theory-cancel-btn" onclick="cancelEditTheoryModal('${key}')">Cancel</button>
+                <button class="theory-delete-btn" onclick="deleteTheoryModal('${key}')">Delete</button>
             </div>
         </div>
     `;
+    
+    document.body.appendChild(modal);
 }
 
-// Save theory edits
-function saveTheory(key) {
-    const title = document.querySelector(`[data-theory-key="${key}"] .theory-edit-title`).value.trim();
-    const content = document.querySelector(`[data-theory-key="${key}"] .theory-edit-theory`).value.trim();
-    
-    // Combine title and content: title on first line, then content
-    const fullTheory = content ? `${title}\n${content}` : title;
+// Save theory from modal
+function saveTheoryModal(key) {
+    const content = document.getElementById(`theory-edit-textarea-${key}`).value.trim();
     
     const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    progressionDetails[key] = { theory: fullTheory, music: '' };
+    progressionDetails[key] = { theory: content, music: '' };
     localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
+    
+    const modal = document.getElementById(`theory-edit-modal-${key}`);
+    if (modal) modal.remove();
     
     loadTheories();
 }
 
-// Cancel theory edit
-function cancelEditTheory(key) {
-    loadTheories();
+// Cancel theory edit from modal
+function cancelEditTheoryModal(key) {
+    const modal = document.getElementById(`theory-edit-modal-${key}`);
+    if (modal) modal.remove();
 }
 
-// Delete theory
-function deleteTheory(key) {
+// Delete theory from modal
+function deleteTheoryModal(key) {
     if (!isOwnerMode()) return;
     if (!confirm('Are you sure you want to delete this theory?')) return;
     
     const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
     delete progressionDetails[key];
     localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
+    
+    const modal = document.getElementById(`theory-edit-modal-${key}`);
+    if (modal) modal.remove();
     
     loadTheories();
 }
