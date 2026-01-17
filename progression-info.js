@@ -90,7 +90,6 @@ function deleteDetailProgression() {
 function loadDetailView() {
     const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     const prog = progs[currentProgId];
-    const sectionLabels = ['Skill', 'Song'];
     
     // Update the header title with the clicked line content
     const params = new URLSearchParams(window.location.search);
@@ -106,24 +105,14 @@ function loadDetailView() {
         controlsDiv.innerHTML = '';
     }
     
-    // Organize content lines with Skill and Song titles
+    // Organize content lines
     const contentLines = prog.content.split('\n').filter(l => l.trim());
     
     let sectionsHtml = '';
     
-    // Add Skill and Song labels for all lines
+    // Display all lines without labels
     contentLines.forEach((line, idx) => {
-        const label = idx < sectionLabels.length ? sectionLabels[idx] : null;
-        if (label) {
-            sectionsHtml += `
-                <div class="detail-section">
-                    <h3 class="section-label">${label}</h3>
-                    <p class="detail-line">${escapeHtml(line)}</p>
-                </div>
-            `;
-        } else {
-            sectionsHtml += `<p class="detail-line">${escapeHtml(line)}</p>`;
-        }
+        sectionsHtml += `<p class="detail-line">${escapeHtml(line)}</p>`;
     });
     
     document.getElementById('detailContent').innerHTML = `
