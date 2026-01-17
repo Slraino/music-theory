@@ -88,10 +88,8 @@ function loadDetailView() {
     const params = new URLSearchParams(window.location.search);
     const content = params.get('content');
     const mainTitle = content || (prog.title || 'Unknown');
-    const titleElement = document.getElementById('progressionTitle');
-    titleElement.textContent = escapeHtml(mainTitle);
-    titleElement.style.cursor = 'pointer';
-    titleElement.onclick = () => window.location.href = 'index.html';
+    document.getElementById('progressionTitle').textContent = escapeHtml(mainTitle);
+    document.getElementById('progressionTitle').style.cursor = 'pointer';
     
     // Show edit button only in owner mode
     const controlsDiv = document.getElementById('detailControls');
