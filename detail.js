@@ -87,7 +87,7 @@ function loadDetailView() {
     // Show edit button only in owner mode
     const controlsDiv = document.getElementById('detailControls');
     if (isOwnerMode()) {
-        controlsDiv.innerHTML = `<button class="detail-edit-btn" onclick="startDetailEdit()">Edit</button>`;
+        controlsDiv.innerHTML = `<span class="edit-icon" onclick="startDetailEdit()" title="Edit">✏️</span>`;
     } else {
         controlsDiv.innerHTML = '';
     }

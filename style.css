@@ -631,6 +631,16 @@ main {
     text-align: right;
 }
 
+.edit-icon {
+    font-size: 2em;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.edit-icon:hover {
+    transform: scale(1.2);
+}
+
 .detail-edit-btn {
     background: linear-gradient(135deg, #00d4ff 0%, #00ff99 100%);
     color: #000;
