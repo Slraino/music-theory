@@ -176,7 +176,7 @@ main {
     font-size: 1em;
     font-weight: 900;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: 0px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -192,7 +192,6 @@ main {
 .group-title-box:hover {
     background: #00ffcc;
     transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 212, 255, 0.5);
 }
 
 .group-title-text {
