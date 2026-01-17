@@ -6,6 +6,28 @@ const STORAGE_KEYS = {
     PROGRESSION_DETAILS: 'progressionDetails'
 };
 
+// Migrate old content format to new two-section format
+function migrateOldContent() {
+    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
+    let needsSave = false;
+    
+    for (const key in progressionDetails) {
+        const item = progressionDetails[key];
+        // If it's a string (old format), convert to new object format
+        if (typeof item === 'string') {
+            progressionDetails[key] = {
+                theory: item,
+                music: ''
+            };
+            needsSave = true;
+        }
+    }
+    
+    if (needsSave) {
+        localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
+    }
+}
+
 // Config: enable edit UI only when viewing locally
 const EDIT_UI_ENABLED = (
     location.hostname === 'localhost' ||
@@ -149,11 +171,12 @@ function loadDetailView() {
 
 // Load progression detail
 window.addEventListener('DOMContentLoaded', () => {
+    // Migrate old content format if needed
+    migrateOldContent();
+    
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     let lineTitle = params.get('lineTitle');
-    
-    console.log('URL params:', { id, lineTitle }); // Debug
     
     if (id === null) {
         document.getElementById('detailContent').innerHTML = '<p>No progression selected.</p>';
@@ -162,7 +185,6 @@ window.addEventListener('DOMContentLoaded', () => {
     
     currentProgId = parseInt(id);
     currentLineTitle = lineTitle ? decodeURIComponent(lineTitle) : '';
-    console.log('Set currentLineTitle to:', currentLineTitle); // Debug
     const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     const prog = progs[currentProgId];
     
