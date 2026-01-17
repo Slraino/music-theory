@@ -102,41 +102,71 @@ function loadTheories() {
         return;
     }
     
-    let html = '';
-    theoriesWithContent.forEach(item => {
-        // Escape and parse the theory content
+    // Build title list on left
+    let titlesHtml = '';
+    theoriesWithContent.forEach((item, index) => {
         const lines = item.theory.split('\n').filter(l => l.trim());
         const firstLine = lines[0] || 'Untitled';
         
         let editBtn = '';
         if (isOwnerMode()) {
-            editBtn = `<button class="theory-edit-btn" onclick="startEditTheory('${item.key}')">✏️</button>`;
+            editBtn = `<button class="theory-title-edit-btn" onclick="startEditTheory('${item.key}')">✏️</button>`;
         }
         
+        const isFirst = index === 0 ? 'active' : '';
+        titlesHtml += `
+            <div class="theory-title-item ${isFirst}" data-theory-key="${item.key}" onmouseenter="switchTheoryContent('${item.key}')">
+                <span class="theory-title-text">${escapeHtml(firstLine)}</span>
+                ${editBtn}
+            </div>
+        `;
+    });
+    
+    // Build content data for JavaScript
+    let contentData = {};
+    theoriesWithContent.forEach(item => {
+        const lines = item.theory.split('\n').filter(l => l.trim());
         let contentHtml = '';
-        // Skip the first line (title) and only show the rest as content
         lines.slice(1).forEach(line => {
             const escapedLine = escapeHtml(line);
             const styledLine = escapedLine.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
             contentHtml += `<p class="theory-card-line">${styledLine}</p>`;
         });
-        
-        html += `
-            <div class="theory-card" data-theory-key="${item.key}">
-                <div class="theory-card-left">
-                    <div class="theory-card-title">${escapeHtml(firstLine)}</div>
-                    ${editBtn}
-                </div>
-                <div class="theory-card-right">
-                    <div class="theory-card-content">
-                        ${contentHtml}
-                    </div>
-                </div>
-            </div>
-        `;
+        contentData[item.key] = contentHtml;
     });
     
+    // Set initial content to first theory
+    const firstKey = theoriesWithContent[0].key;
+    
+    const html = `
+        <div class="theory-view-container">
+            <div class="theory-titles-left">
+                ${titlesHtml}
+            </div>
+            <div class="theory-content-right">
+                <div class="theory-content-display" id="theoryContentDisplay">
+                    ${contentData[firstKey]}
+                </div>
+            </div>
+        </div>
+    `;
+    
     theoryList.innerHTML = html;
+    window.theoryContentData = contentData;
+}
+
+// Switch content when hovering over titles
+function switchTheoryContent(key) {
+    const contentDisplay = document.getElementById('theoryContentDisplay');
+    if (window.theoryContentData && window.theoryContentData[key]) {
+        contentDisplay.innerHTML = window.theoryContentData[key];
+    }
+    
+    // Update active state
+    document.querySelectorAll('.theory-title-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.querySelector(`[data-theory-key="${key}"]`).classList.add('active');
 }
 
 // Helper function to prevent HTML injection

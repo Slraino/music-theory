@@ -977,6 +977,84 @@ footer {
     padding: 20px 0;
 }
 
+/* New layout for side-by-side view */
+.theory-view-container {
+    display: flex;
+    height: calc(100vh - 200px);
+    gap: 20px;
+}
+
+.theory-titles-left {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    overflow-y: auto;
+    gap: 8px;
+}
+
+.theory-title-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 15px;
+    background: #2d2d2d;
+    border-left: 4px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.theory-title-item:hover {
+    background: rgba(40, 40, 40, 0.9);
+    border-left-color: #DC143C;
+}
+
+.theory-title-item.active {
+    background: rgba(40, 40, 40, 0.9);
+    border-left-color: #DC143C;
+}
+
+.theory-title-text {
+    color: #DC143C;
+    font-weight: bold;
+    font-size: 0.95em;
+    word-wrap: break-word;
+    flex: 1;
+}
+
+.theory-content-right {
+    flex: 1;
+    background: #2d2d2d;
+    border-radius: 5px;
+    padding: 20px;
+    border-left: 4px solid #DC143C;
+    overflow-y: auto;
+}
+
+.theory-content-display {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.theory-title-edit-btn {
+    background: #ffc107;
+    color: #000;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: filter 0.2s ease;
+    white-space: nowrap;
+    margin-left: 10px;
+}
+
+.theory-title-edit-btn:hover {
+    filter: brightness(0.9);
+}
+
 .theory-card {
     background: rgba(30, 30, 30, 0.8);
     border-left: 4px solid #DC143C;
