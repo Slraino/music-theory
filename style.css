@@ -312,7 +312,7 @@ main {
 }
 
 .group-content-container::-webkit-scrollbar-thumb {
-    background: rgba(220, 20, 60, 0.1);
+    background: rgba(220, 20, 60, 0);
     border-radius: 3px;
 }
 
