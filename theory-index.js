@@ -180,7 +180,6 @@ function loadTheories() {
                 </div>
             `;
         });
-        });
         
         titlesHtml += `</div>`;
     });
