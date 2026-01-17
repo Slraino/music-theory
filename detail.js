@@ -88,7 +88,7 @@ function loadDetailView() {
     const params = new URLSearchParams(window.location.search);
     const content = params.get('content');
     const mainTitle = content || (prog.title || 'Unknown');
-    document.getElementById('progressionTitle').textContent = '🎵 ' + escapeHtml(mainTitle);
+    document.getElementById('progressionTitle').textContent = escapeHtml(mainTitle);
     
     // Show edit button only in owner mode
     const controlsDiv = document.getElementById('detailControls');
