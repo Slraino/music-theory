@@ -135,16 +135,16 @@ main {
 }
 
 .progressions-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, 50px);
-    grid-auto-flow: column;
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
     align-items: flex-start;
-    overflow-x: auto;
+    justify-content: flex-start;
+    overflow-x: visible;
     overflow-y: visible;
-    padding-bottom: 0px;
+    padding-bottom: 20px;
     line-height: 0;
-    scrollbar-width: none;
+    width: 100%;
 }
 
 .progressions-list::-webkit-scrollbar {
@@ -277,7 +277,8 @@ main {
     opacity: 1;
     margin-top: 15px;
     width: 100%;
-    grid-column: 1 / -1;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .group-content-container.collapsed {

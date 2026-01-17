@@ -17,9 +17,20 @@ function isOwnerMode() {
     return EDIT_UI_ENABLED;
 }
 
-// Toggle group content visibility
+// Toggle group content visibility (accordion - only one open at a time)
 function toggleGroupContent(key) {
     console.log('Toggle clicked for key:', key);
+    
+    // Close all other content containers
+    const allContainers = document.querySelectorAll('.group-content-container');
+    allContainers.forEach(container => {
+        if (container.id !== `group-content-${key}`) {
+            container.classList.add('collapsed');
+            console.log('Collapsed other:', container.id);
+        }
+    });
+    
+    // Toggle current container
     const contentContainer = document.getElementById(`group-content-${key}`);
     console.log('Container found:', contentContainer);
     
