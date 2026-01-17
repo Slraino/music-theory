@@ -185,9 +185,6 @@ function loadProgressions() {
     
     list.appendChild(boxesWrapper);
     list.appendChild(contentWrapper);
-    
-    // Setup scroll fade effect for all content containers
-    setupScrollFadeEffect();
 }
 
 // Group edit mode
@@ -348,6 +345,25 @@ function editSiteDescription() {
 }
 // Setup scroll fade effect for content containers
 function setupScrollFadeEffect() {
+    const contentContainers = document.querySelectorAll('.group-content-container');
+    
+    contentContainers.forEach((container) => {
+        let scrollTimeout;
+        
+        container.addEventListener('scroll', () => {
+            // Add scrolling class to show scrollbar
+            container.classList.add('scrolling');
+            
+            // Clear existing timeout
+            clearTimeout(scrollTimeout);
+            
+            // Set timeout to remove scrolling class after 4 seconds
+            scrollTimeout = setTimeout(() => {
+                container.classList.remove('scrolling');
+            }, 4000);
+        });
+    });
+}
     const contentContainers = document.querySelectorAll('.group-content-container');
     
     contentContainers.forEach((container) => {
