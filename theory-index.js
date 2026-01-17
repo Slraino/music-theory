@@ -124,9 +124,6 @@ function loadTheories() {
         
         html += `
                 </div>
-                <div class="theory-card-footer">
-                    <a href="progression-info.html?lineTitle=${encodeURIComponent(item.key)}" class="theory-card-link">View Full →</a>
-                </div>
             </div>
         `;
     });
