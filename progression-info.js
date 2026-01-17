@@ -1,3 +1,10 @@
+// LocalStorage keys
+const STORAGE_KEYS = {
+    PROGRESSIONS: 'musicProgressions',
+    GROUP_NAMES: 'groupCustomNames',
+    SITE_DESCRIPTION: 'siteDescription'
+};
+
 // Config: enable edit UI only when viewing locally
 const EDIT_UI_ENABLED = (
     location.hostname === 'localhost' ||
@@ -52,9 +59,9 @@ function saveDetailEdit() {
         return;
     }
     
-    const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
+    const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     progs[currentProgId] = { title, content };
-    localStorage.setItem('musicProgressions', JSON.stringify(progs));
+    localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(progs));
     
     loadDetailView();
 }
@@ -69,9 +76,9 @@ function deleteDetailProgression() {
     if (!isOwnerMode()) return;
     
     if (confirm('Are you sure you want to delete this progression?')) {
-        const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
+        const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
         progs.splice(currentProgId, 1);
-        localStorage.setItem('musicProgressions', JSON.stringify(progs));
+        localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(progs));
         
         // Return to main page
         window.location.href = 'index.html';
@@ -80,7 +87,7 @@ function deleteDetailProgression() {
 
 // Load and display progression detail
 function loadDetailView() {
-    const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
+    const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     const prog = progs[currentProgId];
     const sectionLabels = ['Skill', 'Song'];
     
@@ -139,7 +146,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     
     currentProgId = parseInt(id);
-    const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
+    const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     const prog = progs[currentProgId];
     
     if (!prog) {

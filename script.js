@@ -5,6 +5,13 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// LocalStorage keys
+const STORAGE_KEYS = {
+    PROGRESSIONS: 'musicProgressions',
+    GROUP_NAMES: 'groupCustomNames',
+    SITE_DESCRIPTION: 'siteDescription'
+};
+
 // Config: enable edit UI only when viewing locally
 const EDIT_UI_ENABLED = (
     location.hostname === 'localhost' ||
@@ -49,7 +56,7 @@ function toggleGroupContent(key) {
 
 // Initialize progressions if empty
 function initializeProgressions() {
-    let progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
+    let progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     if (progs.length === 0) {
         progs = [
             { title: '1 2 4 6', content: '1 - 2 - 4 - 6m' },
@@ -71,14 +78,14 @@ function initializeProgressions() {
             { title: '2 5 1', content: '2m - 5 - 1' },
             { title: '1 3 6 5', content: '1 - 3m - 6m - 5' }
         ];
-        localStorage.setItem('musicProgressions', JSON.stringify(progs));
+        localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(progs));
     }
     return progs;
 }
 
 function loadProgressions() {
     initializeProgressions();
-    const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
+    const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     const list = document.getElementById('progressionsList');
     list.innerHTML = '';
     
@@ -117,7 +124,7 @@ function loadProgressions() {
             groupBox.className = 'group-box';
             
             // Create clickable title box
-            const customNames = JSON.parse(localStorage.getItem('groupCustomNames')) || {};
+            const customNames = JSON.parse(localStorage.getItem(STORAGE_KEYS.GROUP_NAMES)) || {};
             const groupTitleText = customNames[key] || key;
             
             const titleBox = document.createElement('div');
@@ -188,7 +195,7 @@ function loadProgressions() {
 function startGroupEdit(groupKey) {
     if (!isOwnerMode()) return;
     
-    const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
+    const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     const contentContainer = document.getElementById(`group-content-${groupKey}`);
     const progContainer = contentContainer.querySelector('.group-content-box');
     
@@ -200,7 +207,7 @@ function startGroupEdit(groupKey) {
         return isSingleChar || isTwoChar;
     });
     
-    const customNames = JSON.parse(localStorage.getItem('groupCustomNames')) || {};
+    const customNames = JSON.parse(localStorage.getItem(STORAGE_KEYS.GROUP_NAMES)) || {};
     const currentGroupName = customNames[groupKey] || groupKey;
     
     // Combine all progressions into one text with original indices for tracking
@@ -232,8 +239,8 @@ function startGroupEdit(groupKey) {
 }
 
 function saveGroupEditCombined(groupKey) {
-    const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
-    const customNames = JSON.parse(localStorage.getItem('groupCustomNames')) || {};
+    const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
+    const customNames = JSON.parse(localStorage.getItem(STORAGE_KEYS.GROUP_NAMES)) || {};
     
     // Save group name if changed
     const newGroupName = document.getElementById('group-name-edit').value.trim();
@@ -293,8 +300,8 @@ function saveGroupEditCombined(groupKey) {
         progs.push(prog);
     });
     
-    localStorage.setItem('musicProgressions', JSON.stringify(progs));
-    localStorage.setItem('groupCustomNames', JSON.stringify(customNames));
+    localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(progs));
+    localStorage.setItem(STORAGE_KEYS.GROUP_NAMES, JSON.stringify(customNames));
     loadProgressions();
 }
 
@@ -302,30 +309,9 @@ function cancelGroupEdit(groupKey) {
     loadProgressions();
 }
 
-// Edit group title
-function editGroupTitle(groupKey) {
-    if (!isOwnerMode()) return;
-    
-    const customNames = JSON.parse(localStorage.getItem('groupCustomNames')) || {};
-    const currentName = customNames[groupKey] || groupKey;
-    const newName = prompt(`Edit group name for "${currentName}" (leave blank to reset):`, currentName);
-    
-    if (newName !== null) {
-        if (newName.trim() === '') {
-            // Remove custom name to reset to default
-            delete customNames[groupKey];
-        } else {
-            // Save custom name
-            customNames[groupKey] = newName.trim();
-        }
-        localStorage.setItem('groupCustomNames', JSON.stringify(customNames));
-        loadProgressions();
-    }
-}
-
 // Show detail page for a progression
 function showDetail(index, lineIndex) {
-    const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
+    const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     const prog = progs[index];
     
     // Get the actual line content
@@ -354,7 +340,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // Load and display site description
 function loadSiteDescription() {
-    const savedDescription = localStorage.getItem('siteDescription') || 'Learn and explore chord progressions and music theory concepts.';
+    const savedDescription = localStorage.getItem(STORAGE_KEYS.SITE_DESCRIPTION) || 'Learn and explore chord progressions and music theory concepts.';
     document.getElementById('siteDescription').textContent = savedDescription;
     
     // Show edit button in owner mode
