@@ -1011,10 +1011,16 @@ footer {
 
 .theory-card-right {
     flex: 1;
-    padding: 15px 20px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    padding: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
 }
 
 .theory-card:hover .theory-card-right {
+    max-height: 500px;
+    opacity: 1;
     padding: 15px 20px;
 }
 
