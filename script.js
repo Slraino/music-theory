@@ -204,14 +204,13 @@ function startGroupEdit(groupKey) {
     const customNames = JSON.parse(localStorage.getItem(STORAGE_KEYS.GROUP_NAMES)) || {};
     const currentGroupName = customNames[groupKey] || groupKey;
     
-    // Combine all progressions into one text with original indices for tracking
+    // Combine all progressions into one text
     let combinedAllContent = '';
     groupProgresses.forEach((prog) => {
-        const origIndex = progs.indexOf(prog);
-        combinedAllContent += prog.title + '\n' + prog.content + '\n---\n';
+        combinedAllContent += prog.content + '\n\n';
     });
-    combinedAllContent = combinedAllContent.slice(0, -4); // Remove last \n---\n
-    
+    combinedAllContent = combinedAllContent.trim();
+
     let html = `
         <div class="group-edit-form">
             <div class="group-name-edit">
@@ -219,8 +218,8 @@ function startGroupEdit(groupKey) {
                 <input type="text" id="group-name-edit" value="${escapeHtml(currentGroupName)}" placeholder="Group name" />
             </div>
             <div class="progression-edit-row">
-                <label style="display: block; margin-bottom: 8px; color: #b0b0b0;">Edit all progressions (put --- on its own line to separate each):</label>
-                <textarea class="group-edit-combined" id="group-content-all" placeholder="Title\nContent\n---\nTitle\nContent" style="min-height: 300px;">${escapeHtml(combinedAllContent)}</textarea>
+                <label style="display: block; margin-bottom: 8px; color: #b0b0b0;">Edit content (use <strong>**text**</strong> to style words as titles):</label>
+                <textarea class="group-edit-combined" id="group-content-all" placeholder="Enter your content here...&#10;Use **text** to make styled titles" style="min-height: 300px;">${escapeHtml(combinedAllContent)}</textarea>
             </div>
         </div>
         <div class="group-edit-controls">
@@ -244,38 +243,19 @@ function saveGroupEditCombined(groupKey) {
         delete customNames[groupKey];
     }
     
-    // Get the combined text
-    const combinedText = document.getElementById('group-content-all').value.trim();
-    if (!combinedText) {
-        alert('Please enter at least one progression!');
+    // Get the content
+    const content = document.getElementById('group-content-all').value.trim();
+    if (!content) {
+        alert('Please enter content!');
         return;
     }
     
-    // Split by --- on its own line to get individual progressions
-    const progressionBlocks = combinedText.split(/\n---\n/).map(block => block.trim()).filter(block => block);
-    let newProgressions = [];
-    
-    progressionBlocks.forEach((block) => {
-        const lines = block.split('\n').map(l => l.trim()).filter(l => l);
-        
-        if (lines.length === 0) return; // Skip empty blocks
-        
-        if (lines.length === 1) {
-            // Single line = content only (no title)
-            const content = lines[0];
-            newProgressions.push({ title: content, content: content, displayTitle: '' });
-        } else {
-            // Multiple lines = first is title, rest is content
-            const title = lines[0];
-            const content = lines.slice(1).join('\n');
-            newProgressions.push({ title, content, displayTitle: title });
-        }
-    });
-    
-    if (newProgressions.length === 0) {
-        alert('Please enter at least one valid progression (Title and Content)!');
-        return;
-    }
+    // Create a single progression object with the group key as title
+    const newProgressions = [{
+        title: groupKey,
+        content: content,
+        displayTitle: ''
+    }];
     
     // Remove all progressions in this group from progs array
     for (let i = progs.length - 1; i >= 0; i--) {
