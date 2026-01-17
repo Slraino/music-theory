@@ -40,7 +40,7 @@ function startDetailEdit() {
         <div class="detail-box">
             <div class="detail-edit-form">
                 <div class="progression-edit-row">
-                    <label style="display: block; margin-bottom: 8px; color: #b0b0b0;">Edit content (use <strong>**text**</strong> to style words):</label>
+                    <label for="edit-detail-content" style="display: block; margin-bottom: 8px; color: #b0b0b0;">Edit content (use <strong>**text**</strong> to style words):</label>
                     <textarea class="detail-edit-content" id="edit-detail-content" style="min-height: 300px;">${escapeHtml(detailContent)}</textarea>
                 </div>
                 <div class="detail-edit-controls">
