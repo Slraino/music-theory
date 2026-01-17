@@ -336,5 +336,10 @@ function showDetail(index, lineIndex) {
     window.location.href = detailUrl;
 }
 
-// Load progressions when page starts
-window.addEventListener('DOMContentLoaded', loadProgressions);
+// Load progressions when page starts (only on chord-progressions page)
+window.addEventListener('DOMContentLoaded', () => {
+    // Only load progressions if the progressionsList element exists
+    if (document.getElementById('progressionsList')) {
+        loadProgressions();
+    }
+});
