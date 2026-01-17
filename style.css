@@ -312,12 +312,10 @@ main {
 .group-content-container::-webkit-scrollbar-thumb {
     background: rgba(220, 20, 60, 0.15);
     border-radius: 4px;
-    transition: background-color 1s ease;
 }
 
 .group-content-container.scrolling::-webkit-scrollbar-thumb {
     background: rgba(220, 20, 60, 0.8);
-    transition: background-color 0.2s ease;
 }
 
 .group-content-container.collapsed {
