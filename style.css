@@ -291,7 +291,7 @@ main {
     background: rgba(26, 26, 26, 0.95);
     border-radius: 8px;
     overflow: hidden;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.5s ease;
     max-height: 600px;
     opacity: 1;
     width: 100%;
