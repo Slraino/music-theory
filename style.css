@@ -1029,12 +1029,12 @@ footer {
 
 .theory-subtitle-item:hover {
     background: rgba(40, 40, 40, 0.9);
-    border-left-color: #00d4ff;
+    border-left-color: #DC143C;
 }
 
 .theory-subtitle-item.active {
     background: rgba(40, 40, 40, 0.9);
-    border-left-color: #00d4ff;
+    border-left-color: #DC143C;
 }
 
 .theory-subtitle-text {
