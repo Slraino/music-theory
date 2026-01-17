@@ -148,6 +148,7 @@ main {
     flex-wrap: nowrap;
     gap: 20px;
     align-items: center;
+    justify-content: center;
     overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 10px;
