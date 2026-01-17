@@ -75,25 +75,43 @@ function loadProgressions() {
     
     displayOrder.forEach((key, displayIdx) => {
         if (groups[key] && groups[key].length > 0) {
-            // Create single box for entire group
+            // Create group box container
             const groupBox = document.createElement('div');
             groupBox.className = 'group-box';
             
-            // Create container for all progressions in this group
-            const progContainer = document.createElement('div');
-            progContainer.className = 'progressions-in-group';
-            progContainer.id = `group-${displayIdx}`;
-            progContainer.setAttribute('data-group-key', key);
-            
-            // Create ONE single box for all progressions in this group
-            const groupContentBox = document.createElement('div');
-            groupContentBox.className = 'group-content-box';
-            
-            // Add group title at the top of content box
+            // Create clickable title box
             const customNames = JSON.parse(localStorage.getItem('groupCustomNames')) || {};
             const groupTitleText = customNames[key] || key;
             
-            let allContent = `<h2 class="group-title" data-group-key="${key}">${escapeHtml(groupTitleText)}</h2>`;
+            const titleBox = document.createElement('div');
+            titleBox.className = 'group-title-box';
+            titleBox.setAttribute('data-group-key', key);
+            titleBox.onclick = () => toggleGroupContent(key);
+            titleBox.innerHTML = `
+                <span class="group-title-text">${escapeHtml(groupTitleText)}</span>
+                <span class="group-toggle-icon">▼</span>
+            `;
+            
+            // Make title editable if owner mode
+            if (isOwnerMode()) {
+                titleBox.style.cursor = 'pointer';
+                const titleSpan = titleBox.querySelector('.group-title-text');
+                const originalOnclick = titleBox.onclick;
+                titleBox.ondblclick = () => editGroupTitle(key);
+            }
+            
+            // Create collapsible content container
+            const contentContainer = document.createElement('div');
+            contentContainer.className = 'group-content-container';
+            contentContainer.id = `group-content-${key}`;
+            contentContainer.setAttribute('data-group-key', key);
+            contentContainer.style.display = 'block';
+            
+            // Add all progressions to content
+            const groupContentBox = document.createElement('div');
+            groupContentBox.className = 'group-content-box';
+            
+            let allContent = '';
             
             groups[key].forEach((prog, idx) => {
                 const contentLines = prog.content.split('\n').filter(l => l.trim());
@@ -121,15 +139,11 @@ function loadProgressions() {
                 allContent += `<div class="group-edit-container"><span class="edit-icon" onclick="startGroupEdit('${key}')" title="Edit">✏️</span></div>`;
             }
             
-            // Make group title clickable to edit name if owner mode
-            if (isOwnerMode()) {
-                allContent = allContent.replace(`data-group-key="${key}">`, `data-group-key="${key}" style="cursor: pointer;" onclick="editGroupTitle('${key}')">`);
-            }
-            
             groupContentBox.innerHTML = allContent;
-            progContainer.appendChild(groupContentBox);
+            contentContainer.appendChild(groupContentBox);
             
-            groupBox.appendChild(progContainer);
+            groupBox.appendChild(titleBox);
+            groupBox.appendChild(contentContainer);
             list.appendChild(groupBox);
         }
     });
@@ -290,7 +304,22 @@ function showDetail(index, lineIndex) {
 
 // Load progressions when page starts (only on chord-progressions page)
 window.addEventListener('DOMContentLoaded', () => {
-    // Load site description if on main page
+    // Toggle group content visibility
+function toggleGroupContent(key) {
+    const contentContainer = document.getElementById(`group-content-${key}`);
+    const titleBox = document.querySelector(`[data-group-key="${key}"].group-title-box`);
+    const toggleIcon = titleBox.querySelector('.group-toggle-icon');
+    
+    if (contentContainer.style.display === 'none') {
+        contentContainer.style.display = 'block';
+        toggleIcon.textContent = '▼';
+    } else {
+        contentContainer.style.display = 'none';
+        toggleIcon.textContent = '▶';
+    }
+}
+
+// Load site description if on main page
     if (document.getElementById('siteDescription')) {
         loadSiteDescription();
     }

@@ -150,12 +150,42 @@ main {
 }
 
 .group-box {
-    padding: 20px;
+    padding: 0;
     margin-bottom: 30px;
     border: 1px solid #00d4ff;
     background: #1a1a1a;
     border-radius: 5px;
     box-shadow: none;
+}
+
+.group-title-box {
+    background: #00d4ff;
+    color: #1a1a1a;
+    padding: 15px 20px;
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px 5px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+.group-title-box:hover {
+    background: #00ffcc;
+    filter: brightness(1.1);
+}
+
+.group-title-text {
+    flex: 1;
+}
+
+.group-toggle-icon {
+    font-size: 0.9em;
+    margin-left: 10px;
+    transition: transform 0.3s ease;
 }
 
 .group-title {
@@ -164,6 +194,14 @@ main {
     margin-bottom: 15px;
     border-bottom: none;
     padding-bottom: 10px;
+}
+
+.group-content-container {
+    background: transparent;
+    border: none;
+    border-top: 1px solid #00d4ff;
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
 .progressions-in-group {
@@ -176,16 +214,12 @@ main {
     padding: 0;
 }
 
-.progressions-in-group {
-    display: flex;
-    flex-direction: column;
-}
-
 .group-content-box {
     padding: 12px;
     display: flex;
     flex-direction: column;
     gap: 2px;
+    background: rgba(26, 26, 26, 0.7);
 }
 
 .prog-edit-btn-container {
