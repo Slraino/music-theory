@@ -59,24 +59,24 @@ function initializeProgressions() {
     let progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     if (progs.length === 0) {
         progs = [
-            { title: '1 2 4 6', content: '1 - 2 - 4 - 6m' },
-            { title: '1', content: '1' },
-            { title: 'b2', content: 'b2' },
-            { title: '2', content: '2' },
-            { title: 'b3', content: 'b3' },
-            { title: '3', content: '3' },
-            { title: '4', content: '4' },
-            { title: '#4', content: '#4' },
-            { title: '5', content: '5' },
-            { title: 'b6', content: 'b6' },
-            { title: '6', content: '6' },
-            { title: 'b7', content: 'b7' },
-            { title: '7', content: '7' },
-            { title: '6 4 5 1', content: '6m - 4 - 5 - 1\n6m - 4 - 5 - 1 - 5/7\n6m - 4 - 5 - 1 - 3/7' },
-            { title: '6 3 4 1', content: '6m - 3m - 4 - 5\n6m - 3m - 4 - 1' },
-            { title: '4 5 3 6', content: '4 - 5 - 3m - 6m' },
-            { title: '2 5 1', content: '2m - 5 - 1' },
-            { title: '1 3 6 5', content: '1 - 3m - 6m - 5' }
+            { title: '1 2 4 6', content: '1 - 2 - 4 - 6m', displayTitle: '' },
+            { title: '1', content: '1', displayTitle: '' },
+            { title: 'b2', content: 'b2', displayTitle: '' },
+            { title: '2', content: '2', displayTitle: '' },
+            { title: 'b3', content: 'b3', displayTitle: '' },
+            { title: '3', content: '3', displayTitle: '' },
+            { title: '4', content: '4', displayTitle: '' },
+            { title: '#4', content: '#4', displayTitle: '' },
+            { title: '5', content: '5', displayTitle: '' },
+            { title: 'b6', content: 'b6', displayTitle: '' },
+            { title: '6', content: '6', displayTitle: '' },
+            { title: 'b7', content: 'b7', displayTitle: '' },
+            { title: '7', content: '7', displayTitle: '' },
+            { title: '6 4 5 1', content: '**6m - 4 - 5 - 1**\n6m - 4 - 5 - 1 - 5/7\n6m - 4 - 5 - 1 - 3/7', displayTitle: '' },
+            { title: '6 3 4 1', content: '**6m - 3m - 4 - 5**\n6m - 3m - 4 - 1', displayTitle: '' },
+            { title: '4 5 3 6', content: '**4 - 5 - 3m - 6m**', displayTitle: '' },
+            { title: '2 5 1', content: '**2m - 5 - 1**', displayTitle: '' },
+            { title: '1 3 6 5', content: '**1 - 3m - 6m - 5**', displayTitle: '' }
         ];
         localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(progs));
     }
