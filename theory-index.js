@@ -24,15 +24,20 @@ function startEditTheory(key) {
         ? { theory: progressionDetails[key], music: '' } 
         : (progressionDetails[key] || { theory: '', music: '' });
     
+    // Split title and content
+    const lines = theoryData.theory.split('\n');
+    const title = lines[0] || 'Untitled';
+    const content = lines.slice(1).join('\n');
+    
     const card = document.querySelector(`[data-theory-key="${key}"]`);
     card.innerHTML = `
         <div class="theory-card-left">
-            <div class="theory-card-title">${escapeHtml((theoryData.theory.split('\n')[0] || 'Untitled'))}</div>
+            <input class="theory-edit-title" type="text" value="${escapeHtml(title)}" style="width: 100%; border: 1px solid rgba(220, 20, 60, 0.3); background: rgba(40, 40, 40, 0.9); color: #DC143C; padding: 5px; border-radius: 3px; font-weight: bold; font-size: 1.1em;">
         </div>
         <div class="theory-card-right">
             <div class="theory-card-edit">
                 <div class="theory-edit-row">
-                    <textarea class="theory-edit-theory" placeholder="Content" style="min-height: 150px; width: 100%;">${escapeHtml(theoryData.theory)}</textarea>
+                    <textarea class="theory-edit-theory" placeholder="Content" style="min-height: 150px; width: 100%;">${escapeHtml(content)}</textarea>
                 </div>
                 <div class="theory-edit-controls">
                     <button class="theory-save-btn" onclick="saveTheory('${key}')">Save</button>
@@ -46,10 +51,14 @@ function startEditTheory(key) {
 
 // Save theory edits
 function saveTheory(key) {
-    const theory = document.querySelector(`[data-theory-key="${key}"] .theory-edit-theory`).value.trim();
+    const title = document.querySelector(`[data-theory-key="${key}"] .theory-edit-title`).value.trim();
+    const content = document.querySelector(`[data-theory-key="${key}"] .theory-edit-theory`).value.trim();
+    
+    // Combine title and content: title on first line, then content
+    const fullTheory = content ? `${title}\n${content}` : title;
     
     const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    progressionDetails[key] = { theory, music: '' };
+    progressionDetails[key] = { theory: fullTheory, music: '' };
     localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
     
     loadTheories();
