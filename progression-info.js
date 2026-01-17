@@ -157,11 +157,9 @@ function loadDetailView() {
     
     document.getElementById('detailContent').innerHTML = `
         <div class="detail-box">
-            <div class="section-title">● Theory</div>
             <div class="detail-body">
                 ${theoryHtml}
             </div>
-            <div class="section-title">● Music</div>
             <div class="detail-body">
                 ${musicHtml}
             </div>
