@@ -130,7 +130,7 @@ function loadProgressions() {
             const titleBox = document.createElement('div');
             titleBox.className = 'group-title-box';
             titleBox.setAttribute('data-group-key', key);
-            titleBox.onclick = () => toggleGroupContent(key);
+            titleBox.onmouseenter = () => toggleGroupContent(key);
             titleBox.innerHTML = `
                 <span class="group-title-text">${escapeHtml(groupTitleText)}</span>
             `;
