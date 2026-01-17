@@ -322,7 +322,7 @@ main {
     padding: 25px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 3px;
     background: rgba(26, 26, 26, 0.95);
 }
 
