@@ -185,6 +185,9 @@ function loadProgressions() {
     
     list.appendChild(boxesWrapper);
     list.appendChild(contentWrapper);
+    
+    // Setup scroll fade effect for all content containers
+    setupScrollFadeEffect();
 }
 
 // Group edit mode
@@ -314,8 +317,6 @@ window.addEventListener('DOMContentLoaded', () => {
         if (group1Box) {
             group1Box.click();
         }
-        // Setup scroll fade effect
-        setupScrollFadeEffect();
     }
 });
 
