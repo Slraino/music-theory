@@ -310,12 +310,14 @@ main {
 }
 
 .group-content-container::-webkit-scrollbar-thumb {
-    background: rgba(220, 20, 60, 0.15);
+    background: rgba(220, 20, 60, 0.2);
     border-radius: 4px;
+    width: 4px;
 }
 
 .group-content-container.scrolling::-webkit-scrollbar-thumb {
     background: rgba(220, 20, 60, 0.8);
+    width: 8px;
 }
 
 .group-content-container.collapsed {

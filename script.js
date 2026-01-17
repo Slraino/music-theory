@@ -360,10 +360,10 @@ function setupScrollFadeEffect() {
             // Clear existing timeout
             clearTimeout(scrollTimeout);
             
-            // Set timeout to remove scrolling class after 3 seconds
+            // Set timeout to remove scrolling class after 4 seconds
             scrollTimeout = setTimeout(() => {
                 container.classList.remove('scrolling');
-            }, 3000);
+            }, 4000);
         });
     });
 }
