@@ -100,29 +100,26 @@ function loadTheories() {
         
         let editBtn = '';
         if (isOwnerMode()) {
-            editBtn = `<button class="theory-edit-btn" onclick="startEditTheory('${item.key}')">✏️ Edit</button>`;
+            editBtn = `<button class="theory-edit-btn" onclick="startEditTheory('${item.key}')">✏️</button>`;
         }
+        
+        let contentHtml = '';
+        lines.forEach(line => {
+            const escapedLine = escapeHtml(line);
+            const styledLine = escapedLine.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
+            contentHtml += `<p class="theory-card-line">${styledLine}</p>`;
+        });
         
         html += `
             <div class="theory-card" data-theory-key="${item.key}">
-                <div class="theory-card-header">
+                <div class="theory-card-left">
                     <div class="theory-card-title">${escapeHtml(firstLine)}</div>
                     ${editBtn}
                 </div>
-                <div class="theory-card-content">
-        `;
-        
-        lines.slice(0, 3).forEach(line => {
-            const escapedLine = escapeHtml(line);
-            const styledLine = escapedLine.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
-            html += `<p class="theory-card-line">${styledLine}</p>`;
-        });
-        
-        if (lines.length > 3) {
-            html += `<p style="color: #888; font-size: 0.9em; margin-top: 10px;">... and ${lines.length - 3} more line(s)</p>`;
-        }
-        
-        html += `
+                <div class="theory-card-right">
+                    <div class="theory-card-content">
+                        ${contentHtml}
+                    </div>
                 </div>
             </div>
         `;
