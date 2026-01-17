@@ -222,8 +222,6 @@ main {
 
 .group-title-box:hover {
     background: #00ffcc;
-    transform: scale(1.1) translateY(-3px);
-    box-shadow: 0 8px 16px rgba(0, 255, 204, 0.3);
 }
 
 /* Natural notes - white background, black text */
@@ -293,8 +291,7 @@ main {
     background: rgba(26, 26, 26, 0.95);
     border-radius: 8px;
     overflow: hidden;
-    transition: max-height 0.5s ease, 
-                opacity 0.5s ease;
+    transition: opacity 0.5s ease;
     max-height: 600px;
     opacity: 1;
     width: 100%;
