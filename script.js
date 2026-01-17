@@ -158,12 +158,6 @@ function loadProgressions() {
             groups[key].forEach((prog, idx) => {
                 const contentLines = prog.content.split('\n').filter(l => l.trim());
                 
-                // Add title if displayTitle is set
-                const displayTitle = prog.displayTitle !== undefined ? prog.displayTitle : prog.title;
-                if (displayTitle.trim()) {
-                    allContent += `<p class="progression-title-inline">${escapeHtml(displayTitle)}</p>`;
-                }
-                
                 contentLines.forEach((line, lineIdx) => {
                     // Parse **text** for styled sections
                     const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="styled-text">$1</span>');
