@@ -312,13 +312,12 @@ main {
 }
 
 .group-content-container::-webkit-scrollbar-thumb {
-    background: rgba(220, 20, 60, 0);
+    background: rgba(220, 20, 60, 0.1);
     border-radius: 3px;
-    transition: background 0.3s ease;
 }
 
 .group-content-container.scrolling::-webkit-scrollbar-thumb {
-    background: rgba(220, 20, 60, 0.6);
+    background: rgba(220, 20, 60, 0.7);
 }
 
 .group-content-container.collapsed {
