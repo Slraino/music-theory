@@ -82,6 +82,13 @@ function loadProgressions() {
     const list = document.getElementById('progressionsList');
     list.innerHTML = '';
     
+    // Create wrapper divs
+    const boxesWrapper = document.createElement('div');
+    boxesWrapper.className = 'boxes-wrapper';
+    
+    const contentWrapper = document.createElement('div');
+    contentWrapper.className = 'content-wrapper';
+    
     // Group progressions by first character(s)
     const groups = {};
     progs.forEach((prog, idx) => {
@@ -124,12 +131,13 @@ function loadProgressions() {
             // Make title editable if owner mode
             if (isOwnerMode()) {
                 titleBox.style.cursor = 'pointer';
-                const titleSpan = titleBox.querySelector('.group-title-text');
-                const originalOnclick = titleBox.onclick;
                 titleBox.ondblclick = () => editGroupTitle(key);
             }
             
-            // Create collapsible content container
+            groupBox.appendChild(titleBox);
+            boxesWrapper.appendChild(groupBox);
+            
+            // Create collapsible content container (add to contentWrapper)
             const contentContainer = document.createElement('div');
             contentContainer.className = 'group-content-container collapsed';
             contentContainer.id = `group-content-${key}`;
@@ -169,12 +177,12 @@ function loadProgressions() {
             
             groupContentBox.innerHTML = allContent;
             contentContainer.appendChild(groupContentBox);
-            
-            groupBox.appendChild(titleBox);
-            groupBox.appendChild(contentContainer);
-            list.appendChild(groupBox);
+            contentWrapper.appendChild(contentContainer);
         }
     });
+    
+    list.appendChild(boxesWrapper);
+    list.appendChild(contentWrapper);
 }
 
 // Group edit mode

@@ -138,6 +138,12 @@ main {
 
 .progressions-list {
     display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.boxes-wrapper {
+    display: flex;
     flex-wrap: nowrap;
     gap: 20px;
     align-items: flex-start;
@@ -147,6 +153,17 @@ main {
     line-height: 0;
     width: 100%;
     margin-bottom: 20px;
+}
+
+.boxes-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
 }
 
 .progressions-list::-webkit-scrollbar {
