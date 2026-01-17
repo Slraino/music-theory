@@ -284,7 +284,7 @@ function showDetail(index, lineIndex) {
     
     // Create detail page URL with progression data and line content
     const encodedContent = encodeURIComponent(lineContent);
-    const detailUrl = `detail.html?id=${index}&content=${encodedContent}`;
+    const detailUrl = `progression-info.html?id=${index}&content=${encodedContent}`;
     window.location.href = detailUrl;
 }
 
