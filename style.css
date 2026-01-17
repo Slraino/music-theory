@@ -298,13 +298,11 @@ main {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(220, 20, 60, 0.5) transparent;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .group-content-container::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
 }
 
 .group-content-container::-webkit-scrollbar-track {
@@ -312,12 +310,13 @@ main {
 }
 
 .group-content-container::-webkit-scrollbar-thumb {
-    background: rgba(220, 20, 60, 0);
-    border-radius: 3px;
+    background: transparent;
+    border-radius: 4px;
 }
 
 .group-content-container.scrolling::-webkit-scrollbar-thumb {
-    background: rgba(220, 20, 60, 0.7);
+    background: #DC143C;
+    background: rgba(220, 20, 60, 0.8);
 }
 
 .group-content-container.collapsed {
