@@ -89,7 +89,6 @@ function loadProgressions() {
             titleBox.onclick = () => toggleGroupContent(key);
             titleBox.innerHTML = `
                 <span class="group-title-text">${escapeHtml(groupTitleText)}</span>
-                <span class="group-toggle-icon">▶</span>
             `;
             
             // Make title editable if owner mode
@@ -306,15 +305,11 @@ window.addEventListener('DOMContentLoaded', () => {
     // Toggle group content visibility
 function toggleGroupContent(key) {
     const contentContainer = document.getElementById(`group-content-${key}`);
-    const titleBox = document.querySelector(`[data-group-key="${key}"].group-title-box`);
-    const toggleIcon = titleBox.querySelector('.group-toggle-icon');
     
     if (contentContainer.classList.contains('collapsed')) {
         contentContainer.classList.remove('collapsed');
-        toggleIcon.textContent = '▼';
     } else {
         contentContainer.classList.add('collapsed');
-        toggleIcon.textContent = '▶';
     }
 }
 
