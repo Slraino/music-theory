@@ -314,6 +314,8 @@ window.addEventListener('DOMContentLoaded', () => {
         if (group1Box) {
             group1Box.click();
         }
+        // Setup scroll fade effect
+        setupScrollFadeEffect();
     }
 });
 
@@ -342,4 +344,25 @@ function editSiteDescription() {
         localStorage.setItem('siteDescription', newDescription.trim());
         loadSiteDescription();
     }
+}
+// Setup scroll fade effect for content containers
+function setupScrollFadeEffect() {
+    const contentContainers = document.querySelectorAll('.group-content-container');
+    
+    contentContainers.forEach(container => {
+        let scrollTimeout;
+        
+        container.addEventListener('scroll', () => {
+            // Add scrolling class to show scrollbar
+            container.classList.add('scrolling');
+            
+            // Clear existing timeout
+            clearTimeout(scrollTimeout);
+            
+            // Set timeout to remove scrolling class after 1 second of no scrolling
+            scrollTimeout = setTimeout(() => {
+                container.classList.remove('scrolling');
+            }, 1000);
+        });
+    });
 }
