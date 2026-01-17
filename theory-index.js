@@ -28,11 +28,9 @@ function startEditTheory(key) {
     card.innerHTML = `
         <div class="theory-card-edit">
             <div class="theory-edit-row">
-                <label style="display: block; margin-bottom: 8px; color: #b0b0b0;"><strong>Theory</strong>:</label>
                 <textarea class="theory-edit-theory" style="min-height: 150px; width: 100%;">${escapeHtml(theoryData.theory)}</textarea>
             </div>
             <div class="theory-edit-row">
-                <label style="display: block; margin-bottom: 8px; margin-top: 12px; color: #b0b0b0;"><strong>Music</strong>:</label>
                 <textarea class="theory-edit-music" style="min-height: 150px; width: 100%;">${escapeHtml(theoryData.music)}</textarea>
             </div>
             <div class="theory-edit-controls">
