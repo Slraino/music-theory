@@ -70,8 +70,8 @@ function loadProgressions() {
         groups[key].push({ ...prog, origIndex: idx });
     });
     
-    // Define display order: requested descending groups
-    const displayOrder = ['7','b7','6','b6','5','#4','4','3','b3','2','b2','1'];
+    // Define display order: ascending from 1 to 7
+    const displayOrder = ['1','b2','2','b3','3','4','#4','5','b6','6','b7','7'];
     
     displayOrder.forEach((key, displayIdx) => {
         if (groups[key] && groups[key].length > 0) {
