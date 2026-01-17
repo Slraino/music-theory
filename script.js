@@ -110,8 +110,11 @@ function loadProgressions() {
                 contentLines.forEach((line, lineIdx) => {
                     // Parse **text** for styled sections
                     const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="styled-text">$1</span>');
+                    // Only make lines with content clickable
+                    const hasContent = line.trim().length > 0;
+                    const clickableClass = hasContent ? 'clickable-line' : '';
                     allContent += `
-                        <p class="progression-notes clickable-line" onclick="showDetail(${prog.origIndex})">${styledLine}</p>
+                        <p class="progression-notes ${clickableClass}" ${hasContent ? `onclick="showDetail(${prog.origIndex})"` : ''}>${styledLine}</p>
                     `;
                 });
             });
@@ -242,17 +245,21 @@ function saveGroupEditCombined(groupKey) {
     let newProgressions = [];
     
     progressionBlocks.forEach((block) => {
-        const lines = block.split('\n');
-        const title = lines[0].trim();
-        const content = lines.slice(1).join('\n').trim();
-        console.log('Processing progression - Title:', title, 'Content length:', content.length);
+        const lines = block.split('\n').map(l => l.trim()).filter(l => l);
         
-        // Allow progressions with content only (title is optional)
-        if (content) {
-            newProgressions.push({ title: title || content, content: content || title, displayTitle: title || content });
-        } else if (title) {
-            // If only title, use it as both title and content
-            newProgressions.push({ title, content: title, displayTitle: title });
+        if (lines.length === 0) return; // Skip empty blocks
+        
+        if (lines.length === 1) {
+            // Single line = content only (no title)
+            const content = lines[0];
+            console.log('Processing progression - Content only:', content);
+            newProgressions.push({ title: content, content: content, displayTitle: '' });
+        } else {
+            // Multiple lines = first is title, rest is content
+            const title = lines[0];
+            const content = lines.slice(1).join('\n');
+            console.log('Processing progression - Title:', title, 'Content length:', content.length);
+            newProgressions.push({ title, content, displayTitle: title });
         }
     });
     
