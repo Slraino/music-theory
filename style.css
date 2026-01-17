@@ -155,7 +155,7 @@ main {
 
 .group-box {
     padding: 0;
-    margin: 0;
+    margin: 0 !important;
     border: none;
     background: transparent;
     border-radius: 0;
@@ -226,7 +226,7 @@ main {
     transition: max-height 0.4s ease, opacity 0.4s ease, margin-top 0.4s ease;
     max-height: 600px;
     opacity: 1;
-    margin-top: 15px;
+    margin-top: 2px;
     width: 100%;
 }
 
