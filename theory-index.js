@@ -108,13 +108,14 @@ function loadTheories() {
         const mainTitle = lines[0] || 'Untitled';
         
         const subtitles = [];
+        let mainContent = [];
         let currentSubtitle = null;
         let currentContent = [];
         
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i];
             if (line.trim().startsWith('- ')) {
-                // Save previous subtitle
+                // Save previous subtitle if exists
                 if (currentSubtitle) {
                     subtitles.push({
                         title: currentSubtitle,
@@ -127,6 +128,9 @@ function loadTheories() {
             } else if (currentSubtitle !== null) {
                 // Add to current subtitle content
                 currentContent.push(line);
+            } else {
+                // Add to main content before first subtitle
+                mainContent.push(line);
             }
         }
         
@@ -141,6 +145,7 @@ function loadTheories() {
         return {
             key: item.key,
             mainTitle,
+            mainContent: mainContent.join('\n').trim(),
             subtitles
         };
     });
@@ -158,7 +163,7 @@ function loadTheories() {
         const isFirst = index === 0 ? 'active' : '';
         titlesHtml += `
             <div class="theory-title-group ${isFirst}" data-theory-key="${item.key}">
-                <div class="theory-main-title">
+                <div class="theory-main-title" onmouseenter="switchTheoryContent('${item.key}', -1)">
                     <span class="theory-title-text">${escapeHtml(parsed.mainTitle)}</span>
                     ${editBtn}
                 </div>
@@ -173,6 +178,7 @@ function loadTheories() {
                 </div>
             `;
         });
+        });
         
         titlesHtml += `</div>`;
     });
@@ -180,6 +186,20 @@ function loadTheories() {
     // Build content data for JavaScript
     let contentData = {};
     parsedTheories.forEach((parsed, index) => {
+        // Add main content
+        const mainContentId = `${parsed.key}-main`;
+        let mainContentHtml = '';
+        const mainLines = parsed.mainContent.split('\n');
+        mainLines.forEach(line => {
+            if (line.trim()) {
+                const escapedLine = escapeHtml(line);
+                const styledLine = escapedLine.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
+                mainContentHtml += `<p class="theory-card-line">${styledLine}</p>`;
+            }
+        });
+        contentData[mainContentId] = mainContentHtml || '<p class="theory-card-line" style="color: #888;">No content for this section.</p>';
+        
+        // Add subtitle content
         parsed.subtitles.forEach((subtitle, subIndex) => {
             const contentId = `${parsed.key}-sub-${subIndex}`;
             let contentHtml = '';
@@ -197,8 +217,8 @@ function loadTheories() {
         });
     });
     
-    // Set initial content to first subtitle
-    const firstSubtitleId = `${theoriesWithContent[0].key}-sub-0`;
+    // Set initial content to first theory's main content
+    const firstMainContentId = `${theoriesWithContent[0].key}-main`;
     
     const html = `
         <div class="theory-view-container">
@@ -207,7 +227,7 @@ function loadTheories() {
             </div>
             <div class="theory-content-right">
                 <div class="theory-content-display" id="theoryContentDisplay">
-                    ${contentData[firstSubtitleId] || ''}
+                    ${contentData[firstMainContentId] || ''}
                 </div>
             </div>
         </div>
@@ -217,19 +237,27 @@ function loadTheories() {
     window.theoryContentData = contentData;
 }
 
-// Switch content when hovering over subtitles
+// Switch content when hovering over titles or subtitles
 function switchTheoryContent(key, subtitleIndex) {
-    const subtitleId = `${key}-sub-${subtitleIndex}`;
+    const contentId = subtitleIndex === -1 ? `${key}-main` : `${key}-sub-${subtitleIndex}`;
     const contentDisplay = document.getElementById('theoryContentDisplay');
-    if (window.theoryContentData && window.theoryContentData[subtitleId]) {
-        contentDisplay.innerHTML = window.theoryContentData[subtitleId];
+    if (window.theoryContentData && window.theoryContentData[contentId]) {
+        contentDisplay.innerHTML = window.theoryContentData[contentId];
     }
     
     // Update active state
     document.querySelectorAll('.theory-subtitle-item').forEach(item => {
         item.classList.remove('active');
     });
-    document.querySelector(`[data-subtitle-id="${subtitleId}"]`).classList.add('active');
+    
+    // Set active on subtitle if not main
+    if (subtitleIndex !== -1) {
+        const subtitleId = `${key}-sub-${subtitleIndex}`;
+        const activeSubtitle = document.querySelector(`[data-subtitle-id="${subtitleId}"]`);
+        if (activeSubtitle) {
+            activeSubtitle.classList.add('active');
+        }
+    }
 }
 
 // Helper function to prevent HTML injection
