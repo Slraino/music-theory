@@ -90,7 +90,7 @@ function loadDetailView() {
     console.log('LineIdx from URL:', params.get('lineIdx'), 'Parsed:', lineIdx, 'IsNaN:', isNaN(lineIdx));
     const mainTitle = !isNaN(lineIdx) && lineIdx < sectionLabels.length ? sectionLabels[lineIdx] : (prog.title || 'Unknown');
     console.log('Main title set to:', mainTitle);
-    document.getElementById('progressionTitle').textContent = escapeHtml(mainTitle);
+    document.getElementById('progressionTitle').textContent = '🎵 ' + escapeHtml(mainTitle);
     console.log('Title element text:', document.getElementById('progressionTitle').textContent);
     
     // Show edit button only in owner mode
