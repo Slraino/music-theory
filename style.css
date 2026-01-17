@@ -310,34 +310,15 @@ main {
 }
 
 .group-content-container::-webkit-scrollbar-thumb {
-    background: transparent;
+    background: rgba(220, 20, 60, 0.8);
     border-radius: 4px;
+    opacity: 0;
+    transition: opacity 2s ease;
 }
 
 .group-content-container.scrolling::-webkit-scrollbar-thumb {
-    animation: scrollbarFadeIn 0.3s ease forwards;
-}
-
-.group-content-container:not(.scrolling)::-webkit-scrollbar-thumb {
-    animation: scrollbarFadeOut 2s ease forwards;
-}
-
-@keyframes scrollbarFadeIn {
-    from {
-        background: transparent;
-    }
-    to {
-        background: rgba(220, 20, 60, 0.8);
-    }
-}
-
-@keyframes scrollbarFadeOut {
-    from {
-        background: rgba(220, 20, 60, 0.8);
-    }
-    to {
-        background: transparent;
-    }
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
 
 .group-content-container.collapsed {
