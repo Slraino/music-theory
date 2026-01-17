@@ -165,33 +165,28 @@ function startGroupEdit(groupKey) {
     const customNames = JSON.parse(localStorage.getItem('groupCustomNames')) || {};
     const currentGroupName = customNames[groupKey] || groupKey;
     
+    // Combine all progressions into one text with original indices for tracking
+    let combinedAllContent = '';
+    groupProgresses.forEach((prog) => {
+        const origIndex = progs.indexOf(prog);
+        combinedAllContent += prog.title + '\n' + prog.content + '\n---\n';
+    });
+    combinedAllContent = combinedAllContent.slice(0, -5); // Remove last --- separator
+    
     let html = `
         <div class="group-edit-form">
             <div class="group-name-edit">
                 <label>Group Name:</label>
                 <input type="text" id="group-name-edit" value="${escapeHtml(currentGroupName)}" placeholder="Group name" />
             </div>
-    `;
-    
-    groupProgresses.forEach((prog) => {
-        const origIndex = progs.indexOf(prog);
-        const combinedContent = prog.title + '\n' + prog.content;
-        html += `
-            <div class="progression-edit-row" id="edit-row-${origIndex}">
-                <textarea class="group-edit-combined" id="group-content-${origIndex}" placeholder="Title (first line) and Content (rest)">${escapeHtml(combinedContent)}</textarea>
-                <button class="prog-delete-btn" onclick="removeEditRow(${origIndex})">Remove</button>
+            <div class="progression-edit-row">
+                <label style="display: block; margin-bottom: 8px; color: #b0b0b0;">Edit all progressions (separate each with ---):</label>
+                <textarea class="group-edit-combined" id="group-content-all" placeholder="Title\\nContent\\n---\\nTitle\\nContent" style="min-height: 300px;">${escapeHtml(combinedAllContent)}</textarea>
             </div>
-        `;
-    });
-    
-    html += `
-        <div class="add-new-section">
-            <button class="add-new-btn" onclick="addNewProgressionRow('${groupKey}')">+ Add New</button>
         </div>
         <div class="group-edit-controls">
-            <button class="group-edit-save" onclick="saveGroupEdit('${groupKey}')">Save All</button>
+            <button class="group-edit-save" onclick="saveGroupEditCombined('${groupKey}')">Save All</button>
             <button class="group-edit-cancel" onclick="cancelGroupEdit('${groupKey}')">Cancel</button>
-        </div>
         </div>
     `;
     
@@ -221,7 +216,7 @@ function removeEditRow(id) {
     }
 }
 
-function saveGroupEdit(groupKey) {
+function saveGroupEditCombined(groupKey) {
     const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
     const customNames = JSON.parse(localStorage.getItem('groupCustomNames')) || {};
     
@@ -233,55 +228,45 @@ function saveGroupEdit(groupKey) {
         delete customNames[groupKey];
     }
     
-    // Get all edit rows
-    const editRows = document.querySelectorAll('.progression-edit-row');
-    let rowIndices = new Set();
+    // Get the combined text
+    const combinedText = document.getElementById('group-content-all').value.trim();
+    if (!combinedText) {
+        alert('Please enter at least one progression!');
+        return;
+    }
+    
+    // Split by --- to get individual progressions
+    const progressionBlocks = combinedText.split('---').map(block => block.trim()).filter(block => block);
     let newProgressions = [];
     
-    editRows.forEach((row) => {
-        const rowId = row.id.replace('edit-row-', '');
-        const combinedInput = row.querySelector('.group-edit-combined');
-        
-        const combinedText = combinedInput.value.trim();
-        if (!combinedText) return;
-        
-        // Split by first newline: title is first line, content is rest
-        const lines = combinedText.split('\n');
+    progressionBlocks.forEach((block) => {
+        const lines = block.split('\n');
         const title = lines[0].trim();
         const content = lines.slice(1).join('\n').trim();
         
         if (title && content) {
-            if (rowId.startsWith('new-')) {
-                // New progression
-                newProgressions.push({ title, content, displayTitle: '' });
-            } else {
-                // Existing progression - mark as kept
-                const origIndex = parseInt(rowId);
-                rowIndices.add(origIndex);
-                progs[origIndex] = { 
-                    title: title, 
-                    content: content, 
-                    displayTitle: title
-                };
-            }
+            newProgressions.push({ title, content, displayTitle: title });
         }
     });
     
-    // Remove progressions that were deleted (rows that don't exist anymore)
-    // Go through existing progressions in this group and remove ones not in rowIndices
+    if (newProgressions.length === 0) {
+        alert('Please enter at least one valid progression (Title and Content)!');
+        return;
+    }
+    
+    // Remove all progressions in this group from progs array
     for (let i = progs.length - 1; i >= 0; i--) {
         const prog = progs[i];
         const firstChar = prog.title.charAt(0);
         const isSingleChar = firstChar === groupKey;
         const isTwoChar = groupKey.length === 2 && prog.title.substring(0, 2) === groupKey;
         
-        if ((isSingleChar || isTwoChar) && !rowIndices.has(i)) {
-            // This progression belongs to the group but wasn't in the edit form, so delete it
+        if (isSingleChar || isTwoChar) {
             progs.splice(i, 1);
         }
     }
     
-    // Add new progressions to the end
+    // Add the new progressions to the end
     newProgressions.forEach(prog => {
         progs.push(prog);
     });
@@ -289,6 +274,10 @@ function saveGroupEdit(groupKey) {
     localStorage.setItem('musicProgressions', JSON.stringify(progs));
     localStorage.setItem('groupCustomNames', JSON.stringify(customNames));
     loadProgressions();
+}
+
+function saveGroupEdit(groupKey) {
+    saveGroupEditCombined(groupKey);
 }
 
 function cancelGroupEdit(groupKey) {
