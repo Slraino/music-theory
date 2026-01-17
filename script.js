@@ -89,7 +89,7 @@ function loadProgressions() {
             titleBox.onclick = () => toggleGroupContent(key);
             titleBox.innerHTML = `
                 <span class="group-title-text">${escapeHtml(groupTitleText)}</span>
-                <span class="group-toggle-icon">▼</span>
+                <span class="group-toggle-icon">▶</span>
             `;
             
             // Make title editable if owner mode
@@ -102,10 +102,9 @@ function loadProgressions() {
             
             // Create collapsible content container
             const contentContainer = document.createElement('div');
-            contentContainer.className = 'group-content-container';
+            contentContainer.className = 'group-content-container collapsed';
             contentContainer.id = `group-content-${key}`;
             contentContainer.setAttribute('data-group-key', key);
-            contentContainer.style.display = 'block';
             
             // Add all progressions to content
             const groupContentBox = document.createElement('div');
@@ -310,11 +309,11 @@ function toggleGroupContent(key) {
     const titleBox = document.querySelector(`[data-group-key="${key}"].group-title-box`);
     const toggleIcon = titleBox.querySelector('.group-toggle-icon');
     
-    if (contentContainer.style.display === 'none') {
-        contentContainer.style.display = 'block';
+    if (contentContainer.classList.contains('collapsed')) {
+        contentContainer.classList.remove('collapsed');
         toggleIcon.textContent = '▼';
     } else {
-        contentContainer.style.display = 'none';
+        contentContainer.classList.add('collapsed');
         toggleIcon.textContent = '▶';
     }
 }
