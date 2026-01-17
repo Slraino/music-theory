@@ -6,7 +6,9 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: #1a1a1a;
+    background: #1a1a1a url('bg.gif') no-repeat center center fixed;
+    background-size: cover;
+    background-attachment: fixed;
     min-height: 100vh;
     padding: 20px;
 }
