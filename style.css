@@ -1135,6 +1135,47 @@ footer {
 .theory-title-edit-btn:hover {
 }
 
+.theory-btn-group {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.theory-move-btn {
+    background: transparent;
+    color: inherit;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.85em;
+    white-space: nowrap;
+}
+
+.theory-move-btn:hover {
+    color: #00d4ff;
+}
+
+.theory-add-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    background: rgba(220, 20, 60, 0.2);
+    border: 2px solid rgba(220, 20, 60, 0.5);
+    border-radius: 3px;
+    color: #DC143C;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.theory-add-btn:hover {
+    background: rgba(220, 20, 60, 0.4);
+    border-color: #DC143C;
+    box-shadow: 0 0 15px rgba(220, 20, 60, 0.3);
+}
+
 .theory-card {
     background: rgba(30, 30, 30, 0.8);
     border-left: 4px solid #DC143C;

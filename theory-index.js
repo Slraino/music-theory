@@ -81,6 +81,91 @@ function deleteTheoryModal(key) {
     loadTheories();
 }
 
+// Move theory up in order
+function moveTheoryUp(key) {
+    if (!isOwnerMode()) return;
+    
+    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
+    const keys = Object.keys(progressionDetails).filter(k => {
+        const data = progressionDetails[k];
+        const theoryData = typeof data === 'string' ? { theory: data } : data;
+        return theoryData.theory && theoryData.theory.trim() !== '';
+    });
+    
+    const currentIndex = keys.indexOf(key);
+    if (currentIndex <= 0) return;
+    
+    // Swap order by recreating object with swapped keys
+    const newDetails = {};
+    const keysToSwap = [keys[currentIndex - 1], keys[currentIndex]];
+    let swapped = false;
+    
+    keys.forEach(k => {
+        if (k === keys[currentIndex - 1]) {
+            newDetails[keys[currentIndex]] = progressionDetails[k];
+            swapped = true;
+        } else if (k === keys[currentIndex]) {
+            newDetails[keys[currentIndex - 1]] = progressionDetails[k];
+        } else {
+            newDetails[k] = progressionDetails[k];
+        }
+    });
+    
+    localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(newDetails));
+    loadTheories();
+}
+
+// Move theory down in order
+function moveTheoryDown(key) {
+    if (!isOwnerMode()) return;
+    
+    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
+    const keys = Object.keys(progressionDetails).filter(k => {
+        const data = progressionDetails[k];
+        const theoryData = typeof data === 'string' ? { theory: data } : data;
+        return theoryData.theory && theoryData.theory.trim() !== '';
+    });
+    
+    const currentIndex = keys.indexOf(key);
+    if (currentIndex >= keys.length - 1) return;
+    
+    // Swap order by recreating object with swapped keys
+    const newDetails = {};
+    keys.forEach(k => {
+        if (k === keys[currentIndex]) {
+            newDetails[keys[currentIndex + 1]] = progressionDetails[k];
+        } else if (k === keys[currentIndex + 1]) {
+            newDetails[keys[currentIndex]] = progressionDetails[k];
+        } else {
+            newDetails[k] = progressionDetails[k];
+        }
+    });
+    
+    localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(newDetails));
+    loadTheories();
+}
+
+// Add new theory card
+function addNewTheory() {
+    if (!isOwnerMode()) return;
+    
+    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
+    
+    // Generate a unique key for new theory
+    let newKey = 'New Theory';
+    let counter = 1;
+    while (progressionDetails[newKey]) {
+        newKey = `New Theory ${counter}`;
+        counter++;
+    }
+    
+    // Create new theory entry
+    progressionDetails[newKey] = { theory: newKey, music: '' };
+    localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
+    
+    loadTheories();
+}
+
 // Load and display all theories
 function loadTheories() {
     const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
@@ -156,8 +241,12 @@ function loadTheories() {
         const parsed = parsedTheories[index];
         
         let editBtn = '';
+        let moveBtn = '';
         if (isOwnerMode()) {
             editBtn = `<button class="theory-title-edit-btn" onclick="startEditTheory('${item.key}')">✏️</button>`;
+            let upBtn = index > 0 ? `<button class="theory-move-btn" onclick="moveTheoryUp('${item.key}')">↑</button>` : '';
+            let downBtn = index < theoriesWithContent.length - 1 ? `<button class="theory-move-btn" onclick="moveTheoryDown('${item.key}')">↓</button>` : '';
+            moveBtn = upBtn + downBtn;
         }
         
         const isFirst = index === 0 ? 'active' : '';
@@ -165,7 +254,7 @@ function loadTheories() {
             <div class="theory-title-group ${isFirst}" data-theory-key="${item.key}">
                 <div class="theory-main-title" onmouseenter="switchTheoryContent('${item.key}', -1)">
                     <span class="theory-title-text">${escapeHtml(parsed.mainTitle)}</span>
-                    ${editBtn}
+                    <div class="theory-btn-group">${moveBtn}${editBtn}</div>
                 </div>
         `;
         
@@ -252,6 +341,7 @@ function loadTheories() {
         <div class="theory-view-container">
             <div class="theory-titles-left">
                 ${titlesHtml}
+                ${isOwnerMode() ? '<button class="theory-add-btn" onclick="addNewTheory()">+</button>' : ''}
             </div>
             <div class="theory-content-right">
                 <div class="theory-content-display" id="theoryContentDisplay">
