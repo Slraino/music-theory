@@ -137,7 +137,7 @@ main {
 .progressions-list {
     display: flex;
     flex-wrap: nowrap;
-    gap: 1px;
+    gap: 0px;
     align-items: flex-start;
     overflow-x: auto;
     padding-bottom: 10px;
