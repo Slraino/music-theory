@@ -32,10 +32,7 @@ function startEditTheory(key) {
         <div class="theory-card-right">
             <div class="theory-card-edit">
                 <div class="theory-edit-row">
-                    <textarea class="theory-edit-theory" placeholder="Theory" style="min-height: 150px; width: 100%;">${escapeHtml(theoryData.theory)}</textarea>
-                </div>
-                <div class="theory-edit-row">
-                    <textarea class="theory-edit-music" placeholder="Music" style="min-height: 150px; width: 100%;">${escapeHtml(theoryData.music)}</textarea>
+                    <textarea class="theory-edit-theory" placeholder="Content" style="min-height: 150px; width: 100%;">${escapeHtml(theoryData.theory)}</textarea>
                 </div>
                 <div class="theory-edit-controls">
                     <button class="theory-save-btn" onclick="saveTheory('${key}')">Save</button>
@@ -50,10 +47,9 @@ function startEditTheory(key) {
 // Save theory edits
 function saveTheory(key) {
     const theory = document.querySelector(`[data-theory-key="${key}"] .theory-edit-theory`).value.trim();
-    const music = document.querySelector(`[data-theory-key="${key}"] .theory-edit-music`).value.trim();
     
     const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    progressionDetails[key] = { theory, music };
+    progressionDetails[key] = { theory, music: '' };
     localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
     
     loadTheories();
