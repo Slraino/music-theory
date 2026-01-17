@@ -2,7 +2,8 @@
 const STORAGE_KEYS = {
     PROGRESSIONS: 'musicProgressions',
     GROUP_NAMES: 'groupCustomNames',
-    SITE_DESCRIPTION: 'siteDescription'
+    SITE_DESCRIPTION: 'siteDescription',
+    PROGRESSION_DETAILS: 'progressionDetails'
 };
 
 // Config: enable edit UI only when viewing locally
@@ -32,9 +33,8 @@ let currentLineTitle = null;
 function startDetailEdit() {
     if (!isOwnerMode()) return;
     
-    const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
-    const prog = progs[currentProgId];
-    const detailContent = prog.detailContent || '';
+    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
+    const detailContent = progressionDetails[currentLineTitle] || '';
     
     document.getElementById('detailContent').innerHTML = `
         <div class="detail-box">
@@ -57,9 +57,9 @@ function startDetailEdit() {
 function saveDetailEdit() {
     const content = document.getElementById('edit-detail-content').value.trim();
     
-    const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
-    progs[currentProgId] = { ...progs[currentProgId], detailContent: content };
-    localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(progs));
+    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
+    progressionDetails[currentLineTitle] = content;
+    localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
     
     loadDetailView();
 }
@@ -69,17 +69,16 @@ function cancelDetailEdit() {
     loadDetailView();
 }
 
-// Delete progression and return to main page
+// Delete progression detail
 function deleteDetailProgression() {
     if (!isOwnerMode()) return;
     
-    if (confirm('Are you sure you want to delete this progression?')) {
-        const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
-        progs.splice(currentProgId, 1);
-        localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(progs));
+    if (confirm('Are you sure you want to delete this detail content?')) {
+        const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
+        delete progressionDetails[currentLineTitle];
+        localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
         
-        // Return to main page
-        window.location.href = 'index.html';
+        loadDetailView();
     }
 }
 
@@ -98,14 +97,9 @@ function loadDetailView() {
         controlsDiv.innerHTML = '';
     }
     
-    // Get detail content from separate progression details storage
-    const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
-    const prog = progs[currentProgId];
-    
-    let detailContent = '';
-    if (prog && prog.detailContent) {
-        detailContent = prog.detailContent;
-    }
+    // Get detail content keyed by line title
+    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
+    const detailContent = progressionDetails[currentLineTitle] || '';
     
     let sectionsHtml = '';
     if (detailContent) {
