@@ -461,12 +461,31 @@ function showDetail(index, lineContent) {
 
 // Load progressions when page starts (only on chord-progressions page)
 window.addEventListener('DOMContentLoaded', () => {
-    // Initialize progression details from exported data if not already set
+    // Auto-recover progression details from IndexedDB if localStorage is empty
     let progressionDetails = JSON.parse(localStorage.getItem('progressionDetails')) || {};
-    if (Object.keys(progressionDetails).length === 0) {
-        progressionDetails = {"1 - 2 - 4 - 6m":{"theory":"Diatonic\n< Info >\nin scale","music":""},"New Theory":{"theory":"Chromatic \n< Info >\nnot in scale","music":""},"1M7 - 17 - 1add6 - 1+ㅤㅤ[ Chromatic Descent ]ㅤ[ Verse: 漫ろ雨 ]":{"theory":"Pedal Note","music":""},"15:1M7 - 17 - 1add6 - 1+ㅤㅤ[ Chromatic Descent ]ㅤ[ Verse: 漫ろ雨 ]":{"theory":"Pedal Note / Chromatic Descent","music":"","genre":""},"15:1M7 - 17 - 1add6 - 1+":{"theory":"[ Pedal Note ] [ Chromatic Descent ]","music":"","genre":""}};
-        localStorage.setItem('progressionDetails', JSON.stringify(progressionDetails));
-        StorageManager.set('progressionDetails', 'default', progressionDetails);
+    if (Object.keys(progressionDetails).length === 0 && typeof db !== 'undefined' && db.ready) {
+        db.get('progressionDetails', 'default').then(idbData => {
+            if (idbData && Object.keys(idbData).length > 0) {
+                localStorage.setItem('progressionDetails', JSON.stringify(idbData));
+                console.log('Recovered progression details from IndexedDB');
+                // Reload if we're on the progression info page
+                if (document.getElementById('progressionInfoPage')) {
+                    location.reload();
+                }
+            }
+        }).catch(() => {
+            // IndexedDB recovery failed, use default
+            console.log('IndexedDB recovery failed, using default fallback');
+            setDefaultProgressionDetails();
+        });
+    } else if (Object.keys(progressionDetails).length === 0) {
+        setDefaultProgressionDetails();
+    }
+
+    function setDefaultProgressionDetails() {
+        const defaults = {"1 - 2 - 4 - 6m":{"theory":"Diatonic\n< Info >\nin scale","music":""},"New Theory":{"theory":"Chromatic \n< Info >\nnot in scale","music":""},"1M7 - 17 - 1add6 - 1+ㅤㅤ[ Chromatic Descent ]ㅤ[ Verse: 漫ろ雨 ]":{"theory":"Pedal Note","music":""},"15:1M7 - 17 - 1add6 - 1+ㅤㅤ[ Chromatic Descent ]ㅤ[ Verse: 漫ろ雨 ]":{"theory":"Pedal Note / Chromatic Descent","music":"","genre":""},"15:1M7 - 17 - 1add6 - 1+":{"theory":"[ Pedal Note ] [ Chromatic Descent ]","music":"","genre":""}};
+        localStorage.setItem('progressionDetails', JSON.stringify(defaults));
+        StorageManager.set('progressionDetails', 'default', defaults);
     }
 
 // Load site description if on main page
