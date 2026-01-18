@@ -256,6 +256,7 @@ function addNewTheory() {
     setTimeout(() => {
         startEditTheory(newKey);
     }, 300);
+}
 
 // Migrate music theory data from progressionDetails to musicTheory on first load
 function migrateTheoryData() {
