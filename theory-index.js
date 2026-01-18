@@ -74,9 +74,6 @@ function saveTheoryModal(key) {
         db.set('musicTheory', 'default', musicTheory).catch(() => {});
     }
     
-    // Trigger auto-save to server
-    saveDataToServer();
-    
     invalidateCache();
     
     const modal = document.getElementById(`theory-edit-modal-${key}`);
@@ -107,9 +104,6 @@ function deleteTheoryModal(key) {
     if (typeof db !== 'undefined' && db.ready) {
         db.set('musicTheory', 'default', musicTheory).catch(() => {});
     }
-    
-    // Trigger auto-save to server
-    saveDataToServer();
     
     invalidateCache();
     
