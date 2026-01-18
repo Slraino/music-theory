@@ -215,13 +215,8 @@ function updateGroupPreview() {
     // Display each progression
     let html = '';
     groupProgs.forEach((prog, idx) => {
-        // Show first line of content as identifier if multiple progressions in group
-        const identifier = groupProgs.length > 1 ? 
-            `${selectedGroup} - ${prog.content.split('\n')[0].substring(0, 30)}...` : 
-            selectedGroup;
         html += `
             <div class="prog-edit-item">
-                <label>${identifier}</label>
                 <textarea class="prog-edit-textarea" data-title="${prog.title}">${prog.content}</textarea>
             </div>
         `;
