@@ -230,9 +230,8 @@ function loadDetailView() {
                     
                     while ((match = bracketsRegex.exec(line)) !== null) {
                         const theoryName = match[1].trim();
-                        const fullBracket = match[0];
                         
-                        html += `<span onmouseenter="showTheoryTooltip('${theoryName.replace(/'/g, "\\'")}', event)" onmouseleave="hideTheoryTooltip()" style="cursor: help; margin-right: 8px;">${escapeHtml(fullBracket)}</span>`;
+                        html += `<span class="theory-badge" onmouseenter="showTheoryTooltip('${theoryName.replace(/'/g, "\\'")}', event)" onmouseleave="hideTheoryTooltip()">${escapeHtml(theoryName)}</span>`;
                     }
                     
                     html += '</p>';
