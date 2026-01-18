@@ -1,15 +1,3 @@
-// LocalStorage keys
-const STORAGE_KEYS = {
-    PROGRESSION_DETAILS: 'progressionDetails'
-};
-
-// Config: enable edit UI only when viewing locally
-const EDIT_UI_ENABLED = (
-    location.hostname === 'localhost' ||
-    location.hostname === '127.0.0.1' ||
-    location.protocol === 'file:'
-);
-
 // Check owner mode
 function isOwnerMode() {
     return EDIT_UI_ENABLED;
@@ -19,10 +7,10 @@ function isOwnerMode() {
 function startEditTheory(key) {
     if (!isOwnerMode()) return;
     
-    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    const theoryData = typeof progressionDetails[key] === 'string' 
-        ? { theory: progressionDetails[key], music: '' } 
-        : (progressionDetails[key] || { theory: '', music: '' });
+    const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
+    const theoryData = typeof musicTheory[key] === 'string' 
+        ? { theory: musicTheory[key], music: '' } 
+        : (musicTheory[key] || { theory: '', music: '' });
     
     // Show edit modal
     const modal = document.createElement('div');
@@ -50,9 +38,9 @@ function startEditTheory(key) {
 function saveTheoryModal(key) {
     const content = document.getElementById(`theory-edit-textarea-${key}`).value.trim();
     
-    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    progressionDetails[key] = { theory: content, music: '' };
-    localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
+    const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
+    musicTheory[key] = { theory: content, music: '' };
+    localStorage.setItem('musicTheory', JSON.stringify(musicTheory));
     
     const modal = document.getElementById(`theory-edit-modal-${key}`);
     if (modal) modal.remove();
@@ -71,9 +59,9 @@ function deleteTheoryModal(key) {
     if (!isOwnerMode()) return;
     if (!confirm('Are you sure you want to delete this theory?')) return;
     
-    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    delete progressionDetails[key];
-    localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
+    const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
+    delete musicTheory[key];
+    localStorage.setItem('musicTheory', JSON.stringify(musicTheory));
     
     const modal = document.getElementById(`theory-edit-modal-${key}`);
     if (modal) modal.remove();
@@ -85,9 +73,9 @@ function deleteTheoryModal(key) {
 function moveTheoryUp(key) {
     if (!isOwnerMode()) return;
     
-    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    const keys = Object.keys(progressionDetails).filter(k => {
-        const data = progressionDetails[k];
+    const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
+    const keys = Object.keys(musicTheory).filter(k => {
+        const data = musicTheory[k];
         const theoryData = typeof data === 'string' ? { theory: data } : data;
         return theoryData.theory && theoryData.theory.trim() !== '';
     });
@@ -111,7 +99,7 @@ function moveTheoryUp(key) {
         }
     });
     
-    localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(newDetails));
+    localStorage.setItem('progressionDetails', JSON.stringify(newDetails));
     loadTheories();
 }
 
@@ -119,9 +107,9 @@ function moveTheoryUp(key) {
 function moveTheoryDown(key) {
     if (!isOwnerMode()) return;
     
-    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    const keys = Object.keys(progressionDetails).filter(k => {
-        const data = progressionDetails[k];
+    const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
+    const keys = Object.keys(musicTheory).filter(k => {
+        const data = musicTheory[k];
         const theoryData = typeof data === 'string' ? { theory: data } : data;
         return theoryData.theory && theoryData.theory.trim() !== '';
     });
@@ -133,15 +121,15 @@ function moveTheoryDown(key) {
     const newDetails = {};
     keys.forEach(k => {
         if (k === keys[currentIndex]) {
-            newDetails[keys[currentIndex + 1]] = progressionDetails[k];
+            newDetails[keys[currentIndex + 1]] = musicTheory[k];
         } else if (k === keys[currentIndex + 1]) {
-            newDetails[keys[currentIndex]] = progressionDetails[k];
+            newDetails[keys[currentIndex]] = musicTheory[k];
         } else {
-            newDetails[k] = progressionDetails[k];
+            newDetails[k] = musicTheory[k];
         }
     });
     
-    localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(newDetails));
+    localStorage.setItem('musicTheory', JSON.stringify(newDetails));
     loadTheories();
 }
 
@@ -149,30 +137,70 @@ function moveTheoryDown(key) {
 function addNewTheory() {
     if (!isOwnerMode()) return;
     
-    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
+    const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
     
     // Generate a unique key for new theory
     let newKey = 'New Theory';
     let counter = 1;
-    while (progressionDetails[newKey]) {
+    while (musicTheory[newKey]) {
         newKey = `New Theory ${counter}`;
         counter++;
     }
     
     // Create new theory entry
-    progressionDetails[newKey] = { theory: newKey, music: '' };
-    localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
+    musicTheory[newKey] = { theory: newKey, music: '' };
+    localStorage.setItem('musicTheory', JSON.stringify(musicTheory));
     
     loadTheories();
 }
 
+// Migrate music theory data from progressionDetails to musicTheory on first load
+function migrateTheoryData() {
+    const musicTheory = localStorage.getItem('musicTheory');
+    
+    // If musicTheory already has data, don't migrate
+    if (musicTheory && Object.keys(JSON.parse(musicTheory)).length > 0) {
+        return;
+    }
+    
+    // Check if there's data in progressionDetails
+    const progressionDetails = localStorage.getItem('progressionDetails');
+    if (progressionDetails) {
+        try {
+            const details = JSON.parse(progressionDetails);
+            const theoryEntries = {};
+            
+            // Extract theory-like entries (those created in Music Theory page)
+            for (const key in details) {
+                const data = details[key];
+                const theoryData = typeof data === 'string' ? { theory: data, music: '' } : data;
+                
+                // Check if this looks like a theory entry (has theory content but not linked to a progression)
+                // We'll migrate all entries that have theory content
+                if (theoryData.theory && theoryData.theory.trim() !== '') {
+                    theoryEntries[key] = theoryData;
+                }
+            }
+            
+            // Save to musicTheory if we found entries
+            if (Object.keys(theoryEntries).length > 0) {
+                localStorage.setItem('musicTheory', JSON.stringify(theoryEntries));
+                console.log('Migrated theory data:', theoryEntries);
+            }
+        } catch (e) {
+            console.error('Error migrating theory data:', e);
+        }
+    }
+}
+
 // Load and display all theories
 function loadTheories() {
-    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
+    migrateTheoryData();
+    const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
     const theoryList = document.getElementById('theoryList');
     
     // Filter entries that have theory content
-    const theoriesWithContent = Object.entries(progressionDetails)
+    const theoriesWithContent = Object.entries(musicTheory)
         .filter(([key, data]) => {
             const theoryData = typeof data === 'string' ? { theory: data, music: '' } : data;
             return theoryData.theory && theoryData.theory.trim() !== '';
@@ -252,7 +280,7 @@ function loadTheories() {
         const isFirst = index === 0 ? 'active' : '';
         titlesHtml += `
             <div class="theory-title-group ${isFirst}" data-theory-key="${item.key}">
-                <div class="theory-main-title" onmouseenter="switchTheoryContent('${item.key}', -1)">
+                <div class="theory-main-title" onmouseenter="switchTheoryContent('${item.key}', -1)" onmouseleave="">
                     <span class="theory-title-text">${escapeHtml(parsed.mainTitle)}</span>
                     <div class="theory-btn-group">${moveBtn}${editBtn}</div>
                 </div>
@@ -264,7 +292,7 @@ function loadTheories() {
             // Mark first subtitle as active if no main content
             const isActive = (index === 0 && subIndex === 0 && !parsed.mainContent.trim());
             titlesHtml += `
-                <div class="theory-subtitle-item ${isActive ? 'active' : ''}" data-subtitle-id="${subtitleId}" onmouseenter="switchTheoryContent('${item.key}', ${subIndex})">
+                <div class="theory-subtitle-item ${isActive ? 'active' : ''}" data-subtitle-id="${subtitleId}" onmouseenter="switchTheoryContent('${item.key}', ${subIndex})" onmouseleave="">
                     <span class="theory-subtitle-text">${escapeHtml(subtitle.title)}</span>
                 </div>
             `;
@@ -355,6 +383,46 @@ function loadTheories() {
     window.theoryContentData = contentData;
 }
 
+// Show theory hover box with preview
+function showTheoryHoverBox(key, subtitleIndex, title, event) {
+    // Remove existing hover box
+    hideTheoryHoverBox();
+    
+    if (!window.theoryContentData) return;
+    
+    const contentId = subtitleIndex === -1 ? `${key}-main` : `${key}-sub-${subtitleIndex}`;
+    const content = window.theoryContentData[contentId];
+    
+    if (!content) return;
+    
+    // Create hover box
+    const hoverBox = document.createElement('div');
+    hoverBox.id = 'theory-hover-box';
+    hoverBox.className = 'theory-hover-box';
+    hoverBox.innerHTML = `
+        <div class="theory-hover-box-content">
+            <h3 class="theory-hover-title">${title}</h3>
+            <div class="theory-hover-body">${content}</div>
+        </div>
+    `;
+    
+    document.body.appendChild(hoverBox);
+    
+    // Position near mouse
+    const x = event.pageX + 20;
+    const y = event.pageY - 50;
+    hoverBox.style.left = x + 'px';
+    hoverBox.style.top = y + 'px';
+}
+
+// Hide theory hover box
+function hideTheoryHoverBox() {
+    const hoverBox = document.getElementById('theory-hover-box');
+    if (hoverBox) {
+        hoverBox.remove();
+    }
+}
+
 // Switch content when hovering over titles or subtitles
 function switchTheoryContent(key, subtitleIndex) {
     const contentId = subtitleIndex === -1 ? `${key}-main` : `${key}-sub-${subtitleIndex}`;
@@ -383,6 +451,11 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Alias for SPA compatibility
+function loadTheoryList() {
+    loadTheories();
 }
 
 // Load theories when page starts

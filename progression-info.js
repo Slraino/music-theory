@@ -1,14 +1,6 @@
-// LocalStorage keys
-const STORAGE_KEYS = {
-    PROGRESSIONS: 'musicProgressions',
-    GROUP_NAMES: 'groupCustomNames',
-    SITE_DESCRIPTION: 'siteDescription',
-    PROGRESSION_DETAILS: 'progressionDetails'
-};
-
 // Migrate old content format to new two-section format
 function migrateOldContent() {
-    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
+    const progressionDetails = JSON.parse(localStorage.getItem('progressionDetails')) || {};
     let needsSave = false;
     
     for (const key in progressionDetails) {
@@ -24,16 +16,41 @@ function migrateOldContent() {
     }
     
     if (needsSave) {
-        localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
+        localStorage.setItem('progressionDetails', JSON.stringify(progressionDetails));
     }
 }
 
-// Config: enable edit UI only when viewing locally
-const EDIT_UI_ENABLED = (
-    location.hostname === 'localhost' ||
-    location.hostname === '127.0.0.1' ||
-    location.protocol === 'file:'
-);
+// Initialize sample music theory data if empty (for testing)
+function initializeSampleTheoryData() {
+    const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
+    
+    // Ensure Pedal Note exists
+    if (!musicTheory['Pedal Note']) {
+        musicTheory['Pedal Note'] = {
+            theory: `Pedal Note
+< Info >
+A sustained, repeated low note, usually in the bass, over which the harmony changes`,
+            music: ''
+        };
+    }
+    
+    // Ensure Chromatic Descent exists
+    if (!musicTheory['Chromatic Descent']) {
+        musicTheory['Chromatic Descent'] = {
+            theory: `Chromatic Descent
+< Info >
+A melodic line moving down by semitones`,
+            music: ''
+        };
+    }
+    
+    localStorage.setItem('musicTheory', JSON.stringify(musicTheory));
+    console.log('Ensured theory definitions exist in Music Theory storage');
+}
+
+// Call initialization
+migrateOldContent();
+initializeSampleTheoryData();
 
 // Check owner mode
 function isOwnerMode() {
@@ -47,25 +64,68 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Helper function to add tooltips based on "Word\n< Info >\nDefinition" pattern
+function addTooltipsToContent(text) {
+    // Find patterns like "Word\n< Info >\nDefinition"
+    // and wrap Word with tooltip
+    const lines = text.split('\n');
+    let result = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmed = line.trim();
+        
+        // Check if next line is "< Info >"
+        if (i + 1 < lines.length && lines[i + 1].trim() === '< Info >') {
+            // Check if there's a definition line after
+            if (i + 2 < lines.length) {
+                const definition = lines[i + 2].trim();
+                if (definition && definition !== '< Info >' && definition !== '') {
+                    // Wrap this word with tooltip
+                    result.push(`<span class="tooltip-word" title="${escapeHtml(definition)}">${escapeHtml(trimmed)}</span>`);
+                    i += 2; // Skip the "< Info >" and definition lines
+                    continue;
+                }
+            }
+        }
+        
+        result.push(escapeHtml(line));
+    }
+    
+    return result.join('\n');
+}
+
 // Store current progression ID and title for editing
 let currentProgId = null;
 let currentLineTitle = null;
+let currentUniqueKey = null;
 
 // Start editing detail
 function startDetailEdit() {
     if (!isOwnerMode()) return;
     
-    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    const detailData = progressionDetails[currentLineTitle] || { theory: '', music: '' };
+    const progressionDetails = JSON.parse(localStorage.getItem('progressionDetails')) || {};
+    // Use currentUniqueKey which has format: progIndex:lineTitle
+    const keyToUse = currentUniqueKey || currentLineTitle;
+    const detailData = progressionDetails[keyToUse] || { theory: '', music: '', genre: '' };
+    
+    console.log('Loading for edit - keyToUse:', keyToUse);
+    console.log('detailData:', detailData);
     
     document.getElementById('detailContent').innerHTML = `
         <div class="detail-box">
             <div class="detail-edit-form">
                 <div class="progression-edit-row">
-                    <textarea class="detail-edit-theory" style="min-height: 200px;">${escapeHtml(detailData.theory || '')}</textarea>
+                    <label>Theory:</label>
+                    <textarea class="detail-edit-theory" name="theory" id="detail-edit-theory" style="min-height: 150px;">${escapeHtml(detailData.theory || '')}</textarea>
                 </div>
                 <div class="progression-edit-row">
-                    <textarea class="detail-edit-music" style="min-height: 200px;">${escapeHtml(detailData.music || '')}</textarea>
+                    <label>Music:</label>
+                    <textarea class="detail-edit-music" name="music" id="detail-edit-music" style="min-height: 150px;">${escapeHtml(detailData.music || '')}</textarea>
+                </div>
+                <div class="progression-edit-row">
+                    <label>Genre:</label>
+                    <textarea class="detail-edit-genre" name="genre" id="detail-edit-genre" style="min-height: 150px;">${escapeHtml(detailData.genre || '')}</textarea>
                 </div>
                 <div class="detail-edit-controls">
                     <button class="detail-save-btn" onclick="saveDetailEdit()">Save</button>
@@ -81,10 +141,24 @@ function startDetailEdit() {
 function saveDetailEdit() {
     const theory = document.querySelector('.detail-edit-theory').value.trim();
     const music = document.querySelector('.detail-edit-music').value.trim();
+    const genre = document.querySelector('.detail-edit-genre').value.trim();
     
-    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    progressionDetails[currentLineTitle] = { theory, music };
-    localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
+    console.log('Saving for:', currentUniqueKey || currentLineTitle);
+    console.log('Theory:', theory);
+    console.log('Music:', music);
+    console.log('Genre:', genre);
+    
+    const progressionDetails = JSON.parse(localStorage.getItem('progressionDetails')) || {};
+    const keyToSave = currentUniqueKey || currentLineTitle;
+    progressionDetails[keyToSave] = { theory, music, genre };
+    localStorage.setItem('progressionDetails', JSON.stringify(progressionDetails));
+    
+    // Also save to IndexedDB
+    if (typeof db !== 'undefined' && db.ready) {
+        db.set('progressionDetails', 'default', progressionDetails).catch(() => {});
+    }
+    
+    console.log('Saved progressionDetails:', progressionDetails);
     
     loadDetailView();
 }
@@ -99,9 +173,10 @@ function deleteDetailProgression() {
     if (!isOwnerMode()) return;
     
     if (confirm('Are you sure you want to delete this detail content?')) {
-        const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-        delete progressionDetails[currentLineTitle];
-        localStorage.setItem(STORAGE_KEYS.PROGRESSION_DETAILS, JSON.stringify(progressionDetails));
+        const progressionDetails = JSON.parse(localStorage.getItem('progressionDetails')) || {};
+        const keyToDelete = currentUniqueKey || currentLineTitle;
+        delete progressionDetails[keyToDelete];
+        localStorage.setItem('progressionDetails', JSON.stringify(progressionDetails));
         
         loadDetailView();
     }
@@ -112,7 +187,12 @@ function loadDetailView() {
     // Update the header title with the clicked line
     const titleToShow = currentLineTitle || 'Unknown';
     console.log('Setting title to:', titleToShow); // Debug
-    document.getElementById('progressionTitle').textContent = escapeHtml(titleToShow);
+    
+    // Update page title directly
+    const pageTitleEl = document.getElementById('pageTitle');
+    if (pageTitleEl) {
+        pageTitleEl.textContent = escapeHtml(titleToShow);
+    }
     
     // Show edit button only in owner mode
     const controlsDiv = document.getElementById('detailControls');
@@ -122,45 +202,95 @@ function loadDetailView() {
         controlsDiv.innerHTML = '';
     }
     
-    // Get detail content keyed by line title
-    const progressionDetails = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSION_DETAILS)) || {};
-    const detailData = progressionDetails[currentLineTitle] || { theory: '', music: '' };
+    // Get detail content keyed by unique key (progIndex:lineTitle)
+    const progressionDetails = JSON.parse(localStorage.getItem('progressionDetails')) || {};
+    let detailData = progressionDetails[currentUniqueKey] || { theory: '', music: '', genre: '' };
+    
+    // Fallback to old key format for backward compatibility
+    if (!detailData.theory && !detailData.music) {
+        detailData = progressionDetails[currentLineTitle] || { theory: '', music: '', genre: '' };
+    }
     
     let theoryHtml = '';
     let musicHtml = '';
     
-    // Process theory section
-    if (detailData.theory) {
-        const theoryLines = detailData.theory.split('\n');
-        theoryLines.forEach((line) => {
-            if (line.trim()) {
-                const escapedLine = escapeHtml(line);
-                const styledLine = escapedLine.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
-                theoryHtml += `<p class="detail-line">${styledLine}</p>`;
-            } else {
+    // Process theory section with tooltip support
+    let processedTheory = detailData.theory ? addTooltipsToContent(detailData.theory) : '';
+    
+    if (processedTheory) {
+        const theoryLines = processedTheory.split('\n');
+        for (let i = 0; i < theoryLines.length; i++) {
+            const line = theoryLines[i];
+            if (line.trim() && line.trim() !== '< Info >') {
+                // Check if line contains bracketed theories
+                if (line.includes('[')) {
+                    // Extract all bracketed theories
+                    const bracketsRegex = /\[([^\]]+)\]/g;
+                    let match;
+                    let html = '<p class="detail-line" style="display: flex; gap: 8px; flex-wrap: wrap;">';
+                    let lastIndex = 0;
+                    
+                    while ((match = bracketsRegex.exec(line)) !== null) {
+                        const theoryName = match[1].trim();
+                        const fullBracket = match[0];
+                        
+                        html += `<span onmouseenter="showTheoryTooltip('${theoryName.replace(/'/g, "\\'")}', event)" onmouseleave="hideTheoryTooltip()" style="cursor: help; margin-right: 8px;">${escapeHtml(fullBracket)}</span>`;
+                    }
+                    
+                    html += '</p>';
+                    theoryHtml += html;
+                    console.log('Added bracketed theory line:', html);
+                } else {
+                    // No brackets, render as before
+                    const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
+                    theoryHtml += `<p class="detail-line" onmouseenter="showTheoryTooltip('${line.trim().replace(/'/g, "\\'")}', event)" onmouseleave="hideTheoryTooltip()" style="cursor: help;">` + styledLine + `</p>`;
+                }
+            } else if (line.trim() !== '< Info >' && line.trim() !== '') {
                 // Empty line for spacing
                 theoryHtml += `<p class="detail-line" style="height: 10px; margin: 0;"></p>`;
             }
-        });
+        }
     } else {
         theoryHtml = '<p style="color: #888;">No theory content yet.</p>';
     }
     
-    // Process music section
-    if (detailData.music) {
-        const musicLines = detailData.music.split('\n');
-        musicLines.forEach((line) => {
-            if (line.trim()) {
-                const escapedLine = escapeHtml(line);
-                const styledLine = escapedLine.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
+    // Process music section with tooltip support
+    let processedMusic = detailData.music ? addTooltipsToContent(detailData.music) : '';
+    
+    if (processedMusic) {
+        const musicLines = processedMusic.split('\n');
+        for (let i = 0; i < musicLines.length; i++) {
+            const line = musicLines[i];
+            if (line.trim() && line.trim() !== '< Info >') {
+                const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
                 musicHtml += `<p class="detail-line">${styledLine}</p>`;
-            } else {
+            } else if (line.trim() !== '< Info >' && line.trim() !== '') {
                 // Empty line for spacing
                 musicHtml += `<p class="detail-line" style="height: 10px; margin: 0;"></p>`;
             }
-        });
+        }
     } else {
         musicHtml = '<p style="color: #888;">No music content yet.</p>';
+    }
+    
+    // Process genre section with tooltip support
+    let processedGenre = detailData.genre ? addTooltipsToContent(detailData.genre) : '';
+    let genreHtml = '';
+    
+    if (processedGenre) {
+        const genreLines = processedGenre.split('\n');
+        for (let i = 0; i < genreLines.length; i++) {
+            const line = genreLines[i];
+            if (line.trim() && line.trim() !== '< Info >') {
+                const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
+                genreHtml += `<p class="detail-line">${styledLine}</p>`;
+            } else if (line.trim() !== '< Info >' && line.trim() !== '') {
+                // Empty line for spacing
+                genreHtml += `<p class="detail-line" style="height: 10px; margin: 0;"></p>`;
+            }
+        }
+    } else {
+        genreHtml = '<p style="color: #888;">No genre content yet.</p>';
     }
     
     document.getElementById('detailContent').innerHTML = `
@@ -173,33 +303,186 @@ function loadDetailView() {
             <div class="detail-body">
                 ${musicHtml}
             </div>
+            <h2 class="detail-section-title">Genre</h2>
+            <div class="detail-body">
+                ${genreHtml}
+            </div>
         </div>
     `;
 }
 
+// Load progression detail for SPA
+function loadProgressionDetail() {
+    migrateOldContent();
+    
+    // First priority: use window.lastSelectedUniqueKey (most recent click)
+    if (window.lastSelectedUniqueKey) {
+        currentUniqueKey = window.lastSelectedUniqueKey;
+        currentLineTitle = window.lastSelectedLineTitle;
+        currentProgId = window.lastSelectedProgIndex ? parseInt(window.lastSelectedProgIndex) : null;
+    } else {
+        // Fallback: try to get lineTitle from URL params
+        const params = new URLSearchParams(window.location.search);
+        let lineTitle = params.get('lineTitle');
+        const progIndex = params.get('progIndex');
+        
+        if (!lineTitle) {
+            document.getElementById('detailContent').innerHTML = '<p>No progression selected.</p>';
+            return;
+        }
+        
+        currentLineTitle = decodeURIComponent(lineTitle);
+        currentProgId = progIndex ? parseInt(progIndex) : null;
+        currentUniqueKey = progIndex ? `${progIndex}:${currentLineTitle}` : currentLineTitle;
+    }
+    
+    loadDetailView();
+}
+
 // Load progression detail
 window.addEventListener('DOMContentLoaded', () => {
-    // Migrate old content format if needed
     migrateOldContent();
     
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     let lineTitle = params.get('lineTitle');
     
-    if (id === null) {
+    if (id === null && !lineTitle) {
         document.getElementById('detailContent').innerHTML = '<p>No progression selected.</p>';
         return;
     }
     
-    currentProgId = parseInt(id);
-    currentLineTitle = lineTitle ? decodeURIComponent(lineTitle) : '';
-    const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
-    const prog = progs[currentProgId];
+    if (id !== null) {
+        currentProgId = parseInt(id);
+        currentLineTitle = lineTitle ? decodeURIComponent(lineTitle) : '';
+    } else if (lineTitle) {
+        currentLineTitle = decodeURIComponent(lineTitle);
+    }
     
-    if (!prog) {
-        document.getElementById('detailContent').innerHTML = '<p>Progression not found.</p>';
-        return;
+    const progs = JSON.parse(localStorage.getItem('musicProgressions')) || [];
+    
+    if (id !== null) {
+        const prog = progs[currentProgId];
+        if (!prog) {
+            document.getElementById('detailContent').innerHTML = '<p>Progression not found.</p>';
+            return;
+        }
     }
     
     loadDetailView();
 });
+
+// Show theory tooltip when hovering over a line
+function showTheoryTooltip(lineTitle, event) {
+    // Remove existing tooltip
+    hideTheoryTooltip();
+    
+    const theoryName = lineTitle.trim();
+    console.log('showTheoryTooltip - theoryName:', theoryName);
+    
+    // Get theory definition from Music Theory page storage
+    const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
+    console.log('Full musicTheory object:', musicTheory);
+    console.log('musicTheory keys:', Object.keys(musicTheory));
+    
+    // Try to find exact match first
+    let theoryData = musicTheory[theoryName];
+    console.log('Direct lookup result:', theoryData);
+    
+    // If not found, try case-insensitive search
+    if (!theoryData) {
+        console.log('Trying case-insensitive search...');
+        for (const key in musicTheory) {
+            if (key.toLowerCase() === theoryName.toLowerCase()) {
+                console.log('Found with case-insensitive match:', key);
+                theoryData = musicTheory[key];
+                break;
+            }
+        }
+    }
+    
+    if (!theoryData) {
+        console.log('No theory data found in Music Theory storage');
+        return;
+    }
+    
+    const theory = typeof theoryData === 'string' ? theoryData : (theoryData.theory || '');
+    if (!theory.trim()) {
+        console.log('Theory is empty');
+        return;
+    }
+    
+    console.log('theory content:', theory);
+    
+    // Extract content after "< Info >" until empty line
+    const lines = theory.split('\n');
+    let tooltipContent = '';
+    let inInfoSection = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        
+        if (line.trim() === '< Info >') {
+            inInfoSection = true;
+            console.log('Found < Info > at line', i);
+            continue;
+        }
+        
+        if (inInfoSection) {
+            if (line.trim() === '') {
+                break; // Stop at empty line
+            }
+            if (line.trim()) {
+                const styled = line.replace(/\*\*(.*?)\*\*/g, '<span class="tooltip-styled">$1</span>');
+                tooltipContent += `<p class="tooltip-line">${escapeHtml(styled)}</p>`;
+            }
+        }
+    }
+    
+    // If no info section found, show first 5 lines
+    if (!tooltipContent.trim()) {
+        console.log('No < Info > section found, showing first 5 lines');
+        for (let i = 0; i < Math.min(5, lines.length); i++) {
+            if (lines[i].trim()) {
+                const styled = lines[i].replace(/\*\*(.*?)\*\*/g, '<span class="tooltip-styled">$1</span>');
+                tooltipContent += `<p class="tooltip-line">${escapeHtml(styled)}</p>`;
+            }
+        }
+    }
+    
+    if (!tooltipContent.trim()) {
+        console.log('No content to display');
+        return;
+    }
+    
+    // Create tooltip
+    const tooltip = document.createElement('div');
+    tooltip.id = 'progression-theory-tooltip';
+    tooltip.className = 'progression-theory-tooltip';
+    
+    tooltip.innerHTML = `
+        <div class="tooltip-content">
+            <div class="tooltip-theory">${tooltipContent}</div>
+        </div>
+    `;
+    
+    console.log('Adding tooltip to body');
+    document.body.appendChild(tooltip);
+    
+    // Position near mouse with bounds checking
+    const x = Math.min(event.pageX + 15, window.innerWidth - 370);
+    const y = Math.min(event.pageY + 10, window.innerHeight - 260);
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+    tooltip.style.display = 'block';
+    
+    console.log('Tooltip positioned at:', x, y);
+}
+
+// Hide theory tooltip
+function hideTheoryTooltip() {
+    const tooltip = document.getElementById('progression-theory-tooltip');
+    if (tooltip) {
+        tooltip.remove();
+    }
+}

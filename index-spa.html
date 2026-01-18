@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Theory</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="pageTitle">Music Theory</h1>
+            <button id="backBtn" class="back-btn" style="display: none;">←</button>
+        </header>
+
+        <main id="mainContent">
+            <!-- HOME PAGE -->
+            <section id="homePage" class="page-section">
+                <section class="content-area">
+                    <h2>Welcome to Music Theory</h2>
+                    <p id="siteDescription" style="cursor: pointer;">Learn and explore chord progressions and music theory concepts.</p>
+                    <button id="editDescBtn" class="group-edit-btn" style="display: none; margin-top: 10px;">Edit Description</button>
+                    <p style="margin-top: 20px; color: #ffd6d6; font-size: 0.9em;">By Aino</p>
+                </section>
+
+                <section class="lessons-section">
+                    <h2><a href="chord-progression.html" class="nav-link" style="color: #00d4ff; text-decoration: underline; cursor: pointer;">Chord Progression</a></h2>
+                </section>
+
+                <section class="lessons-section">
+                    <h2><a href="music-theory.html" class="nav-link" style="color: #00d4ff; text-decoration: underline; cursor: pointer;">Music Theory</a></h2>
+                </section>
+            </section>
+
+            <!-- CHORD PROGRESSION PAGE -->
+            <section id="chordProgressionPage" class="page-section" style="display: none;">
+                <div id="progressionsList" class="progressions-list">
+                    <!-- Progressions render here -->
+                </div>
+            </section>
+
+            <!-- PROGRESSION INFO PAGE -->
+            <section id="progressionInfoPage" class="page-section" style="display: none;">
+                <div class="detail-controls" id="detailControls"></div>
+                <div class="detail-content" id="detailContent">
+                    <!-- Detail content will be loaded here -->
+                </div>
+            </section>
+
+            <!-- MUSIC THEORY PAGE -->
+            <section id="musicTheoryPage" class="page-section" style="display: none;">
+                <div class="theory-list-container" id="theoryList">
+                    <!-- Theory list will be loaded here -->
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Music Theory Learning. Happy learning! 🎶</p>
+            <div class="music-controls">
+                <button id="musicToggleBtn" class="music-btn">🎵 Music</button>
+                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="30">
+                <span id="volumeLabel" class="volume-label">30%</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="sounds.js"></script>
+    <script src="router.js"></script>
+    <script src="script.js"></script>
+    <script src="theory-index.js"></script>
+    <script src="progression-info.js"></script>
+</body>
+</html>

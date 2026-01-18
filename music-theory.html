@@ -21,9 +21,15 @@
 
         <footer>
             <p>&copy; 2026 Music Theory Learning. Happy learning! 🎶</p>
+            <div class="music-controls">
+                <button id="musicToggleBtn" class="music-btn">🎵 Music</button>
+                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="30">
+                <span id="volumeLabel" class="volume-label">30%</span>
+            </div>
         </footer>
     </div>
 
+    <script src="sounds.js"></script>
     <script src="theory-index.js"></script>
 </body>
 </html>

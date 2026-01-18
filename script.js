@@ -5,6 +5,43 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Storage abstraction layer - tries IndexedDB, falls back to localStorage
+const StorageManager = {
+    async set(storeName, key, value) {
+        try {
+            if (typeof db !== 'undefined' && db.ready) {
+                await db.set(storeName, key, value);
+            }
+        } catch (error) {
+            console.warn('IndexedDB write failed, using localStorage:', error);
+        }
+        // Also save to localStorage as fallback
+        const lsKey = storeName === 'progressions' ? 'musicProgressions' : 
+                      storeName === 'progressionDetails' ? 'progressionDetails' :
+                      storeName === 'groupNames' ? 'groupCustomNames' : key;
+        localStorage.setItem(lsKey, JSON.stringify(value));
+    },
+
+    async get(storeName, key) {
+        try {
+            if (typeof db !== 'undefined' && db.ready) {
+                const value = await db.get(storeName, key);
+                if (value !== null) {
+                    return value;
+                }
+            }
+        } catch (error) {
+            console.warn('IndexedDB read failed, using localStorage:', error);
+        }
+        // Fallback to localStorage
+        const lsKey = storeName === 'progressions' ? 'musicProgressions' : 
+                      storeName === 'progressionDetails' ? 'progressionDetails' :
+                      storeName === 'groupNames' ? 'groupCustomNames' : key;
+        const value = localStorage.getItem(lsKey);
+        return value ? JSON.parse(value) : null;
+    }
+};
+
 // LocalStorage keys
 const STORAGE_KEYS = {
     PROGRESSIONS: 'musicProgressions',
@@ -12,8 +49,64 @@ const STORAGE_KEYS = {
     SITE_DESCRIPTION: 'siteDescription'
 };
 
-// Track the currently open group
+// Track currently open group for accordion
 let currentOpenGroup = null;
+
+// Export all progression data to a JSON file
+function exportProgressionData() {
+    const data = {
+        progressions: localStorage.getItem(STORAGE_KEYS.PROGRESSIONS),
+        progressionDetails: localStorage.getItem('progressionDetails'),
+        groupNames: localStorage.getItem(STORAGE_KEYS.GROUP_NAMES),
+        timestamp: new Date().toISOString()
+    };
+    
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `music-theory-backup-${Date.now()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    console.log('Data exported successfully!');
+}
+
+// Import progression data from a JSON file
+function importProgressionData(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            
+            if (data.progressions) {
+                localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, data.progressions);
+                StorageManager.set('progressions', 'default', JSON.parse(data.progressions));
+            }
+            if (data.progressionDetails) {
+                localStorage.setItem('progressionDetails', data.progressionDetails);
+                StorageManager.set('progressionDetails', 'default', JSON.parse(data.progressionDetails));
+            }
+            if (data.groupNames) {
+                localStorage.setItem(STORAGE_KEYS.GROUP_NAMES, data.groupNames);
+                StorageManager.set('groupNames', 'default', JSON.parse(data.groupNames));
+            }
+            
+            console.log('Data imported successfully!');
+            alert('Data imported! Refreshing page...');
+            location.reload();
+        } catch (err) {
+            console.error('Error importing data:', err);
+            alert('Error importing file. Make sure it\'s a valid backup file.');
+        }
+    };
+    reader.readAsText(file);
+}
+
+
 
 // Config: enable edit UI only when viewing locally
 const EDIT_UI_ENABLED = (
@@ -83,7 +176,7 @@ function initializeProgressions() {
             { title: '2 5 1', content: '2m - 5 - 1' },
             { title: '1 3 6 5', content: '1 - 3m - 6m - 5' }
         ];
-        localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(progs));
+        StorageManager.set('progressions', 'default', progs);
     }
     return progs;
 }
@@ -91,7 +184,13 @@ function initializeProgressions() {
 function loadProgressions() {
     initializeProgressions();
     const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
+    console.log('Loaded progressions:', progs.length, progs);
+    
     const list = document.getElementById('progressionsList');
+    if (!list) {
+        console.error('progressionsList element not found!');
+        return;
+    }
     list.innerHTML = '';
     
     // Create wrapper divs
@@ -121,6 +220,14 @@ function loadProgressions() {
     
     // Define display order: ascending from 1 to 7
     const displayOrder = ['1','b2','2','b3','3','4','#4','5','b6','6','b7','7'];
+    
+    // Also include any other keys not in the main display order
+    const allKeys = Object.keys(groups).sort();
+    allKeys.forEach(key => {
+        if (!displayOrder.includes(key)) {
+            displayOrder.push(key);
+        }
+    });
     
     displayOrder.forEach((key, displayIdx) => {
         if (groups[key] && groups[key].length > 0) {
@@ -183,8 +290,9 @@ function loadProgressions() {
                         const isClickable = hasContent && !hasStyledText;
                         const clickableClass = isClickable ? 'clickable-line' : '';
                         const crimsonClass = shouldBeCrimson ? 'crimson-text' : '';
+                        const encodedLine = isClickable ? encodeURIComponent(line.trim()) : '';
                         allContent += `
-                            <p class="progression-notes ${clickableClass} ${crimsonClass}" ${isClickable ? `onclick="showDetail(${prog.origIndex}, ${lineIdx})"` : ''}>${styledLine}</p>
+                            <p class="progression-notes ${clickableClass} ${crimsonClass}" ${isClickable ? `onclick="showDetail(${prog.origIndex}, '${encodedLine}')"` : ''}>${styledLine}</p>
                         `;
                         
                         // If this line has styled text, turn on crimson for the next lines
@@ -213,6 +321,15 @@ function loadProgressions() {
     
     list.appendChild(boxesWrapper);
     list.appendChild(contentWrapper);
+    
+    // Restore the previously open group if it exists
+    if (currentOpenGroup) {
+        const previousContainer = document.getElementById(`group-content-${currentOpenGroup}`);
+        if (previousContainer) {
+            previousContainer.classList.remove('collapsed');
+            console.log('Restored open group:', currentOpenGroup);
+        }
+    }
 }
 
 // Group edit mode
@@ -306,6 +423,8 @@ function saveGroupEditCombined(groupKey) {
     
     localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(progs));
     localStorage.setItem(STORAGE_KEYS.GROUP_NAMES, JSON.stringify(customNames));
+    StorageManager.set('progressions', 'default', progs);
+    StorageManager.set('groupNames', 'default', customNames);
     loadProgressions();
 }
 
@@ -314,14 +433,21 @@ function cancelGroupEdit(groupKey) {
 }
 
 // Show detail page for a progression
-function showDetail(index, lineIndex) {
+function showDetail(index, lineContent) {
     // Navigate to progression info page with ID and the clicked line for title
-    const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
-    const prog = progs[index];
-    const contentLines = prog.content.split('\n').filter(l => l.trim());
-    const lineContent = contentLines[lineIndex] || prog.title;
+    let encodedContent;
     
-    const encodedContent = encodeURIComponent(lineContent);
+    // If lineContent is a string (the actual line text)
+    if (typeof lineContent === 'string' && lineContent.length > 0) {
+        // It's already encoded from the onclick
+        encodedContent = lineContent;
+    } else {
+        // Fallback to getting from prog (shouldn't happen now)
+        const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
+        const prog = progs[index];
+        encodedContent = encodeURIComponent(prog.title);
+    }
+    
     const detailUrl = `progression-info.html?id=${index}&lineTitle=${encodedContent}`;
     window.location.href = detailUrl;
 }
@@ -368,6 +494,54 @@ function editSiteDescription() {
     
     if (newDescription !== null && newDescription.trim() !== '') {
         localStorage.setItem('siteDescription', newDescription.trim());
+        StorageManager.set('settings', 'siteDescription', newDescription.trim());
         loadSiteDescription();
+    }
+}
+
+// Load site description (for SPA)
+function loadSiteDescription() {
+    const description = localStorage.getItem('siteDescription') || 'Learn and explore chord progressions and music theory concepts.';
+    const descElement = document.getElementById('siteDescription');
+    if (descElement) {
+        descElement.textContent = description;
+    }
+    
+    const editBtn = document.getElementById('editDescBtn');
+    if (editBtn) {
+        editBtn.style.display = isOwnerMode() ? 'block' : 'none';
+    }
+}
+
+// Updated showDetail for SPA navigation
+function showDetail(indexOrLineText, encodedLineTitle) {
+    // Support both old format (index) and new format (line text)
+    let lineTitle = '';
+    let progIndex = '';
+    
+    if (typeof indexOrLineText === 'number') {
+        progIndex = String(indexOrLineText);
+    } else if (typeof indexOrLineText === 'string') {
+        lineTitle = decodeURIComponent(indexOrLineText);
+    } 
+    
+    if (typeof encodedLineTitle === 'string') {
+        lineTitle = decodeURIComponent(encodedLineTitle);
+    }
+    
+    if ((lineTitle || progIndex) && router) {
+        // Create unique key combining progression index and line title
+        const uniqueKey = progIndex ? `${progIndex}:${lineTitle}` : lineTitle;
+        
+        // Store the line title and progression index for the progression-info page to find
+        window.lastSelectedLineTitle = lineTitle;
+        window.lastSelectedProgIndex = progIndex;
+        window.lastSelectedUniqueKey = uniqueKey;
+        
+        // Navigate to progression-info.html with line title as parameter
+        router.loadPage('progression-info.html');
+        
+        // Set URL parameter for bookmark/share capability
+        window.history.pushState({ page: 'progression-info.html', lineTitle, progIndex }, '', 'progression-info.html?lineTitle=' + encodeURIComponent(lineTitle) + '&progIndex=' + progIndex);
     }
 }

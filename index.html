@@ -7,33 +7,115 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Loading Music Theory...</p>
+        </div>
+    </div>
+
     <div class="container">
         <header>
-            <h1>Music Theory</h1>
+            <h1 id="pageTitle">Music Theory</h1>
+            <button id="backBtn" class="back-btn" style="display: none;">←</button>
         </header>
 
-        <main>
-            <section class="content-area">
-                <h2>Welcome to Music Theory</h2>
-                <p id="siteDescription" style="cursor: pointer;">Learn and explore chord progressions and music theory concepts.</p>
-                <button id="editDescBtn" class="group-edit-btn" style="display: none; margin-top: 10px;">Edit Description</button>
-                <p style="margin-top: 20px; color: #ffd6d6; font-size: 0.9em;">By Aino</p>
+        <main id="mainContent">
+            <!-- HOME PAGE -->
+            <section id="homePage" class="page-section">
+                <section class="content-area">
+                    <h2>Welcome to Music Theory</h2>
+                    <p id="siteDescription" style="cursor: pointer;">Learn and explore chord progressions and music theory concepts.</p>
+                    <button id="editDescBtn" class="group-edit-btn" style="display: none; margin-top: 10px;">Edit Description</button>
+                    <p style="margin-top: 20px; color: #ffd6d6; font-size: 0.9em;">By Aino</p>
+                </section>
+
+                <section class="lessons-section">
+                    <h2><a href="chord-progression.html" class="nav-link" style="color: #00d4ff; text-decoration: underline; cursor: pointer;">Chord Progression</a></h2>
+                </section>
+
+                <section class="lessons-section">
+                    <h2><a href="music-theory.html" class="nav-link" style="color: #00d4ff; text-decoration: underline; cursor: pointer;">Music Theory</a></h2>
+                </section>
             </section>
 
-            <section class="lessons-section">
-                <h2><a href="chord-progression.html" style="color: #00d4ff; text-decoration: underline; cursor: pointer;">Chord Progression</a></h2>
+            <!-- CHORD PROGRESSION PAGE -->
+            <section id="chordProgressionPage" class="page-section" style="display: none;">
+                <div id="progressionsList" class="progressions-list">
+                    <!-- Progressions render here -->
+                </div>
             </section>
 
-            <section class="lessons-section">
-                <h2><a href="music-theory.html" style="color: #00d4ff; text-decoration: underline; cursor: pointer;">Music Theory</a></h2>
+            <!-- PROGRESSION INFO PAGE -->
+            <section id="progressionInfoPage" class="page-section" style="display: none;">
+                <div class="detail-controls" id="detailControls"></div>
+                <div class="detail-content" id="detailContent">
+                    <!-- Detail content will be loaded here -->
+                </div>
+            </section>
+
+            <!-- MUSIC THEORY PAGE -->
+            <section id="musicTheoryPage" class="page-section" style="display: none;">
+                <div class="theory-list-container" id="theoryList">
+                    <!-- Theory list will be loaded here -->
+                </div>
             </section>
         </main>
 
         <footer>
             <p>&copy; 2026 Music Theory Learning. Happy learning! 🎶</p>
+            <div class="sounds-control-panel">
+                <div class="sound-section">
+                    <div class="sound-header">
+                        <button id="musicToggleBtn" class="sound-btn">🎵 Music</button>
+                        <input type="range" id="volumeSlider" class="sound-slider" min="0" max="100" value="20">
+                        <span id="volumeLabel" class="sound-label">20%</span>
+                    </div>
+                </div>
+                <div class="sound-section">
+                    <div class="sound-header">
+                        <button id="sfxToggleBtn" class="sound-btn">🔊 SFX</button>
+                        <input type="range" id="sfxSlider" class="sound-slider" min="0" max="100" value="50">
+                        <span id="sfxLabel" class="sound-label">50%</span>
+                    </div>
+                </div>
+                <div class="sound-section">
+                    <button onclick="exportProgressionData()" class="sound-btn" style="font-size: 0.9em;">💾 Export</button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importProgressionData(this.files[0])">
+                    <button onclick="document.getElementById('importFile').click()" class="sound-btn" style="font-size: 0.9em;">📂 Import</button>
+                </div>
+            </div>
         </footer>
     </div>
 
+    <script src="db.js"></script>
+    <script src="sounds.js"></script>
+    <script src="router.js"></script>
     <script src="script.js"></script>
+    <script src="theory-index.js"></script>
+    <script src="progression-info.js"></script>
+    
+    <script>
+        // Hide loading screen when page is fully loaded
+        function hideLoadingScreen() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.classList.add('hidden');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }
+        }
+        
+        // Hide loading screen when DOM is ready
+        document.addEventListener('DOMContentLoaded', hideLoadingScreen);
+        
+        // Also hide when all resources are loaded
+        window.addEventListener('load', hideLoadingScreen);
+        
+        // Failsafe: hide after 5 seconds anyway
+        setTimeout(hideLoadingScreen, 5000);
+    </script>
 </body>
 </html>
