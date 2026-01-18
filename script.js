@@ -110,11 +110,18 @@ function autoRestoreFromBackup() {
             }
             if (data.siteDescription) {
                 localStorage.setItem(STORAGE_KEYS.SITE_DESCRIPTION, data.siteDescription);
+            } else {
+                // Set default if not in backup
+                localStorage.setItem(STORAGE_KEYS.SITE_DESCRIPTION, 'Learn and explore chord progressions and music theory concepts.');
             }
             console.log('✓ Data restored from backup');
         })
         .catch(err => {
             console.debug('No backup found or failed to restore');
+            // Ensure default siteDescription is set
+            if (!localStorage.getItem(STORAGE_KEYS.SITE_DESCRIPTION)) {
+                localStorage.setItem(STORAGE_KEYS.SITE_DESCRIPTION, 'Learn and explore chord progressions and music theory concepts.');
+            }
         });
 }
 
@@ -646,6 +653,11 @@ function showDetail(index, lineContent) {
 
 // Load progressions when page starts (only on chord-progressions page)
 window.addEventListener('DOMContentLoaded', () => {
+    // Ensure siteDescription has a default value before autoRestore
+    if (!localStorage.getItem(STORAGE_KEYS.SITE_DESCRIPTION)) {
+        localStorage.setItem(STORAGE_KEYS.SITE_DESCRIPTION, 'Learn and explore chord progressions and music theory concepts.');
+    }
+    
     // Auto-restore from backup JSON on page load
     autoRestoreFromBackup();
     
@@ -694,8 +706,19 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // Load and display site description
 function loadSiteDescription() {
-    const savedDescription = localStorage.getItem(STORAGE_KEYS.SITE_DESCRIPTION) || 'Learn and explore chord progressions and music theory concepts.';
-    document.getElementById('siteDescription').textContent = savedDescription;
+    const defaultDescription = 'Learn and explore chord progressions and music theory concepts.';
+    let savedDescription = localStorage.getItem(STORAGE_KEYS.SITE_DESCRIPTION);
+    
+    // If not found, check for the hardcoded default from index.html
+    if (!savedDescription || savedDescription.trim() === '') {
+        savedDescription = defaultDescription;
+        localStorage.setItem(STORAGE_KEYS.SITE_DESCRIPTION, defaultDescription);
+    }
+    
+    const siteDescElement = document.getElementById('siteDescription');
+    if (siteDescElement) {
+        siteDescElement.textContent = savedDescription;
+    }
     
     // Show edit button in owner mode
     if (isOwnerMode()) {
