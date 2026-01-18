@@ -39,22 +39,29 @@ A sustained, repeated low note, usually in the bass, over which the harmony chan
         };
     }
     
-    // Ensure Chromatic Descent exists
+    // Ensure Chromatic theory exists with subtitles
+    if (!musicTheory['Chromatic']) {
+        musicTheory['Chromatic'] = {
+            theory: `Chromatic
+- Chromatic Descending
+< Info >
+Movement down through semitones
+- Chromatic Ascending
+< Info >
+Movement up through semitones
+- Chromatic Descenting
+< Info >
+The progressive descending motion through chromatic notes`,
+            music: ''
+        };
+    }
+    
+    // Ensure Chromatic Descent exists (legacy)
     if (!musicTheory['Chromatic Descent']) {
         musicTheory['Chromatic Descent'] = {
             theory: `Chromatic Descent
 < Info >
 A melodic line moving down by semitones`,
-            music: ''
-        };
-    }
-    
-    // Ensure Chromatic Descenting exists (as separate theory)
-    if (!musicTheory['Chromatic Descenting']) {
-        musicTheory['Chromatic Descenting'] = {
-            theory: `Chromatic Descenting
-< Info >
-The progressive descending motion through chromatic notes`,
             music: ''
         };
     }
@@ -397,6 +404,7 @@ function showTheoryTooltip(lineTitle, event) {
     
     // Try to find exact match first
     let theoryData = musicTheory[theoryName];
+    let tooltipContent = '';
     
     // If not found, try case-insensitive search
     if (!theoryData) {
@@ -408,29 +416,53 @@ function showTheoryTooltip(lineTitle, event) {
         }
     }
     
+    // If still not found, search in subtitles
     if (!theoryData) {
-        return;
-    }
-    
-    const theory = typeof theoryData === 'string' ? theoryData : (theoryData.theory || '');
-    if (!theory.trim()) {
-        return;
-    }
-    
-
-    
-    // Extract content after "< Info >" until empty line
-    const lines = theory.split('\n');
-    let tooltipContent = '';
-    let inInfoSection = false;
-    
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+        for (const key in musicTheory) {
+            const data = musicTheory[key];
+            const theory = typeof data === 'string' ? data : (data.theory || '');
+            const lines = theory.split('\n');
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                // Check if this line is a subtitle matching our search
+                if (line.startsWith('- ') && line.slice(2).toLowerCase() === theoryName.toLowerCase()) {
+                    // Found it as a subtitle, extract its info
+                    for (let j = i + 1; j < lines.length; j++) {
+                        const contentLine = lines[j].trim();
+                        if (contentLine === '< Info >') {
+                            // Extract content after Info marker until next subtitle or end
+                            for (let k = j + 1; k < lines.length; k++) {
+                                const infoLine = lines[k].trim();
+                                if (infoLine.startsWith('- ') || infoLine === '') break;
+                                if (infoLine) tooltipContent += infoLine + '\n';
+                            }
+                            break;
+                        }
+                    }
+                    if (tooltipContent) break;
+                }
+            }
+            if (tooltipContent) break;
+        }
         
-        if (line.trim() === '< Info >') {
-            inInfoSection = true;
-
-            continue;
+        if (!tooltipContent) return;
+    }
+    
+    if (!tooltipContent && theoryData) {
+        const theory = typeof theoryData === 'string' ? theoryData : (theoryData.theory || '');
+        if (!theory.trim()) return;
+        
+        // Extract content after "< Info >" until empty line
+        const lines = theory.split('\n');
+        let inInfoSection = false;
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            
+            if (line.trim() === '< Info >') {
+                inInfoSection = true;
+                continue;
         }
         
         if (inInfoSection) {
