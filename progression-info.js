@@ -534,21 +534,18 @@ function showTheoryTooltip(lineTitle, event) {
                 }
             }
         }
-    }
-    
-    // If no info section found, show first 5 lines
-    if (!tooltipContent.trim()) {
-
-        for (let i = 0; i < Math.min(5, lines.length); i++) {
-            if (lines[i].trim()) {
-                const styled = lines[i].replace(/\*\*(.*?)\*\*/g, '<span class="tooltip-styled">$1</span>');
-                tooltipContent += `<p class="tooltip-line">${escapeHtml(styled)}</p>`;
+        
+        // If no info section found, show first 5 lines
+        if (!tooltipContent.trim()) {
+            for (let i = 0; i < Math.min(5, lines.length); i++) {
+                if (lines[i].trim()) {
+                    const styled = lines[i].replace(/\*\*(.*?)\*\*/g, '<span class="tooltip-styled">$1</span>');
+                    tooltipContent += `<p class="tooltip-line">${escapeHtml(styled)}</p>`;
+                }
             }
         }
-    }
-    
-    if (!tooltipContent.trim()) {
-
+    } else if (!tooltipContent) {
+        // No theory data found at all
         return;
     }
     
