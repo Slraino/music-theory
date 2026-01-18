@@ -1,8 +1,9 @@
 // Local music playlist - add your MP3 files to the /music folder
 const MUSIC_PLAYLIST = [
     'music/Sharou-superstar.mp3',
-    'music/Sharou-Anyone in 2025.mp3',
-    'music/Sharou-3_03 PM.mp3'
+    'music/Sharou-Anyone%20in%202025_.mp3',
+    'music/Sharou-3_03%20PM.mp3',
+    'music/Sharou-2_23%20AM.mp3'
 ];
 
 // Sound Effects Manager
