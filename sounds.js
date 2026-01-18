@@ -3,7 +3,11 @@ const MUSIC_PLAYLIST = [
     'music/Sharou-superstar.mp3',
     'music/Sharou-Anyone%20in%202025_.mp3',
     'music/Sharou-3_03%20PM.mp3',
-    'music/Sharou-2_23%20AM.mp3'
+    'music/Sharou-2_23%20AM.mp3',
+    'music/Sharou-10.mp3',
+    'music/Sharou-Cassette%20Tape%20Dream.mp3',
+    'music/Sharou-Sheep%20of%20the%20Far%20East%2C%20Dancing%20with%20the%20Telecaster.mp3',
+    'music/Sharou-You%20and%20Me.mp3'
 ];
 
 // Sound Effects Manager
