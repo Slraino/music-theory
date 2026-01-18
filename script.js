@@ -235,6 +235,7 @@ function initializeProgressions() {
 function loadProgressions() {
     initializeProgressions();
     const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
+    console.log('📊 Loaded progressions:', progs.length);
 
     // Show edit button if in owner mode (for chord progression page)
     const progressionControls = document.getElementById('progressionControls');
@@ -276,6 +277,7 @@ function loadProgressions() {
         
         groups[key].push({ ...prog, origIndex: idx });
     });
+    console.log('🎵 Groups created:', Object.keys(groups));
     
     // Define display order: ascending from 1 to 7
     const displayOrder = ['1','b2','2','b3','3','4','#4','5','b6','6','b7','7'];
