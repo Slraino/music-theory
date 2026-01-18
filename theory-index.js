@@ -695,4 +695,24 @@ function loadTheoryList() {
 window.addEventListener('DOMContentLoaded', () => {
     loadTheories();
 });
+        }
+    }
+}
+
+// Helper function to prevent HTML injection
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Alias for SPA compatibility
+function loadTheoryList() {
+    loadTheories();
+}
+
+// Load theories when page starts
+window.addEventListener('DOMContentLoaded', () => {
+    loadTheories();
+});
 
