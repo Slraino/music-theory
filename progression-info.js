@@ -118,9 +118,33 @@ function startDetailEdit() {
     // Add a small delay to prevent rapid double-clicks from causing issues
     setTimeout(() => {
         const progressionDetails = JSON.parse(localStorage.getItem('progressionDetails')) || {};
-        // Use currentUniqueKey which has format: progIndex:lineTitle
-        const keyToUse = currentUniqueKey || currentLineTitle;
-        const detailData = progressionDetails[keyToUse] || { theory: '', music: '', genre: '' };
+        
+        // Try multiple key formats to find the data (same logic as loadDetailView)
+        let detailData = null;
+        let keyToUse = null;
+        
+        if (currentUniqueKey && progressionDetails[currentUniqueKey]) {
+            detailData = progressionDetails[currentUniqueKey];
+            keyToUse = currentUniqueKey;
+        }
+        else if (currentLineTitle && progressionDetails[currentLineTitle]) {
+            detailData = progressionDetails[currentLineTitle];
+            keyToUse = currentLineTitle;
+        }
+        else if (currentLineTitle) {
+            const matchingKey = Object.keys(progressionDetails).find(key => 
+                key.includes(currentLineTitle) || currentLineTitle.includes(key.split('ㅤㅤ')[0])
+            );
+            if (matchingKey) {
+                detailData = progressionDetails[matchingKey];
+                keyToUse = matchingKey;
+            }
+        }
+        
+        if (!detailData) {
+            detailData = { theory: '', music: '', genre: '' };
+            keyToUse = currentUniqueKey || currentLineTitle;
+        }
         
         // Find the VISIBLE progressionInfoPage and its detailContent
         const progressionInfoPage = document.getElementById('progressionInfoPage');
@@ -229,11 +253,35 @@ function loadDetailView() {
     
     // Get detail content keyed by unique key (progIndex:lineTitle)
     const progressionDetails = JSON.parse(localStorage.getItem('progressionDetails')) || {};
-    let detailData = progressionDetails[currentUniqueKey] || { theory: '', music: '', genre: '' };
     
-    // Fallback to old key format for backward compatibility
-    if (!detailData.theory && !detailData.music) {
-        detailData = progressionDetails[currentLineTitle] || { theory: '', music: '', genre: '' };
+    // Try multiple key formats to find the data
+    let detailData = null;
+    let keyUsed = null;
+    
+    // First try: currentUniqueKey (new format)
+    if (currentUniqueKey && progressionDetails[currentUniqueKey]) {
+        detailData = progressionDetails[currentUniqueKey];
+        keyUsed = currentUniqueKey;
+    }
+    // Second try: currentLineTitle (old format or direct match)
+    else if (currentLineTitle && progressionDetails[currentLineTitle]) {
+        detailData = progressionDetails[currentLineTitle];
+        keyUsed = currentLineTitle;
+    }
+    // Third try: search for any key that contains the currentLineTitle
+    else if (currentLineTitle) {
+        const matchingKey = Object.keys(progressionDetails).find(key => 
+            key.includes(currentLineTitle) || currentLineTitle.includes(key.split('ㅤㅤ')[0])
+        );
+        if (matchingKey) {
+            detailData = progressionDetails[matchingKey];
+            keyUsed = matchingKey;
+        }
+    }
+    
+    // If still not found, use empty object
+    if (!detailData) {
+        detailData = { theory: '', music: '', genre: '' };
     }
     
     let theoryHtml = '';
