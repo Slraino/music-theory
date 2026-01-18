@@ -75,8 +75,8 @@ function autoSaveData() {
     });
 }
 
-// Start auto-save interval (every 30 seconds)
-setInterval(autoSaveData, 30000);
+// Start auto-save interval (every 60 seconds)
+setInterval(autoSaveData, 60000);
 
 // Also save on page unload
 window.addEventListener('beforeunload', autoSaveData);
