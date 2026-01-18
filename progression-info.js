@@ -112,10 +112,8 @@ function getVisibleDetailContent() {
 let isEditingDetail = false;
 
 function startDetailEdit() {
-    console.log('startDetailEdit called, isEditingDetail:', isEditingDetail);
     if (!isOwnerMode() || isEditingDetail) return;
     isEditingDetail = true;
-    console.log('Opening edit form...');
     
     // Add a small delay to prevent rapid double-clicks from causing issues
     setTimeout(() => {
