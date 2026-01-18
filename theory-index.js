@@ -273,10 +273,9 @@ function loadTheories() {
         let editBtn = '';
         let moveBtn = '';
         if (isOwnerMode()) {
-            const escapedKey = item.key.replace(/'/g, "\\'");
-            editBtn = `<button class="theory-title-edit-btn" onclick="startEditTheory('${escapedKey}')">✏️</button>`;
-            let upBtn = index > 0 ? `<button class="theory-move-btn" onclick="moveTheoryUp('${escapedKey}')">↑</button>` : '';
-            let downBtn = index < theoriesWithContent.length - 1 ? `<button class="theory-move-btn" onclick="moveTheoryDown('${escapedKey}')">↓</button>` : '';
+            editBtn = `<button class="theory-title-edit-btn" data-action="edit" data-key="${escapeHtml(item.key)}">✏️</button>`;
+            let upBtn = index > 0 ? `<button class="theory-move-btn" data-action="up" data-key="${escapeHtml(item.key)}">↑</button>` : '';
+            let downBtn = index < theoriesWithContent.length - 1 ? `<button class="theory-move-btn" data-action="down" data-key="${escapeHtml(item.key)}">↓</button>` : '';
             moveBtn = upBtn + downBtn;
         }
         
@@ -384,6 +383,23 @@ function loadTheories() {
     
     theoryList.innerHTML = html;
     window.theoryContentData = contentData;
+    
+    // Add event listeners for buttons
+    theoryList.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        
+        const action = btn.dataset.action;
+        const key = btn.dataset.key;
+        
+        if (action === 'edit') {
+            startEditTheory(key);
+        } else if (action === 'up') {
+            moveTheoryUp(key);
+        } else if (action === 'down') {
+            moveTheoryDown(key);
+        }
+    });
 }
 
 // Show theory hover box with preview
