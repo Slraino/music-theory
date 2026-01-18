@@ -108,20 +108,11 @@ function autoRestoreFromBackup() {
                 localStorage.setItem(STORAGE_KEYS.GROUP_NAMES, 
                     typeof data.groupNames === 'string' ? data.groupNames : JSON.stringify(data.groupNames));
             }
-            if (data.siteDescription) {
-                localStorage.setItem(STORAGE_KEYS.SITE_DESCRIPTION, data.siteDescription);
-            } else {
-                // Set default if not in backup
-                localStorage.setItem(STORAGE_KEYS.SITE_DESCRIPTION, 'Learn and explore chord progressions and music theory concepts.');
-            }
+            // Don't restore siteDescription from backup - always use fresh defaults or user-set values
             console.log('✓ Data restored from backup');
         })
         .catch(err => {
             console.debug('No backup found or failed to restore');
-            // Ensure default siteDescription is set
-            if (!localStorage.getItem(STORAGE_KEYS.SITE_DESCRIPTION)) {
-                localStorage.setItem(STORAGE_KEYS.SITE_DESCRIPTION, 'Learn and explore chord progressions and music theory concepts.');
-            }
         });
 }
 
