@@ -560,57 +560,72 @@ function loadTheories() {
     // Add event listeners for buttons
     theoryList.addEventListener('click', window.theoryListClickHandler);
     
+    // Remove old drag listeners if they exist
+    if (window.theoryListDragHandlers) {
+        theoryList.removeEventListener('dragstart', window.theoryListDragHandlers.dragstart);
+        theoryList.removeEventListener('dragover', window.theoryListDragHandlers.dragover);
+        theoryList.removeEventListener('dragleave', window.theoryListDragHandlers.dragleave);
+        theoryList.removeEventListener('drop', window.theoryListDragHandlers.drop);
+        theoryList.removeEventListener('dragend', window.theoryListDragHandlers.dragend);
+    }
+    
     // Add drag-and-drop handlers for theory boxes
     let draggedElement = null;
     
-    theoryList.addEventListener('dragstart', (e) => {
-        const titleGroup = e.target.closest('.theory-title-group');
-        if (titleGroup) {
-            draggedElement = titleGroup;
-            titleGroup.style.opacity = '0.6';
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', titleGroup.innerHTML);
-        }
-    });
-    
-    theoryList.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        
-        const titleGroup = e.target.closest('.theory-title-group');
-        if (titleGroup && titleGroup !== draggedElement) {
-            titleGroup.style.borderTop = '2px solid #FF1744';
-        }
-    });
-    
-    theoryList.addEventListener('dragleave', (e) => {
-        const titleGroup = e.target.closest('.theory-title-group');
-        if (titleGroup) {
-            titleGroup.style.borderTop = '';
-        }
-    });
-    
-    theoryList.addEventListener('drop', (e) => {
-        e.preventDefault();
-        
-        const dropTarget = e.target.closest('.theory-title-group');
-        if (dropTarget && draggedElement && dropTarget !== draggedElement) {
-            // Swap the theory boxes
-            const draggedKey = draggedElement.dataset.theoryKey;
-            const dropKey = dropTarget.dataset.theoryKey;
+    // Store handler functions so we can remove them later
+    window.theoryListDragHandlers = {
+        dragstart: (e) => {
+            const titleGroup = e.target.closest('.theory-title-group');
+            if (titleGroup) {
+                draggedElement = titleGroup;
+                titleGroup.style.opacity = '0.6';
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', titleGroup.innerHTML);
+            }
+        },
+        dragover: (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
             
-            swapTheories(draggedKey, dropKey);
+            const titleGroup = e.target.closest('.theory-title-group');
+            if (titleGroup && titleGroup !== draggedElement) {
+                titleGroup.style.borderTop = '2px solid #FF1744';
+            }
+        },
+        dragleave: (e) => {
+            const titleGroup = e.target.closest('.theory-title-group');
+            if (titleGroup) {
+                titleGroup.style.borderTop = '';
+            }
+        },
+        drop: (e) => {
+            e.preventDefault();
+            
+            const dropTarget = e.target.closest('.theory-title-group');
+            if (dropTarget && draggedElement && dropTarget !== draggedElement) {
+                // Swap the theory boxes
+                const draggedKey = draggedElement.dataset.theoryKey;
+                const dropKey = dropTarget.dataset.theoryKey;
+                
+                swapTheories(draggedKey, dropKey);
+            }
+        },
+        dragend: (e) => {
+            const titleGroup = e.target.closest('.theory-title-group');
+            if (titleGroup) {
+                titleGroup.style.opacity = '1';
+                titleGroup.style.borderTop = '';
+            }
+            draggedElement = null;
         }
-    });
+    };
     
-    theoryList.addEventListener('dragend', (e) => {
-        const titleGroup = e.target.closest('.theory-title-group');
-        if (titleGroup) {
-            titleGroup.style.opacity = '1';
-            titleGroup.style.borderTop = '';
-        }
-        draggedElement = null;
-    });
+    // Add drag listeners
+    theoryList.addEventListener('dragstart', window.theoryListDragHandlers.dragstart);
+    theoryList.addEventListener('dragover', window.theoryListDragHandlers.dragover);
+    theoryList.addEventListener('dragleave', window.theoryListDragHandlers.dragleave);
+    theoryList.addEventListener('drop', window.theoryListDragHandlers.drop);
+    theoryList.addEventListener('dragend', window.theoryListDragHandlers.dragend);
 }
 
 // Show theory hover box with preview
