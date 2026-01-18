@@ -13,7 +13,7 @@ class SoundEffects {
         this.initialized = false;
         this.musicPlaying = false;
         this.musicGain = null;
-        this.musicVolume = localStorage.getItem('musicVolume') ? parseFloat(localStorage.getItem('musicVolume')) : 0.2;
+        this.musicVolume = localStorage.getItem('musicVolume') ? parseFloat(localStorage.getItem('musicVolume')) : 0.15;
         this.shouldPlayMusic = localStorage.getItem('musicEnabled') !== 'false';
         this.sfxVolume = localStorage.getItem('sfxVolume') ? parseFloat(localStorage.getItem('sfxVolume')) : 50;
         this.sfxEnabled = localStorage.getItem('sfxEnabled') === 'true' ? true : true;
