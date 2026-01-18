@@ -35,7 +35,7 @@ header {
 header h1 {
     font-size: 1.8em;
     margin-bottom: 5px;
-    color: #DC143C;
+    color: #FF1744;
 }
 
 header p {
@@ -338,7 +338,7 @@ main {
     flex-direction: column;
     gap: 5px;
     background: rgba(15, 15, 15, 0.98);
-    border-left: 4px solid #DC143C;
+    border-left: 4px solid #FF1744;
 }
 
 .prog-edit-btn-container {
@@ -369,7 +369,7 @@ main {
 }
 
 .styled-text {
-    color: #DC143C;
+    color: #FF1744;
     font-weight: bold;
     font-size: 1.15em;
     padding: 2px 6px;
@@ -377,15 +377,19 @@ main {
 }
 
 .bullet-dot {
-    color: #DC143C;
+    color: #FF1744;
     font-weight: bold;
     font-size: 1.3em;
 }
 
 .highlight-text {
-    color: #DC143C;
+    color: #FF1744;
     font-weight: bold;
     font-size: 1.2em;
+}
+
+.crimson-text {
+    color: #FF1744 !important;
 }
 
 .clickable-line {
@@ -398,8 +402,8 @@ main {
 }
 
 .clickable-line:hover {
-    background: rgba(0, 212, 255, 0.1);
-    color: #00d4ff;
+    background: rgba(255, 23, 68, 0.1);
+    color: #FF1744;
 }
 
 .group-header h2 {
@@ -783,10 +787,19 @@ main {
     margin-top: 20px;
 }
 
+.detail-section-title {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #FF1744 !important;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
 .section-title {
     font-size: 1.8em;
     font-weight: bold;
-    color: #DC143C;
+    color: #FF1744;
     margin-top: 30px;
     margin-bottom: 15px;
     letter-spacing: 1px;
@@ -1017,7 +1030,7 @@ footer {
     margin-bottom: 3px;
     box-shadow: 0 0 20px rgba(220, 20, 60, 0.4), inset 0 1px 0 rgba(220, 20, 60, 0.2);
     border: 1px solid rgba(220, 20, 60, 0.5);
-    border-left: 4px solid #DC143C;
+    border-left: 4px solid #FF1744;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -1028,12 +1041,12 @@ footer {
 }
 
 .theory-title-text {
-    color: #DC143C;
+    color: #FF1744;
     font-weight: bold;
     font-size: 0.95em;
     word-wrap: break-word;
     flex: 1;
-    text-shadow: 0 0 10px #DC143C, 0 0 20px rgba(220, 20, 60, 0.6), 0 0 30px rgba(220, 20, 60, 0.3);
+    text-shadow: 0 0 10px #FF1744, 0 0 20px rgba(220, 20, 60, 0.6), 0 0 30px rgba(220, 20, 60, 0.3);
 }
 
 .theory-subtitle-item {
@@ -1054,19 +1067,19 @@ footer {
 
 .theory-subtitle-item:hover {
     background: rgba(50, 50, 50, 0.9);
-    border-left: 4px solid #DC143C;
+    border-left: 4px solid #FF1744;
     box-shadow: 0 0 15px rgba(220, 20, 60, 0.3), inset 0 1px 0 rgba(220, 20, 60, 0.2);
 }
 
 .theory-subtitle-item.active {
     background: linear-gradient(135deg, rgba(220, 20, 60, 0.3) 0%, rgba(139, 10, 26, 0.3) 100%);
-    border-left-color: #DC143C;
+    border-left-color: #FF1744;
     border: 1px solid rgba(220, 20, 60, 0.5);
     box-shadow: 0 0 15px rgba(220, 20, 60, 0.3);
 }
 
 .theory-subtitle-text {
-    color: #DC143C;
+    color: #FF1744;
     font-weight: 500;
     font-size: 0.9em;
     word-wrap: break-word;
@@ -1086,12 +1099,12 @@ footer {
 
 .theory-title-item:hover {
     background: rgba(40, 40, 40, 0.9);
-    border-left-color: #DC143C;
+    border-left-color: #FF1744;
 }
 
 .theory-title-item.active {
     background: rgba(40, 40, 40, 0.9);
-    border-left-color: #DC143C;
+    border-left-color: #FF1744;
 }
 
 .theory-content-right {
@@ -1163,7 +1176,7 @@ footer {
     background: rgba(220, 20, 60, 0.2);
     border: 2px solid rgba(220, 20, 60, 0.5);
     border-radius: 3px;
-    color: #DC143C;
+    color: #FF1744;
     font-size: 1.2em;
     font-weight: bold;
     cursor: pointer;
@@ -1172,13 +1185,13 @@ footer {
 
 .theory-add-btn:hover {
     background: rgba(220, 20, 60, 0.4);
-    border-color: #DC143C;
+    border-color: #FF1744;
     box-shadow: 0 0 15px rgba(220, 20, 60, 0.3);
 }
 
 .theory-card {
     background: rgba(30, 30, 30, 0.8);
-    border-left: 4px solid #DC143C;
+    border-left: 4px solid #FF1744;
     border-radius: 5px;
     padding: 0;
     display: flex;
@@ -1204,7 +1217,7 @@ footer {
 .theory-card-title {
     font-size: 1.1em;
     font-weight: bold;
-    color: #DC143C;
+    color: #FF1744;
     word-wrap: break-word;
 }
 
@@ -1318,7 +1331,7 @@ footer {
 }
 
 .theory-delete-btn {
-    background: #DC143C;
+    background: #FF1744;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -1371,7 +1384,7 @@ footer {
 
 .theory-edit-modal-content {
     background: linear-gradient(135deg, #1a1a1a 0%, #2d1f2e 100%);
-    border: 2px solid #DC143C;
+    border: 2px solid #FF1744;
     border-radius: 8px;
     padding: 30px;
     width: 90%;
