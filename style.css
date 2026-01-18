@@ -79,7 +79,7 @@ body {
 
 header {
     background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
-    color: #00d4ff;
+    color: #FF1744;
     padding: 20px 20px;
     text-align: center;
     position: relative;
@@ -108,7 +108,7 @@ main {
 }
 
 .content-area h2 {
-    color: #00d4ff;
+    color: #FF1744;
     margin-bottom: 15px;
 }
 
@@ -122,7 +122,7 @@ main {
 }
 
 .lessons-section h2 {
-    color: #00d4ff;
+    color: #FF1744;
     margin-bottom: 20px;
 }
 
@@ -234,7 +234,7 @@ main {
 }
 
 .group-header h2 {
-    color: #00d4ff;
+    color: #FF1744;
     padding-bottom: 10px;
     border-bottom: none;
 }
@@ -251,7 +251,7 @@ main {
 }
 
 .group-title-box {
-    background: #00d4ff;
+    background: #FF1744;
     color: #1a1a1a;
     padding: 0;
     width: 50px;
@@ -469,7 +469,7 @@ main {
 
 .progression-item {
     background: linear-gradient(135deg, #1a3a3a 0%, #0d2a2a 100%);
-    color: #00d4ff;
+    color: #FF1744;
     padding: 12px;
     border-radius: 8px;
     margin-bottom: 10px;
@@ -503,7 +503,7 @@ main {
     width: 100%;
     padding: 6px;
     margin: 0;
-    border: 1px solid #00d4ff;
+    border: 1px solid #FF1744;
     border-radius: 3px;
     background: #2d2d2d;
     color: #00ff99;
@@ -522,7 +522,7 @@ main {
     width: 100%;
     padding: 6px;
     margin: 0;
-    border: 1px solid #00d4ff;
+    border: 1px solid #FF1744;
     border-radius: 3px;
     background: #2d2d2d;
     color: #e0e0e0;
@@ -580,7 +580,7 @@ main {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
-    border: 2px solid #00d4ff;
+    border: 2px solid #FF1744;
     border-radius: 5px;
     background: #1a1a1a;
     color: #00ff99;
@@ -599,7 +599,7 @@ main {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
-    border: 2px solid #00d4ff;
+    border: 2px solid #FF1744;
     border-radius: 5px;
     background: #1a1a1a;
     color: #e0e0e0;
@@ -621,7 +621,7 @@ main {
     gap: 10px;
     margin-top: 15px;
     padding-top: 10px;
-    border-top: 2px solid #00d4ff;
+    border-top: 2px solid #FF1744;
 }
 
 .group-edit-form {
@@ -646,7 +646,7 @@ main {
 .group-name-edit input {
     background: #2d2d2d;
     color: #fff;
-    border: 1px solid #00d4ff;
+    border: 1px solid #FF1744;
     padding: 8px;
     border-radius: 3px;
 }
@@ -657,7 +657,7 @@ main {
     gap: 6px;
     padding: 8px;
     background: #0d0d0d;
-    border-left: 3px solid #00d4ff;
+    border-left: 3px solid #FF1744;
 }
 
 .progression-edit-row input,
@@ -724,7 +724,7 @@ main {
 }
 
 .add-new-btn {
-    background: #00d4ff;
+    background: #FF1744;
     color: #000;
     padding: 10px 20px;
     border: none;
@@ -769,7 +769,7 @@ main {
 }
 
 .more-btn {
-    background: #00d4ff;
+    background: #FF1744;
     color: #000;
     padding: 6px 14px;
     border: none;
@@ -956,7 +956,7 @@ main {
 }
 
 .detail-edit-btn {
-    background: linear-gradient(135deg, #00d4ff 0%, #00ff99 100%);
+    background: linear-gradient(135deg, #FF1744 0%, #00ff99 100%);
     color: #000;
     padding: 10px 25px;
     border: none;
@@ -983,7 +983,7 @@ main {
     padding: 12px;
     margin-bottom: 15px;
     background: #2d2d2d;
-    border: 2px solid #00d4ff;
+    border: 2px solid #FF1744;
     border-radius: 5px;
     color: #e0e0e0;
     font-size: 1.2em;
@@ -996,7 +996,7 @@ main {
     padding: 12px;
     margin-bottom: 15px;
     background: #2d2d2d;
-    border: 2px solid #00d4ff;
+    border: 2px solid #FF1744;
     border-radius: 5px;
     color: #e0e0e0;
     font-size: 1.1em;
@@ -1056,7 +1056,7 @@ main {
 }
 
 button {
-    background: linear-gradient(135deg, #00d4ff 0%, #00ff99 100%);
+    background: linear-gradient(135deg, #FF1744 0%, #00ff99 100%);
     color: #000;
     padding: 12px 30px;
     border: none;
@@ -1088,7 +1088,7 @@ button:hover:not(.back-btn) {
 .detail-section {
     background: #1a1a1a;
     padding: 15px;
-    border-left: 4px solid #00d4ff;
+    border-left: 4px solid #FF1744;
     border-radius: 5px;
 }
 
@@ -1112,7 +1112,7 @@ footer {
     padding: 20px;
     text-align: center;
     color: #666;
-    border-top: 2px solid #00d4ff;
+    border-top: 2px solid #FF1744;
 }
 
 /* Theory Index Page */
@@ -1699,7 +1699,7 @@ footer {
 }
 
 .theory-hover-body .highlight-text {
-    color: #00d4ff;
+    color: #FF1744;
     font-style: italic;
 }
 
