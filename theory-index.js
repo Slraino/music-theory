@@ -16,21 +16,26 @@ function startEditTheory(key) {
     const modal = document.createElement('div');
     modal.id = `theory-edit-modal-${key}`;
     modal.className = 'theory-edit-modal';
-    modal.innerHTML = `
-        <div class="theory-edit-modal-content">
-            <h2>Edit Theory</h2>
-            <div class="theory-edit-form">
-                <label>Content (format: Title on first line, then use "- Subtitle" for subtitles):</label>
-                <textarea id="theory-edit-textarea-${key}" style="width: 100%; min-height: 300px; padding: 10px; border: 1px solid #DC143C; background: #2d2d2d; color: #e0e0e0; border-radius: 3px; font-family: Poppins, sans-serif;">${escapeHtml(theoryData.theory)}</textarea>
-            </div>
-            <div class="theory-edit-modal-controls">
-                <button class="theory-save-btn" onclick="saveTheoryModal('${key}')">Save</button>
-                <button class="theory-cancel-btn" onclick="cancelEditTheoryModal('${key}')">Cancel</button>
-                <button class="theory-delete-btn" onclick="deleteTheoryModal('${key}')">Delete</button>
-            </div>
-        </div>
-    `;
     
+    const textarea = document.createElement('textarea');
+    textarea.id = `theory-edit-textarea-${key}`;
+    textarea.className = 'theory-edit-textarea';
+    textarea.value = theoryData.theory;
+    
+    const content = document.createElement('div');
+    content.className = 'theory-edit-modal-content';
+    content.innerHTML = `<h2>Edit Theory</h2>
+        <div class="theory-edit-form">
+            <label>Content (format: Title on first line, then use "- Subtitle" for subtitles):</label>
+        </div>
+        <div class="theory-edit-modal-controls">
+            <button class="theory-save-btn" onclick="saveTheoryModal('${key}')">Save</button>
+            <button class="theory-cancel-btn" onclick="cancelEditTheoryModal('${key}')">Cancel</button>
+            <button class="theory-delete-btn" onclick="deleteTheoryModal('${key}')">Delete</button>
+        </div>`;
+    
+    content.querySelector('.theory-edit-form').appendChild(textarea);
+    modal.appendChild(content);
     document.body.appendChild(modal);
 }
 
