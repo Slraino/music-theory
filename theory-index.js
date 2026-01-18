@@ -3,13 +3,27 @@ function isOwnerMode() {
     return EDIT_UI_ENABLED;
 }
 
+// Cache for fast access
+let cachedMusicTheory = null;
+
+function getCachedMusicTheory() {
+    if (!cachedMusicTheory) {
+        cachedMusicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
+    }
+    return cachedMusicTheory;
+}
+
+function invalidateCache() {
+    cachedMusicTheory = null;
+}
+
 // Start editing a theory
 function startEditTheory(key) {
     if (!isOwnerMode()) return;
     
     // Use requestAnimationFrame to avoid blocking
     requestAnimationFrame(() => {
-        const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
+        const musicTheory = getCachedMusicTheory();
         const theoryData = typeof musicTheory[key] === 'string' 
             ? { theory: musicTheory[key], music: '' } 
             : (musicTheory[key] || { theory: '', music: '' });
@@ -49,6 +63,8 @@ function saveTheoryModal(key) {
     const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
     musicTheory[key] = { theory: content, music: '' };
     localStorage.setItem('musicTheory', JSON.stringify(musicTheory));
+    
+    invalidateCache();
     
     const modal = document.getElementById(`theory-edit-modal-${key}`);
     if (modal) modal.remove();
@@ -200,7 +216,7 @@ function migrateTheoryData() {
 // Load and display all theories
 function loadTheories() {
     migrateTheoryData();
-    const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
+    const musicTheory = getCachedMusicTheory();
     const theoryList = document.getElementById('theoryList');
     
     // Filter entries that have theory content
