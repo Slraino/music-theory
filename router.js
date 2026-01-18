@@ -69,14 +69,21 @@ class Router {
             backBtn.style.display = pageConfig.showBack ? 'block' : 'none';
         }
 
-        // Hide detail-controls, show progression-controls only on chord progression page
+        // Hide BOTH control buttons first
         const detailControls = document.getElementById('detailControls');
         const progressionControls = document.getElementById('progressionControls');
         if (detailControls) {
-            detailControls.style.display = page === 'progression-info.html' ? 'block' : 'none';
+            detailControls.style.display = 'none';
         }
         if (progressionControls) {
-            progressionControls.style.display = page === 'chord-progression.html' ? 'block' : 'none';
+            progressionControls.style.display = 'none';
+        }
+        
+        // Show only the appropriate button for this page
+        if (page === 'progression-info.html' && detailControls) {
+            detailControls.style.display = 'block';
+        } else if (page === 'chord-progression.html' && progressionControls) {
+            progressionControls.style.display = 'block';
         }
 
         // Trigger page-specific initialization
