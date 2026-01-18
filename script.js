@@ -681,9 +681,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // Load site description if on main page
     if (document.getElementById('siteDescription')) {
-        loadSiteDescription();
-    }
-    
+        // Use setTimeout to ensure DOM is fully rendered before setting value
+        setTimeout(() => {
+            loadSiteDescription();
+        }, 10);
     // Only load progressions if the progressionsList element exists
     if (document.getElementById('progressionsList')) {
         loadProgressions();
