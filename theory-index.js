@@ -222,6 +222,9 @@ function swapTheories(key1, key2) {
         db.set('theoryOrder', 'default', theoryOrder).catch(() => {});
     }
     
+    // Invalidate cache so fresh data is loaded
+    invalidateCache();
+    
     console.log('Reloading theories...');
     loadTheories();
 }
