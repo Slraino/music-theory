@@ -54,7 +54,16 @@ class MusicTheoryDB {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readwrite');
             const store = transaction.objectStore(storeName);
-            const request = store.put({ id: key, data: value });
+            
+            // Different stores have different key paths
+            let obj;
+            if (storeName === 'settings') {
+                obj = { key: key, data: value };
+            } else {
+                obj = { id: key, data: value };
+            }
+            
+            const request = store.put(obj);
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => resolve(value);
@@ -67,7 +76,10 @@ class MusicTheoryDB {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], 'readonly');
             const store = transaction.objectStore(storeName);
-            const request = store.get(key);
+            
+            // Use correct key field for settings store
+            const lookupKey = storeName === 'settings' ? key : key;
+            const request = store.get(lookupKey);
 
             request.onerror = () => reject(request.error);
             request.onsuccess = () => {
