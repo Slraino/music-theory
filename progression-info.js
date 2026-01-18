@@ -100,6 +100,13 @@ let currentProgId = null;
 let currentLineTitle = null;
 let currentUniqueKey = null;
 
+// Helper to get the visible detail content element
+function getVisibleDetailContent() {
+    const progressionInfoPage = document.getElementById('progressionInfoPage');
+    if (!progressionInfoPage || progressionInfoPage.style.display === 'none') return null;
+    return progressionInfoPage.querySelector('#detailContent');
+}
+
 // Start editing detail
 // Guard to prevent multiple edit windows opening
 let isEditingDetail = false;
@@ -115,8 +122,19 @@ function startDetailEdit() {
         const keyToUse = currentUniqueKey || currentLineTitle;
         const detailData = progressionDetails[keyToUse] || { theory: '', music: '', genre: '' };
         
-        // Clear any existing edit windows first
-        const detailContent = document.getElementById('detailContent');
+        // Find the VISIBLE progressionInfoPage and its detailContent
+        const progressionInfoPage = document.getElementById('progressionInfoPage');
+        if (!progressionInfoPage || progressionInfoPage.style.display === 'none') {
+            isEditingDetail = false;
+            return;
+        }
+        
+        const detailContent = progressionInfoPage.querySelector('#detailContent');
+        if (!detailContent) {
+            isEditingDetail = false;
+            return;
+        }
+        
         detailContent.innerHTML = '';
         
         detailContent.innerHTML = `
@@ -299,7 +317,11 @@ function loadDetailView() {
         genreHtml = '<p style="color: #888;">No genre content yet.</p>';
     }
     
-    document.getElementById('detailContent').innerHTML = `
+    // Find the visible detailContent within progressionInfoPage
+    const detailContent = getVisibleDetailContent();
+    if (!detailContent) return;
+    
+    detailContent.innerHTML = `
         <div class="detail-box">
             <h2 class="detail-section-title">Theory</h2>
             <div class="detail-body">
@@ -333,7 +355,8 @@ function loadProgressionDetail() {
         const progIndex = params.get('progIndex');
         
         if (!lineTitle) {
-            document.getElementById('detailContent').innerHTML = '<p>No progression selected.</p>';
+            const detailContent = getVisibleDetailContent();
+            if (detailContent) detailContent.innerHTML = '<p>No progression selected.</p>';
             return;
         }
         
@@ -354,7 +377,8 @@ window.addEventListener('DOMContentLoaded', () => {
     let lineTitle = params.get('lineTitle');
     
     if (id === null && !lineTitle) {
-        document.getElementById('detailContent').innerHTML = '<p>No progression selected.</p>';
+        const detailContent = getVisibleDetailContent();
+        if (detailContent) detailContent.innerHTML = '<p>No progression selected.</p>';
         return;
     }
     
@@ -370,7 +394,8 @@ window.addEventListener('DOMContentLoaded', () => {
     if (id !== null) {
         const prog = progs[currentProgId];
         if (!prog) {
-            document.getElementById('detailContent').innerHTML = '<p>Progression not found.</p>';
+            const detailContent = getVisibleDetailContent();
+            if (detailContent) detailContent.innerHTML = '<p>Progression not found.</p>';
             return;
         }
     }
