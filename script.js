@@ -688,7 +688,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         StorageManager.set('progressionDetails', 'default', defaults);
     }
 
-// Load site description if on main page
+    // Load site description if on main page
     if (document.getElementById('siteDescription')) {
         // Use setTimeout to ensure DOM is fully rendered before setting value
         setTimeout(() => {
