@@ -97,3 +97,4 @@ document.addEventListener('DOMContentLoaded', () => {
     router = new Router();
     router.init();
 });
+

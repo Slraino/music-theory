@@ -72,7 +72,7 @@ function exportProgressionData() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     
-    console.log('Data exported successfully!');
+
 }
 
 // Import progression data from a JSON file
@@ -95,7 +95,7 @@ function importProgressionData(file) {
                 StorageManager.set('groupNames', 'default', JSON.parse(data.groupNames));
             }
             
-            console.log('Data imported successfully!');
+
             alert('Data imported! Refreshing page...');
             location.reload();
         } catch (err) {
@@ -122,11 +122,11 @@ function isOwnerMode() {
 
 // Toggle group content visibility (accordion - only one open at a time)
 function toggleGroupContent(key) {
-    console.log('Toggle clicked for key:', key);
+
     
     // If clicking the same group, don't close it
     if (currentOpenGroup === key) {
-        console.log('Same group, not closing');
+
         return;
     }
     
@@ -135,18 +135,18 @@ function toggleGroupContent(key) {
     allContainers.forEach(container => {
         if (container.id !== `group-content-${key}`) {
             container.classList.add('collapsed');
-            console.log('Collapsed other:', container.id);
+
         }
     });
     
     // Open current container
     const contentContainer = document.getElementById(`group-content-${key}`);
-    console.log('Container found:', contentContainer);
+
     
     if (contentContainer) {
         contentContainer.classList.remove('collapsed');
         currentOpenGroup = key;
-        console.log('Expanded:', key);
+
     } else {
         console.error('Container not found for key:', key);
     }
@@ -184,7 +184,7 @@ function initializeProgressions() {
 function loadProgressions() {
     initializeProgressions();
     const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
-    console.log('Loaded progressions:', progs.length, progs);
+
     
     const list = document.getElementById('progressionsList');
     if (!list) {
@@ -327,7 +327,7 @@ function loadProgressions() {
         const previousContainer = document.getElementById(`group-content-${currentOpenGroup}`);
         if (previousContainer) {
             previousContainer.classList.remove('collapsed');
-            console.log('Restored open group:', currentOpenGroup);
+
         }
     }
 }
@@ -545,3 +545,4 @@ function showDetail(indexOrLineText, encodedLineTitle) {
         window.history.pushState({ page: 'progression-info.html', lineTitle, progIndex }, '', 'progression-info.html?lineTitle=' + encodeURIComponent(lineTitle) + '&progIndex=' + progIndex);
     }
 }
+

@@ -45,7 +45,6 @@ A melodic line moving down by semitones`,
     }
     
     localStorage.setItem('musicTheory', JSON.stringify(musicTheory));
-    console.log('Ensured theory definitions exist in Music Theory storage');
 }
 
 // Call initialization
@@ -109,8 +108,8 @@ function startDetailEdit() {
     const keyToUse = currentUniqueKey || currentLineTitle;
     const detailData = progressionDetails[keyToUse] || { theory: '', music: '', genre: '' };
     
-    console.log('Loading for edit - keyToUse:', keyToUse);
-    console.log('detailData:', detailData);
+
+
     
     document.getElementById('detailContent').innerHTML = `
         <div class="detail-box">
@@ -143,10 +142,10 @@ function saveDetailEdit() {
     const music = document.querySelector('.detail-edit-music').value.trim();
     const genre = document.querySelector('.detail-edit-genre').value.trim();
     
-    console.log('Saving for:', currentUniqueKey || currentLineTitle);
-    console.log('Theory:', theory);
-    console.log('Music:', music);
-    console.log('Genre:', genre);
+
+
+
+
     
     const progressionDetails = JSON.parse(localStorage.getItem('progressionDetails')) || {};
     const keyToSave = currentUniqueKey || currentLineTitle;
@@ -158,7 +157,7 @@ function saveDetailEdit() {
         db.set('progressionDetails', 'default', progressionDetails).catch(() => {});
     }
     
-    console.log('Saved progressionDetails:', progressionDetails);
+
     
     loadDetailView();
 }
@@ -186,7 +185,6 @@ function deleteDetailProgression() {
 function loadDetailView() {
     // Update the header title with the clicked line
     const titleToShow = currentLineTitle || 'Unknown';
-    console.log('Setting title to:', titleToShow); // Debug
     
     // Update page title directly
     const pageTitleEl = document.getElementById('pageTitle');
@@ -239,7 +237,7 @@ function loadDetailView() {
                     
                     html += '</p>';
                     theoryHtml += html;
-                    console.log('Added bracketed theory line:', html);
+
                 } else {
                     // No brackets, render as before
                     const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
@@ -378,23 +376,22 @@ function showTheoryTooltip(lineTitle, event) {
     hideTheoryTooltip();
     
     const theoryName = lineTitle.trim();
-    console.log('showTheoryTooltip - theoryName:', theoryName);
+
     
     // Get theory definition from Music Theory page storage
     const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
-    console.log('Full musicTheory object:', musicTheory);
-    console.log('musicTheory keys:', Object.keys(musicTheory));
+
     
     // Try to find exact match first
     let theoryData = musicTheory[theoryName];
-    console.log('Direct lookup result:', theoryData);
+
     
     // If not found, try case-insensitive search
     if (!theoryData) {
-        console.log('Trying case-insensitive search...');
+
         for (const key in musicTheory) {
             if (key.toLowerCase() === theoryName.toLowerCase()) {
-                console.log('Found with case-insensitive match:', key);
+
                 theoryData = musicTheory[key];
                 break;
             }
@@ -402,17 +399,17 @@ function showTheoryTooltip(lineTitle, event) {
     }
     
     if (!theoryData) {
-        console.log('No theory data found in Music Theory storage');
+
         return;
     }
     
     const theory = typeof theoryData === 'string' ? theoryData : (theoryData.theory || '');
     if (!theory.trim()) {
-        console.log('Theory is empty');
+
         return;
     }
     
-    console.log('theory content:', theory);
+
     
     // Extract content after "< Info >" until empty line
     const lines = theory.split('\n');
@@ -424,7 +421,7 @@ function showTheoryTooltip(lineTitle, event) {
         
         if (line.trim() === '< Info >') {
             inInfoSection = true;
-            console.log('Found < Info > at line', i);
+
             continue;
         }
         
@@ -441,7 +438,7 @@ function showTheoryTooltip(lineTitle, event) {
     
     // If no info section found, show first 5 lines
     if (!tooltipContent.trim()) {
-        console.log('No < Info > section found, showing first 5 lines');
+
         for (let i = 0; i < Math.min(5, lines.length); i++) {
             if (lines[i].trim()) {
                 const styled = lines[i].replace(/\*\*(.*?)\*\*/g, '<span class="tooltip-styled">$1</span>');
@@ -451,7 +448,7 @@ function showTheoryTooltip(lineTitle, event) {
     }
     
     if (!tooltipContent.trim()) {
-        console.log('No content to display');
+
         return;
     }
     
@@ -466,7 +463,7 @@ function showTheoryTooltip(lineTitle, event) {
         </div>
     `;
     
-    console.log('Adding tooltip to body');
+
     document.body.appendChild(tooltip);
     
     // Position near mouse with bounds checking
@@ -476,7 +473,7 @@ function showTheoryTooltip(lineTitle, event) {
     tooltip.style.top = y + 'px';
     tooltip.style.display = 'block';
     
-    console.log('Tooltip positioned at:', x, y);
+
 }
 
 // Hide theory tooltip
@@ -486,3 +483,4 @@ function hideTheoryTooltip() {
         tooltip.remove();
     }
 }
+

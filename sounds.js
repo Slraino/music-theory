@@ -27,7 +27,7 @@ class SoundEffects {
             this.audioContext = new AudioContext();
             this.initialized = true;
         } catch (e) {
-            console.log('Web Audio API not supported');
+
         }
     }
 
@@ -48,7 +48,7 @@ class SoundEffects {
             osc.start(now);
             osc.stop(now + 0.12);
         } catch (e) {
-            console.log('Sound effect error:', e);
+
         }
     }
 
@@ -70,7 +70,7 @@ class SoundEffects {
             osc.start(now);
             osc.stop(now + 0.15);
         } catch (e) {
-            console.log('Sound effect error:', e);
+
         }
     }
 
@@ -91,7 +91,7 @@ class SoundEffects {
             osc.start(now);
             osc.stop(now + 0.12);
         } catch (e) {
-            console.log('Sound effect error:', e);
+
         }
     }
 
@@ -155,7 +155,7 @@ class SoundEffects {
         const randomIndex = Math.floor(Math.random() * MUSIC_PLAYLIST.length);
         const trackUrl = MUSIC_PLAYLIST[randomIndex];
 
-        console.log('Loading track:', trackUrl);
+
 
         if (this.audioElement) {
             // Pause and reset before loading new track
@@ -208,7 +208,7 @@ class SoundEffects {
 
             // When track ends, play next random one
             this.audioElement.addEventListener('ended', () => {
-                console.log('Track ended, loading next...');
+
                 setTimeout(() => this.playNextTrack(), 500);
             });
 
@@ -371,3 +371,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     observer.observe(document.body, { childList: true, subtree: true });
 });
+

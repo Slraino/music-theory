@@ -19,7 +19,7 @@ class MusicTheoryDB {
             request.onsuccess = () => {
                 this.db = request.result;
                 this.ready = true;
-                console.log('IndexedDB initialized successfully');
+
                 resolve(this.db);
             };
 
@@ -43,7 +43,7 @@ class MusicTheoryDB {
                     db.createObjectStore('musicTheory', { keyPath: 'id' });
                 }
                 
-                console.log('IndexedDB schema created');
+
             };
         });
     }
@@ -104,28 +104,28 @@ class MusicTheoryDB {
     }
 
     async migrateFromLocalStorage() {
-        console.log('Attempting to migrate from localStorage...');
+
         
         try {
             // Migrate progressions
             const progressions = localStorage.getItem('musicProgressions');
             if (progressions) {
                 await this.set('progressions', 'default', JSON.parse(progressions));
-                console.log('Migrated progressions to IndexedDB');
+
             }
 
             // Migrate progression details
             const details = localStorage.getItem('progressionDetails');
             if (details) {
                 await this.set('progressionDetails', 'default', JSON.parse(details));
-                console.log('Migrated progression details to IndexedDB');
+
             }
 
             // Migrate group names
             const groupNames = localStorage.getItem('groupCustomNames');
             if (groupNames) {
                 await this.set('groupNames', 'default', JSON.parse(groupNames));
-                console.log('Migrated group names to IndexedDB');
+
             }
 
             // Migrate settings
@@ -153,10 +153,10 @@ class MusicTheoryDB {
             const musicTheory = localStorage.getItem('musicTheory');
             if (musicTheory) {
                 await this.set('musicTheory', 'default', JSON.parse(musicTheory));
-                console.log('Migrated music theory to IndexedDB');
+
             }
 
-            console.log('Migration complete!');
+
         } catch (error) {
             console.error('Error during migration:', error);
         }
@@ -171,3 +171,4 @@ db.init().then(() => {
 }).catch(error => {
     console.error('Failed to initialize IndexedDB:', error);
 });
+

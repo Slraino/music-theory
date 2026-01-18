@@ -185,7 +185,7 @@ function migrateTheoryData() {
             // Save to musicTheory if we found entries
             if (Object.keys(theoryEntries).length > 0) {
                 localStorage.setItem('musicTheory', JSON.stringify(theoryEntries));
-                console.log('Migrated theory data:', theoryEntries);
+
             }
         } catch (e) {
             console.error('Error migrating theory data:', e);
@@ -462,3 +462,4 @@ function loadTheoryList() {
 window.addEventListener('DOMContentLoaded', () => {
     loadTheories();
 });
+
