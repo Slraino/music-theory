@@ -97,11 +97,18 @@ function deleteTheoryModal(key) {
     
     const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
     delete musicTheory[key];
+    
+    // Also remove from theoryOrder
+    let theoryOrder = JSON.parse(localStorage.getItem('theoryOrder')) || [];
+    theoryOrder = theoryOrder.filter(k => k !== key);
+    
     localStorage.setItem('musicTheory', JSON.stringify(musicTheory));
+    localStorage.setItem('theoryOrder', JSON.stringify(theoryOrder));
     
     // Sync to IndexedDB
     if (typeof db !== 'undefined' && db.ready) {
         db.set('musicTheory', 'default', musicTheory).catch(() => {});
+        db.set('theoryOrder', 'default', theoryOrder).catch(() => {});
     }
     
     invalidateCache();
