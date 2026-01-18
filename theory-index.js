@@ -234,8 +234,8 @@ function addNewTheory() {
         counter++;
     }
     
-    // Create new theory entry
-    musicTheory[newKey] = { theory: newKey, music: '' };
+    // Create new theory entry with empty content so user can name it
+    musicTheory[newKey] = { theory: '', music: '' };
     
     // Add to order array
     theoryOrder.push(newKey);
@@ -251,7 +251,11 @@ function addNewTheory() {
     
     invalidateCache();
     loadTheories();
-}
+    
+    // Open edit modal immediately so user can name and customize it
+    setTimeout(() => {
+        startEditTheory(newKey);
+    }, 300);
 
 // Migrate music theory data from progressionDetails to musicTheory on first load
 function migrateTheoryData() {
