@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Loading Music Theory...</p>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>Chord Progression</h1>
@@ -23,8 +31,8 @@
             <p>&copy; 2026 Music Theory Learning. Happy learning! 🎶</p>
             <div class="music-controls">
                 <button id="musicToggleBtn" class="music-btn">🎵 Music</button>
-                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="30">
-                <span id="volumeLabel" class="volume-label">30%</span>
+                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="20">
+                <span id="volumeLabel" class="volume-label">20%</span>
             </div>
         </footer>
     </div>
