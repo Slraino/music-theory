@@ -245,9 +245,12 @@ function loadDetailView() {
     
     // Show edit button only in owner mode
     const controlsDiv = document.getElementById('detailControls');
-    controlsDiv.innerHTML = ''; // Clear first
-    if (isOwnerMode()) {
-        controlsDiv.innerHTML = `<span class="edit-icon" data-action="edit" title="Edit">✏️</span>`;
+    if (controlsDiv) {
+        controlsDiv.style.display = 'block';
+        controlsDiv.innerHTML = ''; // Clear first
+        if (isOwnerMode()) {
+            controlsDiv.innerHTML = `<span class="edit-icon" data-action="edit" title="Edit">✏️</span>`;
+        }
     }
     
     // Get detail content keyed by unique key (progIndex:lineTitle)

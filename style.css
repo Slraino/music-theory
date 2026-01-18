@@ -1037,6 +1037,7 @@ main {
     z-index: 9999;
     overflow: visible;
     padding: 20px;
+    display: none;
 }
 
 .progression-controls {
