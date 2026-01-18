@@ -1124,7 +1124,7 @@ main {
 
 .prog-edit-textarea {
     width: 100%;
-    min-height: 180px;
+    min-height: 350px;
     padding: 10px;
     background: #2d2d2d;
     border: 1px solid #555;
