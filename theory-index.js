@@ -69,6 +69,14 @@ function saveTheoryModal(key) {
     musicTheory[key] = { theory: content, music: '' };
     localStorage.setItem('musicTheory', JSON.stringify(musicTheory));
     
+    // Sync to IndexedDB
+    if (typeof db !== 'undefined' && db.ready) {
+        db.set('musicTheory', 'default', musicTheory).catch(() => {});
+    }
+    
+    // Trigger auto-save to server
+    saveDataToServer();
+    
     invalidateCache();
     
     const modal = document.getElementById(`theory-edit-modal-${key}`);
@@ -94,6 +102,16 @@ function deleteTheoryModal(key) {
     const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
     delete musicTheory[key];
     localStorage.setItem('musicTheory', JSON.stringify(musicTheory));
+    
+    // Sync to IndexedDB
+    if (typeof db !== 'undefined' && db.ready) {
+        db.set('musicTheory', 'default', musicTheory).catch(() => {});
+    }
+    
+    // Trigger auto-save to server
+    saveDataToServer();
+    
+    invalidateCache();
     
     const modal = document.getElementById(`theory-edit-modal-${key}`);
     if (modal) modal.remove();
