@@ -707,10 +707,11 @@ function loadTheoryList() {
 }
 
 // Load theories when page starts
-window.addEventListener('DOMContentLoaded', () => {
-    // Add a small delay to let autoRestoreFromBackup() complete (it runs in script.js)
-    setTimeout(() => {
-        loadTheories();
-    }, 100);
+window.addEventListener('DOMContentLoaded', async () => {
+    // Wait for autoRestoreFromBackup to complete before loading theories
+    if (typeof autoRestoreFromBackup === 'function') {
+        await autoRestoreFromBackup();
+    }
+    loadTheories();
 });
 

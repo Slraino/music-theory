@@ -77,13 +77,13 @@ function autoRestoreFromBackup() {
     const hasProgressions = localStorage.getItem(STORAGE_KEYS.PROGRESSIONS);
     const hasTheories = localStorage.getItem('musicTheory');
     
-    // If data exists, don't restore
+    // If data exists, resolve immediately
     if (hasProgressions && hasTheories) {
-        return;
+        return Promise.resolve();
     }
     
     // Try to restore from backup JSON file
-    fetch('music-theory-data.json')
+    return fetch('music-theory-data.json')
         .then(response => response.json())
         .then(data => {
             // The backup file already has stringified JSON values, so don't stringify again
@@ -643,14 +643,14 @@ function showDetail(index, lineContent) {
 }
 
 // Load progressions when page starts (only on chord-progressions page)
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
     // Ensure siteDescription has a default value before autoRestore
     if (!localStorage.getItem(STORAGE_KEYS.SITE_DESCRIPTION)) {
         localStorage.setItem(STORAGE_KEYS.SITE_DESCRIPTION, 'Learn and explore chord progressions and music theory concepts.');
     }
     
     // Auto-restore from backup JSON on page load
-    autoRestoreFromBackup();
+    await autoRestoreFromBackup();
     
     // Auto-recover progression details from IndexedDB if localStorage is empty
     let progressionDetails = JSON.parse(localStorage.getItem('progressionDetails')) || {};
