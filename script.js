@@ -90,8 +90,8 @@ window.addEventListener('beforeunload', autoSaveData);
 // Track currently open group for accordion
 let currentOpenGroup = null;
 
-// Export all progression data to a JSON file
-function exportProgressionData() {
+// Manual save with audio feedback
+function manualSaveData() {
     const data = {
         progressions: localStorage.getItem(STORAGE_KEYS.PROGRESSIONS),
         progressionDetails: localStorage.getItem('progressionDetails'),
@@ -107,59 +107,26 @@ function exportProgressionData() {
         timestamp: new Date().toISOString()
     };
     
-    // Also save to server
+    // Save to server
     fetch('/api/save-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
         keepalive: true
-    }).catch(() => {
-        // Silently fail if server not running
-    });
-    
-    const dataStr = JSON.stringify(data, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `music-theory-backup-${Date.now()}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-// Import progression data from a JSON file
-function importProgressionData(file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            
-            if (data.progressions) {
-                localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, data.progressions);
-                StorageManager.set('progressions', 'default', JSON.parse(data.progressions));
-            }
-            if (data.progressionDetails) {
-                localStorage.setItem('progressionDetails', data.progressionDetails);
-                StorageManager.set('progressionDetails', 'default', JSON.parse(data.progressionDetails));
-            }
-            if (data.groupNames) {
-                localStorage.setItem(STORAGE_KEYS.GROUP_NAMES, data.groupNames);
-                StorageManager.set('groupNames', 'default', JSON.parse(data.groupNames));
-            }
-            
-
-            alert('Data imported! Refreshing page...');
-            location.reload();
-        } catch (err) {
-            console.error('Error importing data:', err);
-            alert('Error importing file. Make sure it\'s a valid backup file.');
+    }).then(() => {
+        // Success - play success sound
+        if (typeof soundEffects !== 'undefined') {
+            soundEffects.playSoftBeepSound();
         }
-    };
-    reader.readAsText(file);
+        console.log('✓ Data saved successfully');
+    }).catch(err => {
+        // Failed - play error sound
+        if (typeof soundEffects !== 'undefined') {
+            soundEffects.playClickSound();
+        }
+        console.log('✗ Save failed (server may not be running)');
+    });
 }
-
-
 
 // Config: enable edit UI only when viewing locally
 const EDIT_UI_ENABLED = true; // Always enable editing
