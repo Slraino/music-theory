@@ -176,6 +176,8 @@ function moveTheoryDown(key) {
 function swapTheories(key1, key2) {
     if (!isOwnerMode()) return;
     
+    console.log('swapTheories called with:', key1, key2);
+    
     const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
     const keys = Object.keys(musicTheory).filter(k => {
         const data = musicTheory[k];
@@ -183,13 +185,22 @@ function swapTheories(key1, key2) {
         return theoryData.theory && theoryData.theory.trim() !== '';
     });
     
+    console.log('Available keys:', keys);
+    
     const index1 = keys.indexOf(key1);
     const index2 = keys.indexOf(key2);
     
-    if (index1 === -1 || index2 === -1) return;
+    console.log('Index1:', index1, 'Index2:', index2);
+    
+    if (index1 === -1 || index2 === -1) {
+        console.log('Key not found!');
+        return;
+    }
     
     // Swap positions in the array
     [keys[index1], keys[index2]] = [keys[index2], keys[index1]];
+    
+    console.log('Keys after swap:', keys);
     
     // Rebuild object with new order
     const newTheory = {};
@@ -201,6 +212,8 @@ function swapTheories(key1, key2) {
     if (typeof db !== 'undefined' && db.ready) {
         db.set('musicTheory', 'default', newTheory).catch(() => {});
     }
+    
+    console.log('Reloading theories...');
     loadTheories();
 }
 
