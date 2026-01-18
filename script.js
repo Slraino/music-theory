@@ -78,15 +78,6 @@ function autoSaveData() {
     });
 }
 
-// Only save when leaving page (minimal impact)
-window.addEventListener('beforeunload', autoSaveData);
-
-// Save every 3 minutes (low frequency)
-setInterval(autoSaveData, 180000);
-
-// Also save on page unload
-window.addEventListener('beforeunload', autoSaveData);
-
 // Track currently open group for accordion
 let currentOpenGroup = null;
 
