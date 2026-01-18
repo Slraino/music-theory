@@ -117,27 +117,27 @@ function moveTheoryUp(key) {
     if (!isOwnerMode()) return;
     
     const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
-    const keys = Object.keys(musicTheory).filter(k => {
-        const data = musicTheory[k];
-        const theoryData = typeof data === 'string' ? { theory: data } : data;
-        return theoryData.theory && theoryData.theory.trim() !== '';
-    });
+    let theoryOrder = JSON.parse(localStorage.getItem('theoryOrder')) || [];
     
-    const currentIndex = keys.indexOf(key);
+    // Build order from actual keys if theoryOrder doesn't exist
+    if (theoryOrder.length === 0) {
+        theoryOrder = Object.keys(musicTheory).filter(k => {
+            const data = musicTheory[k];
+            const theoryData = typeof data === 'string' ? { theory: data } : data;
+            return theoryData.theory && theoryData.theory.trim() !== '';
+        });
+    }
+    
+    const currentIndex = theoryOrder.indexOf(key);
     if (currentIndex <= 0) return;
     
     // Swap positions in the array
-    [keys[currentIndex - 1], keys[currentIndex]] = [keys[currentIndex], keys[currentIndex - 1]];
+    [theoryOrder[currentIndex - 1], theoryOrder[currentIndex]] = [theoryOrder[currentIndex], theoryOrder[currentIndex - 1]];
     
-    // Rebuild object with new order
-    const newTheory = {};
-    keys.forEach(k => {
-        newTheory[k] = musicTheory[k];
-    });
-    
-    localStorage.setItem('musicTheory', JSON.stringify(newTheory));
+    // Save the new order
+    localStorage.setItem('theoryOrder', JSON.stringify(theoryOrder));
     if (typeof db !== 'undefined' && db.ready) {
-        db.set('musicTheory', 'default', newTheory).catch(() => {});
+        db.set('theoryOrder', 'default', theoryOrder).catch(() => {});
     }
     loadTheories();
 }
@@ -147,27 +147,27 @@ function moveTheoryDown(key) {
     if (!isOwnerMode()) return;
     
     const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
-    const keys = Object.keys(musicTheory).filter(k => {
-        const data = musicTheory[k];
-        const theoryData = typeof data === 'string' ? { theory: data } : data;
-        return theoryData.theory && theoryData.theory.trim() !== '';
-    });
+    let theoryOrder = JSON.parse(localStorage.getItem('theoryOrder')) || [];
     
-    const currentIndex = keys.indexOf(key);
-    if (currentIndex >= keys.length - 1) return;
+    // Build order from actual keys if theoryOrder doesn't exist
+    if (theoryOrder.length === 0) {
+        theoryOrder = Object.keys(musicTheory).filter(k => {
+            const data = musicTheory[k];
+            const theoryData = typeof data === 'string' ? { theory: data } : data;
+            return theoryData.theory && theoryData.theory.trim() !== '';
+        });
+    }
+    
+    const currentIndex = theoryOrder.indexOf(key);
+    if (currentIndex >= theoryOrder.length - 1) return;
     
     // Swap positions in the array
-    [keys[currentIndex], keys[currentIndex + 1]] = [keys[currentIndex + 1], keys[currentIndex]];
+    [theoryOrder[currentIndex], theoryOrder[currentIndex + 1]] = [theoryOrder[currentIndex + 1], theoryOrder[currentIndex]];
     
-    // Rebuild object with new order
-    const newTheory = {};
-    keys.forEach(k => {
-        newTheory[k] = musicTheory[k];
-    });
-    
-    localStorage.setItem('musicTheory', JSON.stringify(newTheory));
+    // Save the new order
+    localStorage.setItem('theoryOrder', JSON.stringify(theoryOrder));
     if (typeof db !== 'undefined' && db.ready) {
-        db.set('musicTheory', 'default', newTheory).catch(() => {});
+        db.set('theoryOrder', 'default', theoryOrder).catch(() => {});
     }
     loadTheories();
 }
@@ -179,16 +179,23 @@ function swapTheories(key1, key2) {
     console.log('swapTheories called with:', key1, key2);
     
     const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
-    const keys = Object.keys(musicTheory).filter(k => {
-        const data = musicTheory[k];
-        const theoryData = typeof data === 'string' ? { theory: data } : data;
-        return theoryData.theory && theoryData.theory.trim() !== '';
-    });
     
-    console.log('Available keys:', keys);
+    // Get or create theoryOrder array
+    let theoryOrder = JSON.parse(localStorage.getItem('theoryOrder')) || [];
     
-    const index1 = keys.indexOf(key1);
-    const index2 = keys.indexOf(key2);
+    // Build order from actual keys if theoryOrder doesn't exist
+    if (theoryOrder.length === 0) {
+        theoryOrder = Object.keys(musicTheory).filter(k => {
+            const data = musicTheory[k];
+            const theoryData = typeof data === 'string' ? { theory: data } : data;
+            return theoryData.theory && theoryData.theory.trim() !== '';
+        });
+    }
+    
+    console.log('Available keys:', theoryOrder);
+    
+    const index1 = theoryOrder.indexOf(key1);
+    const index2 = theoryOrder.indexOf(key2);
     
     console.log('Index1:', index1, 'Index2:', index2);
     
@@ -198,19 +205,14 @@ function swapTheories(key1, key2) {
     }
     
     // Swap positions in the array
-    [keys[index1], keys[index2]] = [keys[index2], keys[index1]];
+    [theoryOrder[index1], theoryOrder[index2]] = [theoryOrder[index2], theoryOrder[index1]];
     
-    console.log('Keys after swap:', keys);
+    console.log('Keys after swap:', theoryOrder);
     
-    // Rebuild object with new order
-    const newTheory = {};
-    keys.forEach(k => {
-        newTheory[k] = musicTheory[k];
-    });
-    
-    localStorage.setItem('musicTheory', JSON.stringify(newTheory));
+    // Save the new order
+    localStorage.setItem('theoryOrder', JSON.stringify(theoryOrder));
     if (typeof db !== 'undefined' && db.ready) {
-        db.set('musicTheory', 'default', newTheory).catch(() => {});
+        db.set('theoryOrder', 'default', theoryOrder).catch(() => {});
     }
     
     console.log('Reloading theories...');
@@ -222,6 +224,7 @@ function addNewTheory() {
     if (!isOwnerMode()) return;
     
     const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
+    let theoryOrder = JSON.parse(localStorage.getItem('theoryOrder')) || [];
     
     // Generate a unique key for new theory
     let newKey = 'New Theory';
@@ -233,11 +236,17 @@ function addNewTheory() {
     
     // Create new theory entry
     musicTheory[newKey] = { theory: newKey, music: '' };
+    
+    // Add to order array
+    theoryOrder.push(newKey);
+    
     localStorage.setItem('musicTheory', JSON.stringify(musicTheory));
+    localStorage.setItem('theoryOrder', JSON.stringify(theoryOrder));
     
     // Sync to IndexedDB
     if (typeof db !== 'undefined' && db.ready) {
         db.set('musicTheory', 'default', musicTheory).catch(() => {});
+        db.set('theoryOrder', 'default', theoryOrder).catch(() => {});
     }
     
     invalidateCache();
@@ -292,16 +301,45 @@ function loadTheories() {
     // Clear old content first to prevent duplicates
     theoryList.innerHTML = '';
     
-    // Filter entries that have theory content
-    const theoriesWithContent = Object.entries(musicTheory)
-        .filter(([key, data]) => {
-            const theoryData = typeof data === 'string' ? { theory: data, music: '' } : data;
-            return theoryData.theory && theoryData.theory.trim() !== '';
-        })
-        .map(([key, data]) => {
-            const theoryData = typeof data === 'string' ? { theory: data, music: '' } : data;
-            return { key, ...theoryData };
-        });
+    // Get stored order or use object keys
+    let theoryOrder = JSON.parse(localStorage.getItem('theoryOrder')) || [];
+    
+    // Filter entries that have theory content, respecting theoryOrder
+    let theoriesWithContent = [];
+    
+    // If we have a stored order, use it
+    if (theoryOrder.length > 0) {
+        theoriesWithContent = theoryOrder
+            .filter(key => musicTheory[key])
+            .filter(key => {
+                const data = musicTheory[key];
+                const theoryData = typeof data === 'string' ? { theory: data, music: '' } : data;
+                return theoryData.theory && theoryData.theory.trim() !== '';
+            })
+            .map(key => {
+                const data = musicTheory[key];
+                const theoryData = typeof data === 'string' ? { theory: data, music: '' } : data;
+                return { key, ...theoryData };
+            });
+    } else {
+        // Fallback to object entries if no stored order
+        theoriesWithContent = Object.entries(musicTheory)
+            .filter(([key, data]) => {
+                const theoryData = typeof data === 'string' ? { theory: data, music: '' } : data;
+                return theoryData.theory && theoryData.theory.trim() !== '';
+            })
+            .map(([key, data]) => {
+                const theoryData = typeof data === 'string' ? { theory: data, music: '' } : data;
+                return { key, ...theoryData };
+            });
+        
+        // Save the order for future use
+        theoryOrder = theoriesWithContent.map(t => t.key);
+        localStorage.setItem('theoryOrder', JSON.stringify(theoryOrder));
+        if (typeof db !== 'undefined' && db.ready) {
+            db.set('theoryOrder', 'default', theoryOrder).catch(() => {});
+        }
+    }
     
     if (theoriesWithContent.length === 0) {
         theoryList.innerHTML = '<p style="color: #888; text-align: center; margin-top: 40px;">No theories yet. Add content in Chord Progression to see them here.</p>';
