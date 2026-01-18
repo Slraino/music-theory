@@ -219,6 +219,9 @@ function loadTheories() {
     const musicTheory = getCachedMusicTheory();
     const theoryList = document.getElementById('theoryList');
     
+    // Clear old content first to prevent duplicates
+    theoryList.innerHTML = '';
+    
     // Filter entries that have theory content
     const theoriesWithContent = Object.entries(musicTheory)
         .filter(([key, data]) => {
