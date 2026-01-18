@@ -97,7 +97,6 @@ function getVisibleDetailContent() {
     }
     return detailContent;
 }
-}
 
 // Start editing detail
 // Guard to prevent multiple edit windows opening
