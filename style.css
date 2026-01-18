@@ -141,7 +141,8 @@ main {
     justify-content: center;
     width: 200px;
     height: 200px;
-    background: linear-gradient(135deg, #FF1744 0%, #cc0033 100%);
+    background: #1a1a1a;
+    border: 3px solid #FF1744;
     border-radius: 12px;
     text-decoration: none;
     color: white;
@@ -153,6 +154,7 @@ main {
 .nav-box-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 8px 25px rgba(255, 23, 68, 0.5);
+    background: #2a2a2a;
 }
 
 .nav-box-icon {
