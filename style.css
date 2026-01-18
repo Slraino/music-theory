@@ -1030,8 +1030,8 @@ main {
 }
 
 .detail-controls {
-    position: absolute;
-    top: 25px;
+    position: fixed;
+    top: 20px;
     right: 20px;
     z-index: 100;
 }
