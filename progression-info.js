@@ -475,6 +475,20 @@ function showTheoryTooltip(lineTitle, event) {
         }
     }
     
+    // If not found, try partial match (check if theory name appears in stored theory content)
+    if (!theoryData) {
+        for (const key in musicTheory) {
+            const data = musicTheory[key];
+            const theory = typeof data === 'string' ? data : (data.theory || '');
+            // Check first line (main title)
+            const firstLine = theory.split('\n')[0];
+            if (firstLine.toLowerCase() === theoryName.toLowerCase()) {
+                theoryData = musicTheory[key];
+                break;
+            }
+        }
+    }
+    
     // If still not found, search in subtitles
     if (!theoryData) {
         for (const key in musicTheory) {
@@ -505,7 +519,10 @@ function showTheoryTooltip(lineTitle, event) {
             if (tooltipContent) break;
         }
         
-        if (!tooltipContent) return;
+        if (!tooltipContent) {
+            // Theory not found - show helpful message
+            tooltipContent = `<p class="tooltip-line" style="color: #999; font-style: italic;">Theory definition not found. Add to Music Theory page.</p>`;
+        }
     }
     
     if (!tooltipContent && theoryData) {
