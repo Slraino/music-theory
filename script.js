@@ -156,19 +156,24 @@ function loadProgressions() {
             let allContent = '';
             
             groups[key].forEach((prog, idx) => {
-                const contentLines = prog.content.split('\n').filter(l => l.trim());
+                const contentLines = prog.content.split('\n');
                 
                 contentLines.forEach((line, lineIdx) => {
-                    // Parse **text** for styled sections
-                    const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
-                    // Only make lines clickable if they have content AND don't contain styling markers
-                    const hasContent = line.trim().length > 0;
-                    const hasStyledText = line.includes('**');
-                    const isClickable = hasContent && !hasStyledText;
-                    const clickableClass = isClickable ? 'clickable-line' : '';
-                    allContent += `
-                        <p class="progression-notes ${clickableClass}" ${isClickable ? `onclick="showDetail(${prog.origIndex}, ${lineIdx})"` : ''}>${styledLine}</p>
-                    `;
+                    if (line.trim()) {
+                        // Parse **text** for styled sections
+                        const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
+                        // Only make lines clickable if they have content AND don't contain styling markers
+                        const hasContent = line.trim().length > 0;
+                        const hasStyledText = line.includes('**');
+                        const isClickable = hasContent && !hasStyledText;
+                        const clickableClass = isClickable ? 'clickable-line' : '';
+                        allContent += `
+                            <p class="progression-notes ${clickableClass}" ${isClickable ? `onclick="showDetail(${prog.origIndex}, ${lineIdx})"` : ''}>${styledLine}</p>
+                        `;
+                    } else {
+                        // Empty line for spacing
+                        allContent += `<p class="progression-notes" style="height: 10px; margin: 0;"></p>`;
+                    }
                 });
             });
             
