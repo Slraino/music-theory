@@ -307,10 +307,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (document.getElementById('progressionsList')) {
         loadProgressions();
         // Expand group "1" by default
-        const group1Box = document.querySelector('[data-group-key="1"]');
-        if (group1Box) {
-            toggleGroupContent('1');
-        }
+        setTimeout(() => {
+            const group1Container = document.getElementById('group-content-1');
+            if (group1Container) {
+                group1Container.classList.remove('collapsed');
+                currentOpenGroup = '1';
+            }
+        }, 100);
     }
 });
 
