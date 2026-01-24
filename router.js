@@ -3,11 +3,12 @@ class Router {
     constructor() {
         this.currentPage = 'homePage';
         this.pages = {
-            'index.html': { id: 'homePage', title: 'Fantasia', showBack: false },
+            'index.html': { id: 'homePage', title: '', showBack: false },
             'chord-progression.html': { id: 'chordProgressionPage', title: 'Chord Progression', showBack: true },
             'progression-info.html': { id: 'progressionInfoPage', title: 'Progression Detail', showBack: true },
             'music-theory.html': { id: 'musicTheoryPage', title: 'Music Theory', showBack: true },
-            'theory-index.html': { id: 'musicTheoryPage', title: 'Music Theory', showBack: true }
+            'theory-index.html': { id: 'musicTheoryPage', title: 'Music Theory', showBack: true },
+            'chord-generator.html': { id: 'chordGeneratorPage', title: 'Chord Generator', showBack: true }
         };
     }
 
@@ -102,6 +103,8 @@ class Router {
             if (typeof loadProgressionDetail === 'function') loadProgressionDetail();
         } else if (page === 'music-theory.html' || page === 'theory-index.html') {
             if (typeof loadTheories === 'function') loadTheories();
+        } else if (page === 'chord-generator.html') {
+            if (typeof initChordGenerator === 'function') initChordGenerator();
         } else if (page === 'index.html') {
             if (typeof loadSiteDescription === 'function') loadSiteDescription();
         }

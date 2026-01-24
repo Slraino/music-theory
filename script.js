@@ -385,9 +385,7 @@ function loadProgressions() {
     const progressionControls = document.getElementById('progressionControls');
     if (progressionControls) {
         progressionControls.innerHTML = '';
-        if (isOwnerMode()) {
-            progressionControls.innerHTML = `<span class="edit-icon" onclick="editCurrentProgression()" title="Edit Progression">✏️</span>`;
-        }
+        progressionControls.style.display = 'none';
     }
     
     const list = document.getElementById('progressionsList');
@@ -723,12 +721,18 @@ function loadSiteDescription() {
         siteDescElement.textContent = savedDescription;
     }
     
-    // Show edit button in owner mode
+    // Show edit button in owner mode (only if element exists)
     if (isOwnerMode()) {
-        document.getElementById('editDescBtn').style.display = 'inline-block';
-        document.getElementById('editDescBtn').onclick = editSiteDescription;
-        document.getElementById('siteDescription').style.cursor = 'pointer';
-        document.getElementById('siteDescription').onclick = editSiteDescription;
+        const editBtn = document.getElementById('editDescBtn');
+        if (editBtn) {
+            editBtn.style.display = 'inline-block';
+            editBtn.onclick = editSiteDescription;
+        }
+        const siteDesc = document.getElementById('siteDescription');
+        if (siteDesc) {
+            siteDesc.style.cursor = 'pointer';
+            siteDesc.onclick = editSiteDescription;
+        }
     }
 }
 
@@ -777,5 +781,33 @@ function showDetail(indexOrLineText, encodedLineTitle) {
         // Set URL parameter for bookmark/share capability
         window.history.pushState({ page: 'progression-info.html', lineTitle, progIndex }, '', 'progression-info.html?lineTitle=' + encodeURIComponent(lineTitle) + '&progIndex=' + progIndex);
     }
+}
+
+// Initialize Settings Panel toggle regardless of load timing
+function initSettingsPanel() {
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsPanel = document.getElementById('settingsPanel');
+    if (!settingsBtn || !settingsPanel) return;
+    settingsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = settingsPanel.classList.contains('open');
+        settingsPanel.classList.toggle('open', !isOpen);
+    });
+    document.addEventListener('click', (e) => {
+        if (!settingsPanel.contains(e.target) && e.target !== settingsBtn) {
+            settingsPanel.classList.remove('open');
+        }
+    });
+
+    // Prevent clicks inside the panel from bubbling to the document close handler
+    settingsPanel.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+}
+
+if (document.readyState !== 'loading') {
+    initSettingsPanel();
+} else {
+    document.addEventListener('DOMContentLoaded', initSettingsPanel);
 }
 

@@ -1,5 +1,6 @@
 // Local music playlist - add your MP3 files to the /music folder
 const MUSIC_PLAYLIST = [
+    'music/Mitsukiyo-Candy%20Dreamy.mp3',
     'music/Sharou-superstar.mp3',
     'music/Sharou-Anyone%20in%202025_.mp3',
     'music/Sharou-3_03%20PM.mp3',
@@ -268,10 +269,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (sfxToggleBtn) {
             if (soundEffects.sfxEnabled) {
                 sfxToggleBtn.classList.add('active');
-                sfxToggleBtn.textContent = '[SFX] On';
+                sfxToggleBtn.textContent = '🔊';
             } else {
                 sfxToggleBtn.classList.remove('active');
-                sfxToggleBtn.textContent = '[SFX] Off';
+                sfxToggleBtn.textContent = '🔇';
             }
         }
     };
@@ -282,12 +283,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (soundEffects.musicPlaying) {
                 soundEffects.stopBackgroundMusic();
                 musicToggleBtn.classList.remove('active');
-                musicToggleBtn.textContent = '[Music] Music';
+                musicToggleBtn.textContent = '⏹';
             } else {
                 soundEffects.init();
                 soundEffects.playBackgroundMusic();
                 musicToggleBtn.classList.add('active');
-                musicToggleBtn.textContent = '[Music] Music On';
+                musicToggleBtn.textContent = '🎵';
             }
         });
     }
@@ -324,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
             soundEffects.playBackgroundMusic();
             if (musicToggleBtn) {
                 musicToggleBtn.classList.add('active');
-                musicToggleBtn.textContent = '[Music] Music On';
+                musicToggleBtn.textContent = '🎵';
             }
         }
         // Remove listeners after first interaction

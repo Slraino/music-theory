@@ -1,0 +1,39 @@
+/* Music Theory page-specific tweaks */
+
+/* Align footer controls nicely */
+.music-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.music-btn {
+    background: #1a1a1a;
+    color: #FF1744;
+    border: 2px solid #FF1744;
+    padding: 6px 12px;
+    border-radius: 0;
+    cursor: pointer;
+    font-weight: 600;
+    transition: filter 0.2s ease;
+}
+
+.music-btn:hover {
+    filter: brightness(0.95);
+}
+
+.volume-slider {
+    width: 160px;
+}
+
+.volume-label {
+    color: #b0b0b0;
+}
+
+/* Slightly larger list padding for readability */
+.theory-list-container {
+    padding-top: 24px;
+    padding-bottom: 24px;
+}

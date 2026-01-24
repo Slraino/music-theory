@@ -6,44 +6,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark">
     <title>Music Theory</title>
+    <link rel="stylesheet" href="base.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen">
-        <div class="loading-container">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Loading Music Theory...</p>
-        </div>
-    </div>
+    
 
     <div class="container">
+        <!-- Floating Title -->
+        <div class="floating-title">✧ Fantasia ✧</div>
+        
+        <!-- Floating Copyright -->
+        <div class="floating-copyright">&copy; 2026 Music Theory Learning. Happy learning! 🎵</div>
+        
         <header>
             <h1 id="pageTitle">Music Theory</h1>
             <button id="backBtn" class="back-btn" style="display: none;">←</button>
+            <!-- Settings Button -->
+            <button id="settingsBtn" class="settings-btn" title="Settings">⚙️</button>
+
+            <!-- Settings Panel -->
+            <div id="settingsPanel" class="settings-panel">
+                <div class="sounds-control-panel" style="background:rgba(10,10,14,0.95);border:4px solid #FF1744;box-shadow:0 12px 32px rgba(0,0,0,0.7),0 0 30px rgba(255,23,68,0.35);border-radius:16px;">
+                    <div class="sound-section">
+                        <div class="sound-header">
+                            <button id="musicToggleBtn" class="sound-btn" aria-label="Toggle Music">🎵</button>
+                            <input type="range" id="volumeSlider" class="sound-slider" min="0" max="100" value="15">
+                            <span id="volumeLabel" class="sound-label">15%</span>
+                        </div>
+                    </div>
+                    <div class="sound-section">
+                        <div class="sound-header">
+                            <button id="sfxToggleBtn" class="sound-btn" aria-label="Toggle SFX">🔊</button>
+                            <input type="range" id="sfxSlider" class="sound-slider" min="0" max="100" value="50">
+                            <span id="sfxLabel" class="sound-label">50%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <main id="mainContent">
             <!-- HOME PAGE -->
             <section id="homePage" class="page-section">
                 <section class="content-area" style="text-align: center;">
-                    <h2 class="fancy-title">Welcome to Fantasia</h2>
-                    <p id="siteDescription" style="cursor: pointer;">Every Day ⭐ Music Day ~ !</p>
-                    <p style="margin-top: 20px; color: #ffd6d6; font-size: 0.9em; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                        By Aino
-                        <button id="editDescBtn" class="icon-edit-btn" style="display: none;">✏️</button>
-                    </p>
+                    
                 </section>
 
-                <div class="nav-boxes-container">
-                    <a href="chord-progression.html" class="nav-box-card">
-                        <div class="nav-box-icon">🎼</div>
-                        <div class="nav-box-title">Chord Progression</div>
-                    </a>
-                    <a href="music-theory.html" class="nav-box-card">
-                        <div class="nav-box-icon">📚</div>
-                        <div class="nav-box-title">Music Theory</div>
-                    </a>
+                <div class="nav-category">
+                    <h3 class="category-title">🎨 Tools</h3>
+                    <div class="nav-boxes-container">
+                        <a href="chord-generator.html" class="nav-box-card">
+                            <div class="nav-box-icon">🎹</div>
+                            <div class="nav-box-title">Chord Generator</div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-category">
+                    <h3 class="category-title">📖 Data</h3>
+                    <div class="nav-boxes-container">
+                        <a href="chord-progression.html" class="nav-box-card">
+                            <div class="nav-box-icon">🎼</div>
+                            <div class="nav-box-title">Chord Progression</div>
+                        </a>
+                        <a href="music-theory.html" class="nav-box-card">
+                            <div class="nav-box-icon">📚</div>
+                            <div class="nav-box-title">Music Theory</div>
+                        </a>
+                    </div>
                 </div>
             </section>
 
@@ -69,75 +100,26 @@
                     <!-- Theory list will be loaded here -->
                 </div>
             </section>
+
+            <!-- CHORD GENERATOR PAGE -->
+            <section id="chordGeneratorPage" class="page-section" style="display: none;">
+                <div class="generator-container">
+                    <!-- Generator content will be loaded here -->
+                </div>
+            </section>
         </main>
 
-        <footer>
-            <p>&copy; 2026 Music Theory Learning. Happy learning! 🎵</p>
-            <div class="sounds-control-panel">
-                <div class="sound-section">
-                    <div class="sound-header">
-                        <button id="musicToggleBtn" class="sound-btn">🎵 Music</button>
-                        <input type="range" id="volumeSlider" class="sound-slider" min="0" max="100" value="15">
-                        <span id="volumeLabel" class="sound-label">15%</span>
-                    </div>
-                </div>
-                <div class="sound-section">
-                    <div class="sound-header">
-                        <button id="sfxToggleBtn" class="sound-btn">🔊</button>
-                        <input type="range" id="sfxSlider" class="sound-slider" min="0" max="100" value="50">
-                        <span id="sfxLabel" class="sound-label">50%</span>
-                    </div>
-                </div>
-                <div class="sound-section">
-                    <button onclick="manualSaveData()" class="sound-btn" style="font-size: 0.9em;">💾 Save</button>
-                </div>
-                <div class="sound-section" id="ownerModeSection">
-                    <button onclick="toggleOwnerMode()" class="sound-btn" id="ownerModeToggle" style="font-size: 0.9em;">🔓</button>
-                </div>
-            </div>
-        </footer>
+        <footer></footer>
     </div>
 
     <script src="db.js"></script>
     <script src="sounds.js"></script>
     <script src="router.js"></script>
+    <script src="chord-generator.js"></script>
+    <script src="chord-generator-page.js"></script>
     <script src="script.js"></script>
     <script src="theory-index.js"></script>
     <script src="progression-info.js"></script>
-    
-    <script>
-        // Hide loading screen when page is fully loaded
-        function hideLoadingScreen() {
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen) {
-                loadingScreen.classList.add('hidden');
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                }, 500);
-            }
-        }
-        
-        // Update owner mode button text based on current state
-        function updateOwnerModeButton() {
-            const btn = document.getElementById('ownerModeToggle');
-            if (btn) {
-                btn.textContent = EDIT_UI_ENABLED ? '🔒' : '🔓';
-                btn.onclick = EDIT_UI_ENABLED ? disableOwnerMode : toggleOwnerMode;
-            }
-        }
-        
-        // Hide loading screen when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            hideLoadingScreen();
-            updateOwnerModeButton();
-        });
-        
-        // Also hide when all resources are loaded
-        window.addEventListener('load', hideLoadingScreen);
-        
-        // Failsafe: hide after 5 seconds anyway
-        setTimeout(hideLoadingScreen, 5000);
-    </script>
 </body>
 </html>
 

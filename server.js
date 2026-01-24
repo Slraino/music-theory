@@ -12,15 +12,21 @@ app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
+    // Allow scripts, inline handlers, and eval (needed for some client libs)
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; media-src 'self';");
     next();
 });
+
+// Return empty response for favicon requests to avoid 404 noise
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 // Body parser with size limit
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Static files with caching
-app.use(express.static(__dirname, { 
+const publicDir = path.join(__dirname, 'public');
+app.use(express.static(publicDir, { 
     maxAge: '1d',
     etag: false 
 }));
@@ -65,7 +71,7 @@ app.post('/api/save-data', (req, res) => {
             });
         }
 
-        const filePath = path.join(__dirname, 'music-theory-data.json');
+        const filePath = path.join(publicDir, 'music-theory-data.json');
         
         // Write with UTF-8 encoding
         fs.writeFileSync(filePath, JSON.stringify(req.body, null, 2), 'utf8');

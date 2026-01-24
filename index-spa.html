@@ -11,16 +11,35 @@
         <header>
             <h1 id="pageTitle">Music Theory</h1>
             <button id="backBtn" class="back-btn" style="display: none;">←</button>
+            <!-- Settings Button -->
+            <button id="settingsBtn" class="settings-btn" title="Settings">⚙️</button>
+
+            <!-- Settings Panel -->
+            <div id="settingsPanel" class="settings-panel">
+                <div class="sounds-control-panel" style="background:rgba(10,10,14,0.95);border:4px solid #FF1744;box-shadow:0 12px 32px rgba(0,0,0,0.7),0 0 30px rgba(255,23,68,0.35);border-radius:16px;">
+                    <div class="sound-section">
+                        <div class="sound-header">
+                            <button id="musicToggleBtn" class="sound-btn" aria-label="Toggle Music">🎵</button>
+                            <input type="range" id="volumeSlider" class="sound-slider" min="0" max="100" value="30">
+                            <span id="volumeLabel" class="sound-label">30%</span>
+                        </div>
+                    </div>
+                    <div class="sound-section">
+                        <div class="sound-header">
+                            <button id="sfxToggleBtn" class="sound-btn" aria-label="Toggle SFX">🔊</button>
+                            <input type="range" id="sfxSlider" class="sound-slider" min="0" max="100" value="50">
+                            <span id="sfxLabel" class="sound-label">50%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <main id="mainContent">
             <!-- HOME PAGE -->
             <section id="homePage" class="page-section">
                 <section class="content-area">
-                    <h2>Welcome to Music Theory</h2>
-                    <p id="siteDescription" style="cursor: pointer;">Learn and explore chord progressions and music theory concepts.</p>
-                    <button id="editDescBtn" class="group-edit-btn" style="display: none; margin-top: 10px;">Edit Description</button>
-                    <p style="margin-top: 20px; color: #ffd6d6; font-size: 0.9em;">By Aino</p>
+                    
                 </section>
 
                 <section class="lessons-section">
@@ -56,7 +75,6 @@
         </main>
 
         <footer>
-            <p>&copy; 2026 Music Theory Learning. Happy learning! [Music]</p>
             <div class="music-controls">
                 <button id="musicToggleBtn" class="music-btn">[Music] Music</button>
                 <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="30">

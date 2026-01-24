@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>Music Theory</title>
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="settings-panel.css">
+    <link rel="stylesheet" href="pages.css">
+    <link rel="stylesheet" href="responsive.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Floating Title -->
+        <div class="floating-title">✧ Fantasia ✧</div>
+        
+        <!-- Floating Copyright -->
+        <div class="floating-copyright">&copy; 2026 Music Theory Learning. Happy learning! 🎵</div>
+        
+        <header>
+            <h1 id="pageTitle">Music Theory</h1>
+            <button id="backBtn" class="back-btn" style="display: none;">←</button>
+            <!-- Settings Button -->
+            <button id="settingsBtn" class="settings-btn" title="Settings">⚙️</button>
+
+            <!-- Settings Panel -->
+            <div id="settingsPanel" class="settings-panel">
+                <div class="sounds-control-panel">
+                    <div class="sound-section">
+                        <div class="sound-header">
+                            <button id="musicToggleBtn" class="sound-btn" aria-label="Toggle Music">🎵</button>
+                            <input type="range" id="volumeSlider" class="sound-slider" min="0" max="100" value="15">
+                            <span id="volumeLabel" class="sound-label">15%</span>
+                        </div>
+                    </div>
+                    <div class="sound-section">
+                        <div class="sound-header">
+                            <button id="sfxToggleBtn" class="sound-btn" aria-label="Toggle SFX">🔊</button>
+                            <input type="range" id="sfxSlider" class="sound-slider" min="0" max="100" value="50">
+                            <span id="sfxLabel" class="sound-label">50%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main id="mainContent">
+            <!-- HOME PAGE -->
+            <section id="homePage" class="page-section">
+                <section class="content-area" style="text-align: center;">
+                    
+                </section>
+
+                <div class="nav-category">
+                    <h3 class="category-title">🎨 Tools</h3>
+                    <div class="nav-boxes-container">
+                        <a href="chord-generator.html" class="nav-box-card">
+                            <div class="nav-box-icon">🎹</div>
+                            <div class="nav-box-title">Chord Generator</div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-category">
+                    <h3 class="category-title">📖 Data</h3>
+                    <div class="nav-boxes-container">
+                        <a href="chord-progression.html" class="nav-box-card">
+                            <div class="nav-box-icon">🎼</div>
+                            <div class="nav-box-title">Chord Progression</div>
+                        </a>
+                        <a href="music-theory.html" class="nav-box-card">
+                            <div class="nav-box-icon">📚</div>
+                            <div class="nav-box-title">Music Theory</div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CHORD PROGRESSION PAGE -->
+            <section id="chordProgressionPage" class="page-section" style="display: none;">
+                <div id="progressionControls" class="progression-controls"></div>
+                <div id="progressionsList" class="progressions-list">
+                    <!-- Progressions render here -->
+                </div>
+            </section>
+
+            <!-- PROGRESSION INFO PAGE -->
+            <section id="progressionInfoPage" class="page-section" style="display: none;">
+                <div class="detail-controls" id="detailControls"></div>
+                <div class="detail-content" id="detailContent">
+                    <!-- Detail content will be loaded here -->
+                </div>
+            </section>
+
+            <!-- MUSIC THEORY PAGE -->
+            <section id="musicTheoryPage" class="page-section" style="display: none;">
+                <div class="theory-list-container" id="theoryList">
+                    <!-- Theory list will be loaded here -->
+                </div>
+            </section>
+
+            <!-- CHORD GENERATOR PAGE -->
+            <section id="chordGeneratorPage" class="page-section" style="display: none;">
+                <div class="generator-container">
+                    <!-- Generator content will be loaded here -->
+                </div>
+            </section>
+        </main>
+
+        <footer></footer>
+    </div>
+
+    <script src="db.js"></script>
+    <script src="sounds.js"></script>
+    <script src="router.js"></script>
+    <script src="chord-generator.js"></script>
+    <script src="chord-generator-page.js"></script>
+    <script src="script.js"></script>
+    <script src="theory-index.js"></script>
+    <script src="progression-info.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
