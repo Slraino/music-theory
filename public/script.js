@@ -63,8 +63,10 @@ function initializeProgressions() {
 }
 
 function loadProgressions() {
+    console.log('loadProgressions() called');
     initializeProgressions();
     const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
+    console.log('Progressions loaded:', progs.length, 'items');
 
     // Hide detail-controls on this page
     const detailControls = document.getElementById('detailControls');
@@ -84,6 +86,7 @@ function loadProgressions() {
         console.error('progressionsList element not found!');
         return;
     }
+    console.log('Found progressionsList element');
     list.innerHTML = '';
     
     // Create wrapper divs
@@ -205,6 +208,10 @@ function loadProgressions() {
     list.appendChild(boxesWrapper);
     list.appendChild(contentWrapper);
     
+    console.log('Appended', boxesWrapper.children.length, 'boxes and', contentWrapper.children.length, 'content containers');
+    console.log('boxesWrapper display:', window.getComputedStyle(boxesWrapper).display);
+    console.log('First box element:', boxesWrapper.firstElementChild);
+    
     // Restore the previously open group if it exists
     if (currentOpenGroup) {
         const previousContainer = document.getElementById(`group-content-${currentOpenGroup}`);
@@ -305,15 +312,21 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     // Only load progressions if the progressionsList element exists
     if (document.getElementById('progressionsList')) {
+        console.log('Starting loadProgressions from DOMContentLoaded');
         loadProgressions();
         // Expand group "1" by default
         setTimeout(() => {
             const group1Container = document.getElementById('group-content-1');
             if (group1Container) {
+                console.log('Expanding group-content-1');
                 group1Container.classList.remove('collapsed');
                 currentOpenGroup = '1';
+            } else {
+                console.error('group-content-1 not found after timeout');
             }
         }, 100);
+    } else {
+        console.log('progressionsList element not found, skipping loadProgressions');
     }
 });
 
