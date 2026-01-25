@@ -183,7 +183,7 @@ function loadProgressions() {
                         const crimsonClass = shouldBeCrimson ? 'crimson-text' : '';
                         const encodedLine = isClickable ? encodeURIComponent(line.trim()) : '';
                         allContent += `
-                            <p class="progression-notes ${clickableClass} ${crimsonClass}" ${isClickable ? `onclick="showDetail(${prog.origIndex}, '${encodedLine}')"` : ''}>${styledLine}</p>
+                            <p class="progression-notes ${clickableClass} ${crimsonClass}" ${isClickable ? `data-prog-index="${prog.origIndex}" data-line="${encodedLine}"` : ''}>${styledLine}</p>
                         `;
                         
                         // If this line has styled text, turn on crimson for the next lines
@@ -211,6 +211,16 @@ function loadProgressions() {
     console.log('Appended', boxesWrapper.children.length, 'boxes and', contentWrapper.children.length, 'content containers');
     console.log('boxesWrapper display:', window.getComputedStyle(boxesWrapper).display);
     console.log('First box element:', boxesWrapper.firstElementChild);
+    
+    // Add event delegation for clickable lines
+    list.addEventListener('click', (e) => {
+        const clickableLine = e.target.closest('.clickable-line');
+        if (clickableLine) {
+            const progIndex = parseInt(clickableLine.getAttribute('data-prog-index'));
+            const encodedLine = clickableLine.getAttribute('data-line');
+            showDetail(progIndex, encodedLine);
+        }
+    });
     
     // Restore the previously open group if it exists
     if (currentOpenGroup) {

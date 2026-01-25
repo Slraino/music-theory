@@ -107,7 +107,7 @@
                 <div class="container">
                     <header>
                         <h1>Chord Generator</h1>
-                        <button class="back-btn" onclick="window.location.href='index.html'">←</button>
+                        <button class="back-btn" id="backBtn">←</button>
                     </header>
 
                     <main>
@@ -121,7 +121,7 @@
                                 </div>
                                 <div class="mini-label" id="chordMeta">Ready</div>
                                 <div class="refresh-row">
-                                    <button class="refresh-btn" onclick="refreshChords()">🔄 Refresh</button>
+                                    <button class="refresh-btn" id="refreshBtn">🔄 Refresh</button>
                                 </div>
                             </div>
                         </div>
@@ -170,6 +170,9 @@
                     });
                     window.addEventListener('load', hideLoadingScreen);
                     setTimeout(hideLoadingScreen, 5000);
+                    
+                    document.getElementById('backBtn')?.addEventListener('click', () => window.location.href = 'index.html');
+                    document.getElementById('refreshBtn')?.addEventListener('click', refreshChords);
                 </script>
             </body>
             </html>

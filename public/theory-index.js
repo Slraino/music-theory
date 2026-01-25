@@ -63,7 +63,7 @@ async function loadTheories() {
             
             titlesHtml += `
                 <div class="theory-title-group ${isFirst}" data-theory-index="${index}">
-                    <div class="theory-main-title" onmouseenter="switchTheoryContent(${index}, -1)" onmouseleave="">
+                    <div class="theory-main-title" data-theory-index="${index}" data-sub-index="-1">
                         <span class="theory-title-text">${escapeHtml(theory.name)}</span>
                     </div>
             `;
@@ -73,7 +73,7 @@ async function loadTheories() {
                 theory.items.forEach((item, subIndex) => {
                     const isActive = (index === 0 && subIndex === 0 && (!theory.info || (Array.isArray(theory.info) && theory.info.length === 0)));
                     titlesHtml += `
-                        <div class="theory-subtitle-item ${isActive ? 'active' : ''}" data-subtitle-index="${subIndex}" onmouseenter="switchTheoryContent(${index}, ${subIndex})" onmouseleave="">
+                        <div class="theory-subtitle-item ${isActive ? 'active' : ''}" data-theory-index="${index}" data-subtitle-index="${subIndex}">
                             <span class="theory-subtitle-text">${escapeHtml(item.name)}</span>
                         </div>
                     `;
@@ -119,6 +119,22 @@ async function loadTheories() {
         
         theoryList.innerHTML = html;
         window.theoryContentData = contentData;
+        
+        // Add event delegation for theory title and subtitle clicks
+        theoryList.addEventListener('mouseenter', (e) => {
+            const mainTitle = e.target.closest('.theory-main-title');
+            const subtitle = e.target.closest('.theory-subtitle-item');
+            
+            if (mainTitle) {
+                const theoryIndex = parseInt(mainTitle.getAttribute('data-theory-index'));
+                const subIndex = parseInt(mainTitle.getAttribute('data-sub-index'));
+                switchTheoryContent(theoryIndex, subIndex);
+            } else if (subtitle) {
+                const theoryIndex = parseInt(subtitle.closest('.theory-title-group').getAttribute('data-theory-index'));
+                const subIndex = parseInt(subtitle.getAttribute('data-subtitle-index'));
+                switchTheoryContent(theoryIndex, subIndex);
+            }
+        }, true);
         
     } catch (error) {
         console.error('Error loading music theory data:', error);

@@ -166,13 +166,20 @@ function startDetailEdit() {
                         <textarea class="detail-edit-genre" name="genre" id="detail-edit-genre" style="min-height: 150px;">${escapeHtml(detailData.genre || '')}</textarea>
                     </div>
                     <div class="detail-edit-controls">
-                        <button class="detail-save-btn" onclick="saveDetailEdit()">Save</button>
-                        <button class="detail-cancel-btn" onclick="cancelDetailEdit()">Cancel</button>
-                        <button class="detail-delete-btn" onclick="deleteDetailProgression()">Delete</button>
+                        <button class="detail-save-btn" id="detailSaveBtn">Save</button>
+                        <button class="detail-cancel-btn" id="detailCancelBtn">Cancel</button>
+                        <button class="detail-delete-btn" id="detailDeleteBtn">Delete</button>
                     </div>
                 </div>
             </div>
         `;
+        
+        // Add event listeners for edit buttons (CSP-compliant)
+        setTimeout(() => {
+            document.getElementById('detailSaveBtn')?.addEventListener('click', saveDetailEdit);
+            document.getElementById('detailCancelBtn')?.addEventListener('click', cancelDetailEdit);
+            document.getElementById('detailDeleteBtn')?.addEventListener('click', deleteDetailProgression);
+        }, 0);
     }, 0);
 }
 
@@ -305,7 +312,7 @@ function loadDetailView() {
                     while ((match = bracketsRegex.exec(line)) !== null) {
                         const theoryName = match[1].trim();
                         
-                        html += `<span class="theory-badge" onmouseenter="showTheoryTooltip('${theoryName.replace(/'/g, "\\'")}', event)" onmouseleave="hideTheoryTooltip()">${escapeHtml(theoryName)}</span>`;
+                        html += `<span class="theory-badge" data-theory-name="${escapeHtml(theoryName)}">${escapeHtml(theoryName)}</span>`;
                     }
                     
                     html += '</p>';
@@ -314,7 +321,7 @@ function loadDetailView() {
                 } else {
                     // No brackets, render as before
                     const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
-                    theoryHtml += `<p class="detail-line" onmouseenter="showTheoryTooltip('${line.trim().replace(/'/g, "\\'")}', event)" onmouseleave="hideTheoryTooltip()" style="cursor: help;">` + styledLine + `</p>`;
+                    theoryHtml += `<p class="detail-line" data-theory-tooltip="${escapeHtml(line.trim())}" style="cursor: help;">` + styledLine + `</p>`;
                 }
             } else if (line.trim() !== '< Info >' && line.trim() !== '') {
                 // Empty line for spacing
@@ -384,6 +391,29 @@ function loadDetailView() {
             </div>
         </div>
     `;
+    
+    // Add event delegation for theory tooltips (CSP-compliant)
+    detailContent.addEventListener('mouseenter', (e) => {
+        const theoryBadge = e.target.closest('.theory-badge');
+        const detailLine = e.target.closest('.detail-line[data-theory-tooltip]');
+        
+        if (theoryBadge) {
+            const theoryName = theoryBadge.getAttribute('data-theory-name');
+            showTheoryTooltip(theoryName, e);
+        } else if (detailLine) {
+            const tooltipText = detailLine.getAttribute('data-theory-tooltip');
+            showTheoryTooltip(tooltipText, e);
+        }
+    }, true);
+    
+    detailContent.addEventListener('mouseleave', (e) => {
+        const theoryBadge = e.target.closest('.theory-badge');
+        const detailLine = e.target.closest('.detail-line[data-theory-tooltip]');
+        
+        if (theoryBadge || detailLine) {
+            hideTheoryTooltip();
+        }
+    }, true);
 }
 
 // Load progression detail for SPA
