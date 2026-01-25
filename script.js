@@ -52,21 +52,32 @@ const STORAGE_KEYS = {
 // Track currently open group for accordion
 let currentOpenGroup = null;
 
-// Initialize progressions if empty
+// Initialize progressions from JSON file
 function initializeProgressions() {
     let progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     if (progs.length === 0) {
-        progs = [{"title":"b2","content":"b2"},{"title":"2","content":"2"},{"title":"b3","content":"b3"},{"title":"3","content":"3"},{"title":"4","content":"4"},{"title":"#4","content":"#4"},{"title":"5","content":"5"},{"title":"b6","content":"b6"},{"title":"6","content":"6"},{"title":"b7","content":"b7"},{"title":"7","content":"7"},{"title":"6 4 5 1","content":"6m - 4 - 5 - 1\n6m - 4 - 5 - 1 - 5/7\n6m - 4 - 5 - 1 - 3/7"},{"title":"6 3 4 1","content":"6m - 3m - 4 - 5\n6m - 3m - 4 - 1"},{"title":"4 5 3 6","content":"4 - 5 - 3m - 6m"},{"title":"2 5 1","content":"2m - 5 - 1"},{"title":"1","content":"1 - 5/7 - 5m/b7 - 4/6 - 4m/b6 - 1/5 - 2/#4 - 5 \n[ Chromatic Descent / Seondary Dominant ( 2/#4 ) / Model Interchange ( 5m/b7 / 4mb6 / 2/#4 ) ]\n\n1 7 6 5 4 3 2 5ㅤ[ Cannon ]ㅤ1 5 6 3 4 1 4 5\n1 - 5/7 - 6m - 3m/5 - 4 - 1/3 - 2m - 5ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ[ Verse = キセキ ]\n1 - 7ø & 3/#5 - 6m - 5m & 17 - 4M7 - 1/3 - 2M7 - 4/5 & 4m/5ㅤㅤ[ Chorus = Pretender ]\n1 - 7ø & 3 - 6m - 5m & 1 - 4......ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ[ Chorus = クラクラ ]\n\n1 b7 6m 4\n1 b7 b6 5\n1 b7 4 4m\n1 b7m 1 b7m\n1 b6o 6m b7\n1 b6 1 b6\n1 5 6 5\n\n1 - 7o - 6m - b6\n\n1 5 6 4ㅤ[ Axis Progression ]\n1 - 5 - 6m - 4\n1 - 5 - 6m - 27ㅤ[ Chorus = クリスマスソング ] \n\n1 5 6 3\n1 - 5m - 4 - 4m\n\n1 4 6 5ㅤ[ 50s progression ]\n1 4 6m 5\n1 4m 6m 5\n\n1 & 5m & 17 - 4 - 5 - 6m [ 9/8 ] [ Debussy - Clair De Lune ( Section 3 ) ]\n1 - 4 - 5 - 1ㅤㅤ[ Verse = 優しい忘却 ]\n1 -4 - 1/3 - 4ㅤ[ 9/8 ] [ Debussy - Clair de Lune ( Section 1, 0:34 ) ]\n1 - 4 - 1 - 4\n1 - 47 - 1 - 47\n1 - 4 - 2m - b2\n\n1 3 6\n1 - 1 - 3o - 6m ㅤ[ Chorus = Violet Snow ]\n1 - 3m - 6m - 5ㅤ[ Chorus = Silent ]\n1 - 37 - 6m - 5ㅤ [ Chorus = Orange ]\n1 3 2 5\n\n1 - 27 - 1 - 27ㅤ[ Lydian / Secondary Dominant ]\n1 - 2 - 1 - 2 ㅤ[ Lydian ]\n\n1 - b2o - 2m - 5ㅤ[ IT'S - YOU ( Max ) ]\n\n**1 1 1 1**\n1M7 - 17 - 1add6 - 1+\n1 - 1+ - 6m/1 - 17 ㅤㅤㅤ[ Chromatic Accents / Line Cliche ]\n1 omit3 - 1add6 omit3 ㅤ[ Blues ]\n1 - 4/1 - 1 - 4m/1","displayTitle":""}];
-        StorageManager.set('progressions', 'default', progs);
+        // Load from progressions-data.json
+        fetch('progressions-data.json')
+            .then(response => response.json())
+            .then(data => {
+                localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(data));
+                StorageManager.set('progressions', 'default', data);
+                console.log('Loaded', data.length, 'progressions from progressions-data.json');
+            })
+            .catch(error => {
+                console.error('Failed to load progressions-data.json:', error);
+                // Fallback to hardcoded defaults if file not found
+                const defaults = [{"title":"b2","content":"b2"},{"title":"2","content":"2"},{"title":"b3","content":"b3"},{"title":"3","content":"3"},{"title":"4","content":"4"},{"title":"#4","content":"#4"},{"title":"5","content":"5"},{"title":"b6","content":"b6"},{"title":"6","content":"6"},{"title":"b7","content":"b7"},{"title":"7","content":"7"}];
+                localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(defaults));
+                StorageManager.set('progressions', 'default', defaults);
+            });
     }
     return progs;
 }
 
 function loadProgressions() {
-    console.log('loadProgressions() called');
     initializeProgressions();
     const progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
-    console.log('Progressions loaded:', progs.length, 'items');
 
     // Hide detail-controls on this page
     const detailControls = document.getElementById('detailControls');
@@ -86,7 +97,6 @@ function loadProgressions() {
         console.error('progressionsList element not found!');
         return;
     }
-    console.log('Found progressionsList element');
     list.innerHTML = '';
     
     // Create wrapper divs
@@ -208,25 +218,6 @@ function loadProgressions() {
     list.appendChild(boxesWrapper);
     list.appendChild(contentWrapper);
     
-    console.log('Appended', boxesWrapper.children.length, 'boxes and', contentWrapper.children.length, 'content containers');
-    console.log('boxesWrapper display:', window.getComputedStyle(boxesWrapper).display);
-    console.log('First box element:', boxesWrapper.firstElementChild);
-    
-    // Debug: Check if CSS is loading properly
-    if (boxesWrapper.firstElementChild) {
-        const firstBox = boxesWrapper.firstElementChild.firstElementChild;
-        if (firstBox) {
-            const styles = window.getComputedStyle(firstBox);
-            console.log('First group-title-box styles:', {
-                width: styles.width,
-                height: styles.height,
-                backgroundColor: styles.backgroundColor,
-                display: styles.display,
-                visibility: styles.visibility
-            });
-        }
-    }
-    
     // Add event delegation for clickable lines
     list.addEventListener('click', (e) => {
         const clickableLine = e.target.closest('.clickable-line');
@@ -337,21 +328,15 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     // Only load progressions if the progressionsList element exists
     if (document.getElementById('progressionsList')) {
-        console.log('Starting loadProgressions from DOMContentLoaded');
         loadProgressions();
         // Expand group "1" by default
         setTimeout(() => {
             const group1Container = document.getElementById('group-content-1');
             if (group1Container) {
-                console.log('Expanding group-content-1');
                 group1Container.classList.remove('collapsed');
                 currentOpenGroup = '1';
-            } else {
-                console.error('group-content-1 not found after timeout');
             }
         }, 100);
-    } else {
-        console.log('progressionsList element not found, skipping loadProgressions');
     }
 });
 
