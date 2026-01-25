@@ -111,7 +111,7 @@ function loadProgressions() {
         return;
     }
     list.innerHTML = '';
-    
+
     // Create wrapper divs
     const boxesWrapper = document.createElement('div');
     boxesWrapper.className = 'boxes-wrapper';
@@ -136,7 +136,7 @@ function loadProgressions() {
         
         groups[key].push({ ...prog, origIndex: idx });
     });
-    
+
     // Define display order: ascending from 1 to 7
     const displayOrder = ['1','b2','2','b3','3','4','#4','5','b6','6','b7','7'];
     
@@ -194,19 +194,32 @@ function loadProgressions() {
                     }
                     
                     if (line.trim()) {
-                        // Parse **text** for styled sections
-                        const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
-                        // Check if this line has styled text (**text**)
+                        let displayHTML = '';
                         const hasStyledText = line.includes('**');
                         
                         // Only make lines clickable if they have content AND don't contain styling markers
                         const hasContent = line.trim().length > 0;
                         const isClickable = hasContent && !hasStyledText;
+                        
+                        if (isClickable) {
+                            // Split chords into grid columns
+                            const chords = line.split(' - ').map(c => c.trim()).filter(c => c);
+                            displayHTML = `<div class="progression-grid">`;
+                            chords.forEach((chord) => {
+                                displayHTML += `<div class="progression-cell">${chord}</div>`;
+                            });
+                            displayHTML += `</div>`;
+                        } else {
+                            // Parse **text** for styled sections
+                            const styledText = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
+                            displayHTML = `<p>${styledText}</p>`;
+                        }
+                        
                         const clickableClass = isClickable ? 'clickable-line' : '';
                         const crimsonClass = shouldBeCrimson ? 'crimson-text' : '';
                         const encodedLine = isClickable ? encodeURIComponent(line.trim()) : '';
                         allContent += `
-                            <p class="progression-notes ${clickableClass} ${crimsonClass}" ${isClickable ? `data-prog-index="${prog.origIndex}" data-line="${encodedLine}"` : ''}>${styledLine}</p>
+                            <div class="progression-notes ${clickableClass} ${crimsonClass}" ${isClickable ? `data-prog-index="${prog.origIndex}" data-line="${encodedLine}"` : ''}>${displayHTML}</div>
                         `;
                         
                         // If this line has styled text, turn on crimson for the next lines

@@ -194,20 +194,30 @@ function loadProgressions() {
                     }
                     
                     if (line.trim()) {
-                        // Parse **text** for styled sections
-                        const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
-                        // Check if this line has styled text (**text**)
                         const hasStyledText = line.includes('**');
                         
                         // Only make lines clickable if they have content AND don't contain styling markers
                         const hasContent = line.trim().length > 0;
                         const isClickable = hasContent && !hasStyledText;
-                        const clickableClass = isClickable ? 'clickable-line' : '';
                         const crimsonClass = shouldBeCrimson ? 'crimson-text' : '';
-                        const encodedLine = isClickable ? encodeURIComponent(line.trim()) : '';
-                        allContent += `
-                            <p class="progression-notes ${clickableClass} ${crimsonClass}" ${isClickable ? `data-prog-index="${prog.origIndex}" data-line="${encodedLine}"` : ''}>${styledLine}</p>
-                        `;
+                        
+                        if (isClickable) {
+                            // Split chords into grid columns and render a clickable grid
+                            const chords = line.split(' - ').map(c => c.trim()).filter(c => c);
+                            const encodedLine = encodeURIComponent(line.trim());
+                            
+                            let gridHTML = `<div class="progression-grid clickable-line" data-prog-index="${prog.origIndex}" data-line="${encodedLine}">`;
+                            chords.forEach((chord) => {
+                                gridHTML += `<div class="progression-cell">${chord}</div>`;
+                            });
+                            gridHTML += `</div>`;
+                            
+                            allContent += `<div class="progression-notes ${crimsonClass}">${gridHTML}</div>`;
+                        } else {
+                            // Parse **text** for styled sections
+                            const styledText = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
+                            allContent += `<p class="progression-notes ${crimsonClass}">${styledText}</p>`;
+                        }
                         
                         // If this line has styled text, turn on crimson for the next lines
                         if (hasStyledText) {
