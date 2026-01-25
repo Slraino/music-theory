@@ -52,22 +52,35 @@ const STORAGE_KEYS = {
 // Track currently open group for accordion
 let currentOpenGroup = null;
 
-// Initialize progressions from JSON file
+// Initialize progressions from music-theory-data.json
 function initializeProgressions() {
     let progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     if (progs.length === 0) {
-        // Load from progressions-data.json
-        fetch('progressions-data.json')
+        // Load from music-theory-data.json
+        fetch('music-theory-data.json')
             .then(response => response.json())
             .then(data => {
-                localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(data));
-                StorageManager.set('progressions', 'default', data);
-                console.log('Loaded', data.length, 'progressions from progressions-data.json');
+                // Extract progressions from chordProgressions structure
+                const progressions = [];
+                if (data.chordProgressions && Array.isArray(data.chordProgressions)) {
+                    data.chordProgressions.forEach(group => {
+                        progressions.push({
+                            title: group.note,
+                            content: group.note
+                        });
+                    });
+                }
+                localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(progressions));
+                StorageManager.set('progressions', 'default', progressions);
+                console.log('Loaded', progressions.length, 'progressions from music-theory-data.json');
             })
             .catch(error => {
-                console.error('Failed to load progressions-data.json:', error);
-                // Fallback to hardcoded defaults if file not found
-                const defaults = [{"title":"b2","content":"b2"},{"title":"2","content":"2"},{"title":"b3","content":"b3"},{"title":"3","content":"3"},{"title":"4","content":"4"},{"title":"#4","content":"#4"},{"title":"5","content":"5"},{"title":"b6","content":"b6"},{"title":"6","content":"6"},{"title":"b7","content":"b7"},{"title":"7","content":"7"}];
+                console.error('Failed to load music-theory-data.json:', error);
+                // Fallback to minimal defaults if file not found
+                const defaults = ["1","b2","2","b3","3","4","#4","5","b6","6","b7","7"].map(note => ({
+                    title: note,
+                    content: note
+                }));
                 localStorage.setItem(STORAGE_KEYS.PROGRESSIONS, JSON.stringify(defaults));
                 StorageManager.set('progressions', 'default', defaults);
             });
