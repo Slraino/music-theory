@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Theory - All Theories</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎵</text></svg>">
+    <link rel="stylesheet" href="../../src/styles/app.css">
+    <link rel="stylesheet" href="../css/musicTheory.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="fancy-title">Music Theory</h1>
+            <button class="back-btn" id="backBtn">←</button>
+        </header>
+
+        <main>
+            <div class="theory-list-container" id="theoryList">
+                <!-- Theory list will be loaded here -->
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Music Theory Learning. Happy learning! 🎵</p>
+            <div class="music-controls">
+                <button id="musicToggleBtn" class="music-btn">🎵 Music</button>
+                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="15">
+                <span id="volumeLabel" class="volume-label">15%</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/scripts/app.js"></script>
+    <script src="/pages/musicTheory.js"></script>
+    <script>
+        document.getElementById('backBtn')?.addEventListener('click', () => window.location.href = 'index.html');
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

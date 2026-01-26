@@ -1,0 +1,215 @@
+/* Chord Progression page styles */
+
+.progressions-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: relative;
+}
+
+.boxes-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 10px;
+    line-height: 0;
+    width: 100%;
+    margin-bottom: 30px;
+    height: 50px;
+}
+
+.boxes-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}
+
+.progressions-list::-webkit-scrollbar {
+    display: none;
+}
+
+.group-box {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.group-title-box {
+    background: var(--brand);
+    color: var(--bg);
+    padding: 0;
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    min-height: 50px;
+    font-size: 1em;
+    font-weight: 900;
+    cursor: pointer;
+    border-radius: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    margin-right: 0;
+    user-select: none;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    z-index: 1;
+}
+
+.group-title-box:hover {
+    background: #00ffcc;
+}
+
+/* Natural notes - white background, black text */
+.group-title-box[data-group-key="1"],
+.group-title-box[data-group-key="2"],
+.group-title-box[data-group-key="3"],
+.group-title-box[data-group-key="4"],
+.group-title-box[data-group-key="5"],
+.group-title-box[data-group-key="6"],
+.group-title-box[data-group-key="7"] {
+    background: #ffffff;
+    color: #000000;
+}
+
+.group-title-box[data-group-key="1"]:hover,
+.group-title-box[data-group-key="2"]:hover,
+.group-title-box[data-group-key="3"]:hover,
+.group-title-box[data-group-key="4"]:hover,
+.group-title-box[data-group-key="5"]:hover,
+.group-title-box[data-group-key="6"]:hover,
+.group-title-box[data-group-key="7"]:hover {
+    background: #e0e0e0;
+}
+
+/* Accidental notes - black background, white text */
+.group-title-box[data-group-key="b2"],
+.group-title-box[data-group-key="b3"],
+.group-title-box[data-group-key="#4"],
+.group-title-box[data-group-key="b6"],
+.group-title-box[data-group-key="b7"] {
+    background: #000000;
+    color: #ffffff;
+}
+
+.group-title-box[data-group-key="b2"]:hover,
+.group-title-box[data-group-key="b3"]:hover,
+.group-title-box[data-group-key="#4"]:hover,
+.group-title-box[data-group-key="b6"]:hover,
+.group-title-box[data-group-key="b7"]:hover {
+    background: #333333;
+}
+
+.group-title-text {
+    text-align: center;
+    word-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.2em;
+    line-height: 1;
+}
+
+.group-content-container {
+    background: rgba(15, 15, 15, 0.98);
+    border-radius: 8px;
+    overflow-y: auto;
+    transition: opacity 0.5s ease;
+    max-height: 600px;
+    opacity: 1;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.group-content-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.group-content-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.group-content-container::-webkit-scrollbar-thumb {
+    display: none;
+}
+
+.group-content-container.collapsed {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    margin-top: 0 !important;
+    border: none !important;
+    padding: 0 !important;
+    visibility: hidden;
+}
+
+.group-content-box {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: rgba(15, 15, 15, 0.98);
+    border-left: 4px solid var(--brand);
+}
+
+.progression-notes {
+    color: #e0e0e0;
+    font-size: 1.5em;
+    margin: 8px 0;
+    line-height: 1.2;
+    padding: 6px;
+}
+
+.styled-text {
+    color: var(--brand);
+    font-weight: bold;
+    font-size: 1.15em;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.bullet-dot {
+    color: var(--brand);
+    font-weight: bold;
+    font-size: 1.3em;
+}
+
+.highlight-text {
+    color: var(--brand);
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.crimson-text {
+    color: var(--brand) !important;
+}
+
+.clickable-line {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 6px;
+    border-radius: 3px;
+    margin: 8px 0;
+    display: block;
+}
+
+.clickable-line:hover {
+    background: rgba(255, 23, 68, 0.1);
+    color: var(--brand);
+}

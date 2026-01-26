@@ -1,0 +1,120 @@
+[
+  {
+    "name": "Diatonic",
+    "info": "Within scale",
+    "items": []
+  },
+  {
+    "name": "Chromatic",
+    "info": "Outside scale",
+    "items": [
+      {
+        "name": "Chromatic Accenting",
+        "info": "A melodic line moving up by semitones"
+      },
+      {
+        "name": "Chromatic Descending",
+        "info": "A melodic line moving down by semitones"
+      }
+    ]
+  },
+  {
+    "name": "Pedal Note",
+    "info": "A sustained note over changing harmonies",
+    "items": []
+  },
+  {
+    "name": "Line Cliche",
+    "info": "A melodic line that moves stepwise in one direction while the underlying harmony changes",
+    "characteristics": [
+      "Occurs at the top or bottom (often using slash chords); may appear in the middle",
+      "Line movement uses root, 5th, or 7th (never the 3rd)",
+      "Usually on minor chords; sometimes on major chords",
+      "Common on the tonic; can occur on other chords",
+      "Can ascend, descend, or change direction",
+      "Usually moves in semitones; can also move in tones"
+    ],
+    "items": []
+  },
+  {
+    "name": "Chord Substitution",
+    "info": "Replacing a chord with another that has a similar function",
+    "items": [
+      {
+        "name": "Function",
+        "info": "Based on harmonic roles",
+        "type": [
+          "T = 1 3 6",
+          "S = 2 4",
+          "D = 5 7"
+        ]
+      },
+      {
+        "name": "Model Interchange",
+        "info": "Borrowing chords from parallel modes",
+        "type": [
+          "1 ( Ionian, Lydian, Mixolydian )",
+          "1 > 1m ( Dorian, Phrygian, Minor )",
+          "",
+          "2m ( Ionian, Dorian, Mixolydian )",
+          "2m > 2 ( Lydian )",
+          "2m > b2 ( Phrygian, Locrian)",
+          "",
+          "3m ( Ionian, Lydian )",
+          "3m > b3 ( Dorian, Phrygian, Aeolian )",
+          "3m > b3m ( Locrian )",
+          "",
+          "4 ( Ionian, Dorian, Mixolydian )",
+          "4 > 4m ( Phrygian, Aeolian, Locrian )",
+          "4 > #4o ( Lydian )",
+          "",
+          "5 ( Ionian, Lydian )",
+          "5 > 5m ( Dorian, Mixolydian, Aeolian )",
+          "5 > 5o ( Phrygian, Locrian )",
+          "",
+          "6m ( Ionian, Lydian, Phrygian )",
+          "6m > b6 ( Phrygian, Aeolian, Locrian )",
+          "6m > 6o ( Dorian )",
+          "",
+          "7o ( Ionian )",
+          "7o > 7m ( Lydian )",
+          "7o > b7 ( Dorian, Mixolydian, Aeolian )",
+          "7o > b7m ( Phrygian, Locrian )"
+        ]
+      },
+      {
+        "name": "Axis System",
+        "info": "Based on minor thirds and tritones",
+        "type": [
+          "[ T ]",
+          "C - Eb - Gb - A",
+          "C - F#",
+          "",
+          "[ S ]",
+          "F - Ab - B - D",
+          "F - B",
+          "",
+          "[ D ]",
+          "G - Bb - Db - E",
+          "G - Db"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Chord Extension",
+    "info": "Adding notes beyond the 7th to a chord",
+    "type": [
+      "13 > M7, m7, 7, 7sus4",
+      "b13 > 7, hdim",
+      "",
+      "#11 > M7, M6, 7",
+      "11 > m, sus4",
+      "",
+      "#9 > 7",
+      "9 > M, m, sus, 7, dim, hdim",
+      "b9 > 7, 7sus4, hdim"
+    ],
+    "items": []
+  }
+]

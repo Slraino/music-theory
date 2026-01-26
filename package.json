@@ -1,18 +1,12 @@
 {
-  "name": "music-theory-app",
+  "name": "music-website",
   "version": "1.0.0",
-  "description": "Music Theory Learning App",
-  "main": "server.js",
+  "description": "Music theory SPA server",
+  "main": "server/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server/server.js",
+    "dev": "node server/server.js"
   },
-  "keywords": [
-    "music",
-    "theory"
-  ],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "dotenv": "^16.6.1",
     "express": "^4.18.2"

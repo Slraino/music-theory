@@ -1,0 +1,193 @@
+/* Music Theory page-specific tweaks */
+
+/* Slightly larger list padding for readability */
+.theory-list-container {
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+
+/* Full theory page styles */
+.theory-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 0;
+}
+
+.theory-view-container {
+    display: flex;
+    height: calc(100vh - 200px);
+    gap: 20px;
+}
+
+.theory-titles-left {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    overflow-y: auto;
+    gap: 3px;
+    padding: 15px;
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.8) 0%, rgba(30, 15, 20, 0.8) 100%);
+    border-radius: 8px;
+    border: 1px solid rgba(220, 20, 60, 0.2);
+}
+
+.theory-title-group {
+    margin-bottom: 5px;
+    cursor: grab;
+    transition: opacity 0.2s ease, border-top 0.2s ease;
+}
+
+.theory-title-group:active {
+    cursor: grabbing;
+}
+
+.theory-main-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background: rgba(20, 20, 20, 0.9);
+    border-radius: 3px;
+    margin-bottom: 3px;
+    box-shadow: 0 0 20px rgba(220, 20, 60, 0.4), inset 0 1px 0 rgba(220, 20, 60, 0.2);
+    border: 1px solid rgba(220, 20, 60, 0.5);
+    border-left: 4px solid var(--brand);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.theory-main-title:hover {
+    box-shadow: 0 0 20px rgba(220, 20, 60, 0.5), inset 0 1px 0 rgba(220, 20, 60, 0.3);
+}
+
+.theory-title-text {
+    color: var(--brand);
+    font-weight: bold;
+    font-size: 0.95em;
+    word-wrap: break-word;
+    flex: 1;
+    text-shadow: 0 0 10px var(--brand), 0 0 20px rgba(220, 20, 60, 0.6), 0 0 30px rgba(220, 20, 60, 0.3);
+}
+
+.theory-subtitle-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px 10px 30px;
+    background: rgba(20, 20, 20, 0.9);
+    border-left: 4px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 5px;
+    border-top: 1px solid rgba(220, 20, 60, 0.2);
+    border-right: 1px solid rgba(220, 20, 60, 0.2);
+    border-bottom: 1px solid rgba(220, 20, 60, 0.2);
+    margin-bottom: 2px;
+}
+
+.theory-subtitle-item:hover {
+    background: rgba(50, 50, 50, 0.9);
+    border-left: 4px solid var(--brand);
+    box-shadow: 0 0 15px rgba(220, 20, 60, 0.3), inset 0 1px 0 rgba(220, 20, 60, 0.2);
+}
+
+.theory-subtitle-item.active {
+    background: linear-gradient(135deg, rgba(220, 20, 60, 0.3) 0%, rgba(139, 10, 26, 0.3) 100%);
+    border-left-color: var(--brand);
+    border: 1px solid rgba(220, 20, 60, 0.5);
+    box-shadow: 0 0 15px rgba(220, 20, 60, 0.3);
+}
+
+.theory-subtitle-text {
+    color: var(--brand);
+    font-weight: 500;
+    font-size: 0.9em;
+    word-wrap: break-word;
+}
+
+.theory-content-right {
+    flex: 1;
+    background: linear-gradient(135deg, rgba(15, 15, 15, 0.95) 0%, rgba(20, 10, 15, 0.95) 100%);
+    border-radius: 8px;
+    padding: 25px;
+    overflow-y: auto;
+    box-shadow: 0 0 50px rgba(220, 20, 60, 0.4), 0 0 80px rgba(220, 20, 60, 0.2), inset 0 0 20px rgba(220, 20, 60, 0.1);
+}
+
+.theory-content-display {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.theory-card-line {
+    font-size: 0.95em;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.theory-card-line:hover {
+    color: var(--brand);
+}
+
+.theory-badge {
+    color: #e0e0e0;
+    padding: 6px 14px;
+    cursor: help;
+    font-size: 0.85em;
+    font-weight: 600;
+    display: inline-block;
+    animation: fadeInScale 0.5s ease-out;
+    transition: all 0.3s ease;
+}
+
+.theory-badge:hover {
+    background: linear-gradient(135deg, var(--brand) 0%, #DC143C 100%);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(255, 23, 68, 0.5);
+    transform: translateY(-2px);
+}
+
+.tooltip-word {
+    color: var(--brand);
+    cursor: help;
+    position: relative;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+.tooltip-word:hover {
+    background: rgba(255, 23, 68, 0.2);
+    padding: 4px 8px;
+    box-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+}
+
+.tooltip-word::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000;
+    color: var(--brand);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: normal;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(255, 23, 68, 0.4);
+    border: 2px solid var(--brand);
+    text-shadow: 0 0 8px var(--brand), 0 0 16px var(--brand), 0 0 24px var(--brand);
+}
+
+.tooltip-word:hover::after {
+    opacity: 1;
+}

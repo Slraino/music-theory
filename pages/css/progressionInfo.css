@@ -1,0 +1,78 @@
+/* Progression Info page styles (placeholder for page-specific rules) */
+
+/* Future detail styles can be added here to keep isolation per page. */
+
+/* Detail page styles */
+.detail-content {
+	margin-top: 20px;
+}
+
+.detail-box {
+	background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+	border: 2px solid var(--brand);
+	border-radius: 8px;
+	padding: 30px;
+	box-shadow: 0 4px 15px rgba(255, 23, 68, 0.2);
+}
+
+.detail-box h2 {
+	color: var(--brand);
+	font-size: 2.2em;
+	margin-bottom: 20px;
+	border-bottom: 3px solid var(--brand);
+	padding-bottom: 10px;
+}
+
+.detail-body {
+	margin-top: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.detail-section {
+	background: var(--bg);
+	padding: 15px;
+	border-left: 4px solid var(--brand);
+	border-radius: 5px;
+}
+
+.detail-section-title,
+.section-title {
+	font-size: 1.8em;
+	font-weight: bold;
+	color: var(--brand);
+	margin-top: 30px;
+	margin-bottom: 15px;
+	letter-spacing: 1px;
+}
+
+.section-label {
+	color: #00ff99;
+	font-size: 1.1em;
+	margin-bottom: 8px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.detail-line {
+	font-size: 1.5em;
+	font-weight: bold;
+	letter-spacing: 2px;
+	color: #e0e0e0;
+	margin: 4px 0;
+	line-height: 1.6;
+}
+
+.detail-controls,
+.progression-controls {
+	position: absolute;
+	top: 30px;
+	right: 30px;
+	z-index: 100;
+	overflow: visible;
+}
+
+.detail-controls {
+	display: none !important;
+}

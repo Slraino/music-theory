@@ -29,6 +29,3 @@ build/
 *.swp
 *.swo
 *~
-
-# Backup files
-music-theory-backup-*.json

@@ -1,0 +1,66 @@
+/* Chord Generator page styles */
+
+.generator-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.chord-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.chord-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 24px 18px;
+    text-align: center;
+    min-height: 140px;
+}
+
+.chord-symbol {
+    font-size: 2.6em;
+    font-weight: 700;
+    color: #ffd6d6;
+    letter-spacing: 0.5px;
+}
+
+.chord-notes {
+    margin-top: 10px;
+    color: #ffb6c1;
+    font-size: 1.05em;
+}
+
+.refresh-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+}
+
+.refresh-btn {
+    padding: 12px 22px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 12px rgba(102,126,234,0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.refresh-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgba(102,126,234,0.45);
+}
+
+.mini-label {
+    text-align: center;
+    color: #ffc0cb;
+    margin-top: 6px;
+    font-size: 0.95em;
+}
