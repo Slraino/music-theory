@@ -29,7 +29,7 @@ html, body {
 body {
     font-family: 'Quicksand', sans-serif;
     font-weight: bold;
-    background: var(--bg) url('./assets/image/bg.gif') no-repeat center center;
+    background: var(--bg) url('../../assets/image/bg.gif') no-repeat center center;
     background-size: cover;
     background-attachment: fixed;
     min-height: 100dvh;
