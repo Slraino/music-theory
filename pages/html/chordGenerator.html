@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chord Generator - Music Theory</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎵</text></svg>">
-    <link rel="stylesheet" href="/styles/app.css">
-    <link rel="stylesheet" href="/pages/css/chordGenerator.css">
+    <link rel="stylesheet" href="../../src/styles/app.css">
+    <link rel="stylesheet" href="../css/chordGenerator.css">
 </head>
 <body>
     <!-- Loading Screen -->
@@ -62,8 +62,8 @@
         </footer>
     </div>
 
-    <script src="/scripts/app.js"></script>
-    <script src="/pages/chordGenerator.js"></script>
+    <script src="../../src/scripts/app.js"></script>
+    <script src="../js/chordGenerator.js"></script>
     <script>
         function hideLoadingScreen() {
             const loadingScreen = document.getElementById('loadingScreen');
@@ -82,7 +82,7 @@
         window.addEventListener('load', hideLoadingScreen);
         setTimeout(hideLoadingScreen, 5000);
         
-        document.getElementById('backBtn')?.addEventListener('click', () => window.location.href = 'index.html');
+        document.getElementById('backBtn')?.addEventListener('click', () => window.location.href = '../../index.html');
         document.getElementById('refreshBtn')?.addEventListener('click', refreshChords);
     </script>
 </body>

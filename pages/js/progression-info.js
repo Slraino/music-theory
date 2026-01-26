@@ -258,7 +258,7 @@ function loadDetailView() {
     }
     
     // Load from chord-progressions.json
-    fetch('../chordProgressions.json')
+    fetch('../json/chordProgressions.json')
         .then(response => response.json())
         .then(data => {
             let detailData = { theory: '', music: '', genre: '' };

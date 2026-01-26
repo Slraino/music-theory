@@ -282,15 +282,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ==================== SOUND EFFECTS ==================== */
 const MUSIC_PLAYLIST = [
-    'music/Mitsukiyo-Candy%20Dreamy.mp3',
-    'music/Sharou-superstar.mp3',
-    'music/Sharou-Anyone%20in%202025_.mp3',
-    'music/Sharou-3_03%20PM.mp3',
-    'music/Sharou-2_23%20AM.mp3',
-    'music/Sharou-10.mp3',
-    'music/Sharou-Cassette%20Tape%20Dream.mp3',
-    'music/Sharou-Sheep%20of%20the%20Far%20East%2C%20Dancing%20with%20the%20Telecaster.mp3',
-    'music/Sharou-You%20and%20Me.mp3'
+    'assets/audio/Mitsukiyo-Candy%20Dreamy.mp3',
+    'assets/audio/Sharou-superstar.mp3',
+    'assets/audio/Sharou-Anyone%20in%202025_.mp3',
+    'assets/audio/Sharou-3_03%20PM.mp3',
+    'assets/audio/Sharou-2_23%20AM.mp3',
+    'assets/audio/Sharou-10.mp3',
+    'assets/audio/Sharou-Cassette%20Tape%20Dream.mp3',
+    'assets/audio/Sharou-Sheep%20of%20the%20Far%20East%2C%20Dancing%20with%20the%20Telecaster.mp3',
+    'assets/audio/Sharou-You%20and%20Me.mp3'
 ];
 
 class SoundEffects {
@@ -649,7 +649,7 @@ let currentOpenGroup = null;
 function initializeProgressions() {
     let progs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESSIONS)) || [];
     if (progs.length === 0) {
-        fetch('/pages/json/chordProgressions.json')
+        fetch('pages/json/chordProgressions.json')
             .then(response => response.json())
             .then(data => {
                 const progressions = [];

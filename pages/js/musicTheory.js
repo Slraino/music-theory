@@ -43,7 +43,7 @@ async function loadTheories() {
     
     try {
         // Fetch data from JSON file
-        const response = await fetch('/pages/json/musicTheory.json');
+        const response = await fetch('../json/musicTheory.json');
         const musicTheoryArray = await response.json();
         
         // Clear old content first to prevent duplicates
