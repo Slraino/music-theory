@@ -78,13 +78,15 @@ body {
     z-index: 0;
     opacity: 0;
     transition: opacity var(--transition-default);
-    pointer-events: auto;
+    pointer-events: none;
     background: #000;
     overflow: hidden;
 }
 
 .bg-video-overlay.is-active {
     opacity: 1;
+    pointer-events: auto;
+    z-index: 50;
 }
 
 .bg-video-overlay iframe {
