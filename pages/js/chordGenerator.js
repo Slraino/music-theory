@@ -8,7 +8,7 @@ let currentBars = []; // Store current progression bars
 let currentParents = []; // Store original parent chords for substitution reference
 let lastProgressionIndex = -1; // Track last selected progression to avoid repeats
 let isSubstituted = []; // Track which chords are substituted (true) or parent (false)
-let bpm = 120; // Beats per minute (tempo control)
+let bpm = 200; // Beats per minute (tempo control)
 
 const KEYS = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
@@ -137,10 +137,10 @@ function renderChordGeneratorPage() {
                 </button>
                 <div>
                     <label>BPM:</label>
-                    <input type="range" id="bpmSlider" min="60" max="200" value="120" 
+                    <input type="range" id="bpmSlider" min="60" max="200" value="200" 
                            oninput="updateBPM(this.value)" 
                            style="width: 80px; vertical-align: middle;">
-                    <span id="bpmDisplay" style="font-size: 0.85em; color: #888;">120</span>
+                    <span id="bpmDisplay" style="font-size: 0.85em; color: #888;">200</span>
                 </div>
                 <div>
                     <label>Key:</label>
@@ -543,22 +543,37 @@ function playChord(degree, startTime, duration) {
     const note = chordGenerator.degreeToNote(selectedKey, degree);
     
     // Extract bass note (root or slash bass)
-    // For slash chords like "1/3", we need to convert the bass degree too
     let bassNote;
+    let mainChord = degree;
+    
     if (degree.includes('/')) {
-        const bassDegree = degree.split('/')[1];
-        // Convert bass degree to actual note
-        bassNote = chordGenerator.degreeToNote(selectedKey, bassDegree);
-        // Extract just the note name (remove any quality like m, 7, etc)
-        const bassMatch = bassNote.match(/^[A-G][#b]?/);
-        bassNote = bassMatch ? bassMatch[0] : bassNote;
+        // Split main chord and bass degree
+        const parts = degree.split('/');
+        mainChord = parts[0];
+        const bassDegree = parts[1];
+        
+        // Convert bass degree to actual note (extract just degree number with accidentals, no quality)
+        const bassDegreeMatch = bassDegree.match(/^[b#]?[1-7]/);
+        if (bassDegreeMatch) {
+            const cleanBassDegree = bassDegreeMatch[0];
+            bassNote = chordGenerator.degreeToNote(selectedKey, cleanBassDegree);
+            // Extract just the note name (remove any quality that got appended)
+            const bassMatch = bassNote.match(/^[A-G][#b]?/);
+            bassNote = bassMatch ? bassMatch[0] : bassNote;
+        } else {
+            // Fallback: try to extract note from bassDegree directly
+            const bassMatch = bassDegree.match(/^[A-G][#b]?/);
+            bassNote = bassMatch ? bassMatch[0] : getBassNote(note);
+        }
     } else {
         bassNote = getBassNote(note);
     }
+    
     const bassFreq = getNoteFrequency(bassNote, 3); // Bass in octave 3 (C3-B3)
     
     // Get chord tones (without bass)
-    const chordTones = getChordTones(note);
+    // Use the main chord (without slash) for voicing
+    const chordTones = getChordTones(chordGenerator.degreeToNote(selectedKey, mainChord));
     
     // Apply voice leading to get smooth voicing
     const voicing = getClosestVoicing(chordTones, previousVoicing);
