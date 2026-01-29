@@ -49,10 +49,10 @@ class ChordGenerator {
     }
 }
 
-// Normalize degree display for UI (e.g., 3dim -> 3o)
+// Normalize degree display for UI (e.g., 3dim -> 3o, 7hdim -> 7⌀)
 function formatDegreeForDisplay(degree) {
     if (typeof degree !== 'string') return degree;
-    return degree.replace('dim', 'o');
+    return degree.replace('hdim', '⌀').replace('dim', 'o');
 }
 
 // Helper function to escape HTML

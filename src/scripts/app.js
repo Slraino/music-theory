@@ -525,15 +525,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ==================== SOUND EFFECTS ==================== */
 const MUSIC_PLAYLIST = [
-    'assets/audio/Mitsukiyo-Candy%20Dreamy.mp3',
-    'assets/audio/Sharou-superstar.mp3',
-    'assets/audio/Sharou-Anyone%20in%202025_.mp3',
-    'assets/audio/Sharou-3_03%20PM.mp3',
-    'assets/audio/Sharou-2_23%20AM.mp3',
-    'assets/audio/Sharou-10.mp3',
-    'assets/audio/Sharou-Cassette%20Tape%20Dream.mp3',
-    'assets/audio/Sharou-Sheep%20of%20the%20Far%20East%2C%20Dancing%20with%20the%20Telecaster.mp3',
-    'assets/audio/Sharou-You%20and%20Me.mp3'
+    'assets/audio/bgm/Mitsukiyo-Candy%20Dreamy.mp3',
+    'assets/audio/bgm/Sharou-superstar.mp3',
+    'assets/audio/bgm/Sharou-Anyone%20in%202025_.mp3',
+    'assets/audio/bgm/Sharou-3_03%20PM.mp3',
+    'assets/audio/bgm/Sharou-2_23%20AM.mp3',
+    'assets/audio/bgm/Sharou-10.mp3',
+    'assets/audio/bgm/Sharou-Cassette%20Tape%20Dream.mp3',
+    'assets/audio/bgm/Sharou-Sheep%20of%20the%20Far%20East%2C%20Dancing%20with%20the%20Telecaster.mp3',
+    'assets/audio/bgm/Sharou-You%20and%20Me.mp3'
 ];
 
 class SoundEffects {
