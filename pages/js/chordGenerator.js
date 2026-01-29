@@ -49,10 +49,10 @@ class ChordGenerator {
     }
 }
 
-// Normalize degree display for UI (e.g., 3dim -> 3o, 7hdim -> 7⌀)
+// Normalize degree display for UI (e.g., 3dim -> 3o, 7hdim -> 7⌀, 1aug -> 1+)
 function formatDegreeForDisplay(degree) {
     if (typeof degree !== 'string') return degree;
-    return degree.replace('hdim', '⌀').replace('dim', 'o');
+    return degree.replace('hdim', '⌀').replace('dim', 'o').replace('aug', '+');
 }
 
 // Helper function to escape HTML
@@ -543,7 +543,18 @@ function playChord(degree, startTime, duration) {
     const note = chordGenerator.degreeToNote(selectedKey, degree);
     
     // Extract bass note (root or slash bass)
-    const bassNote = getBassNote(note);
+    // For slash chords like "1/3", we need to convert the bass degree too
+    let bassNote;
+    if (degree.includes('/')) {
+        const bassDegree = degree.split('/')[1];
+        // Convert bass degree to actual note
+        bassNote = chordGenerator.degreeToNote(selectedKey, bassDegree);
+        // Extract just the note name (remove any quality like m, 7, etc)
+        const bassMatch = bassNote.match(/^[A-G][#b]?/);
+        bassNote = bassMatch ? bassMatch[0] : bassNote;
+    } else {
+        bassNote = getBassNote(note);
+    }
     const bassFreq = getNoteFrequency(bassNote, 3); // Bass in octave 3 (C3-B3)
     
     // Get chord tones (without bass)
@@ -691,7 +702,15 @@ function getChordFrequencies(noteSymbol) {
 
 // Get bass note from chord symbol (always uses root, even for slash chords)
 function getBassNote(chordSymbol) {
-    // Always return root note (before slash)
+    // Check for slash chord (e.g., C/E or 1/3)
+    if (chordSymbol.includes('/')) {
+        const parts = chordSymbol.split('/');
+        const bassNote = parts[1]; // The note after the slash
+        // Extract just the note name (handle cases like "3m" or just "3")
+        const bassMatch = bassNote.match(/^[A-G][#b]?/);
+        return bassMatch ? bassMatch[0] : bassNote;
+    }
+    // Return root note (before slash or entire symbol)
     const rootMatch = chordSymbol.match(/^[A-G][#b]?/);
     return rootMatch ? rootMatch[0] : 'C';
 }
@@ -736,7 +755,7 @@ function getChordTones(chordSymbol) {
     } else if (quality.includes('maj7') || quality === 'M7' || quality === 'Δ7') {
         intervals = [0, 4, 7, 11]; // Major 7th
     } else if (quality.includes('7')) {
-        intervals = [0, 3, 7, 10]; // Dominant 7th
+        intervals = [0, 4, 7, 10]; // Dominant 7th
     } else if (quality.includes('dim') || quality.includes('o')) {
         intervals = [0, 3, 6]; // Diminished
     } else if (quality.includes('m')) {
@@ -778,6 +797,14 @@ function getChordTones(chordSymbol) {
         intervals.sort((a, b) => a - b);
     } else {
         intervals = [0, 4, 7]; // Major
+    }
+    
+    // Handle removals (no3), (no5), etc. for all chord types
+    if (quality.includes('(no3)') || quality.includes('no3')) {
+        intervals = intervals.filter(i => i !== 4 && i !== 3); // Remove both major and minor 3rd
+    }
+    if (quality.includes('(no5)') || quality.includes('no5')) {
+        intervals = intervals.filter(i => i !== 7);
     }
     
     // Convert intervals to note names

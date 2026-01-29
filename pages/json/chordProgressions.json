@@ -196,6 +196,11 @@
         "music": []
       },
       {
+        "chords": ["#4dim", "4m/b6", "3hdim/b7", "6m"],
+        "theory": [],
+        "music": []
+      },
+      {
         "chords": ["#4dim", "4m/b6", "3m", "6m"],
         "theory": ["王道進行 variation"],
         "music": []
