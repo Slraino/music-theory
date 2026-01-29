@@ -582,15 +582,63 @@ window.setBackgroundPreview = (videoId, clipStart = 0) => {
         iframe.src = url;
     }
     overlay.classList.add('is-active');
+    startYouTubeVolumeControl(iframe);
 };
 
 window.clearBackgroundPreview = () => {
     const overlay = document.getElementById('bgVideoOverlay');
     if (!overlay) return;
-    const iframe = overlay.querySelector('iframe');
-    iframe.src = '';
-    overlay.classList.remove('is-active');
+    
+    try {
+        const iframe = overlay.querySelector('iframe');
+        if (iframe) {
+            iframe.src = '';
+        }
+        overlay.classList.remove('is-active');
+    } catch (e) {
+        console.error('Error clearing background preview:', e);
+    }
+    
+    stopYouTubeVolumeControl();
 };
+
+let youTubeVolumeCheckInterval;
+
+function startYouTubeVolumeControl(iframe) {
+    stopYouTubeVolumeControl();
+    
+    youTubeVolumeCheckInterval = setInterval(() => {
+        try {
+            if (soundEffects && soundEffects.audioElement && soundEffects.musicPlaying) {
+                // Fade out music to 0% volume
+                let currentVol = soundEffects.audioElement.volume;
+                if (currentVol > 0) {
+                    soundEffects.audioElement.volume = Math.max(0, currentVol - 0.1);
+                }
+            }
+        } catch (e) {
+            // Ignore errors
+        }
+    }, 500);
+}
+
+function stopYouTubeVolumeControl() {
+    clearInterval(youTubeVolumeCheckInterval);
+    
+    // Restore music volume
+    if (soundEffects && soundEffects.audioElement && soundEffects.musicPlaying) {
+        const targetVol = soundEffects.musicVolume;
+        const currentVol = soundEffects.audioElement.volume;
+        
+        const fadeInInterval = setInterval(() => {
+            if (soundEffects.audioElement.volume < targetVol) {
+                soundEffects.audioElement.volume = Math.min(targetVol, soundEffects.audioElement.volume + 0.1);
+            } else {
+                clearInterval(fadeInInterval);
+            }
+        }, 100);
+    }
+}
 
 /* ==================== SOUND EFFECTS ==================== */
 const MUSIC_PLAYLIST = [
