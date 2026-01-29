@@ -32,17 +32,53 @@ const scriptsDir = path.join(rootDir, 'src', 'scripts');
 const assetsDir = path.join(rootDir, 'assets');
 const dataDir = pagesDir;
 
+// Cache settings: disable in dev, enable in production
+const cacheConfig = process.env.NODE_ENV === 'production' 
+    ? { maxAge: '1d', etag: true } 
+    : { maxAge: 0, etag: false };
+
 // Serve root index.html and top-level files
-app.use(express.static(rootDir, { maxAge: '1d', etag: false }));
+app.use(express.static(rootDir, cacheConfig));
 // Serve SPA assets
-app.use('/pages', express.static(pagesDir, { maxAge: '1d', etag: false }));
-app.use('/styles', express.static(stylesDir, { maxAge: '1d', etag: false }));
-app.use('/scripts', express.static(scriptsDir, { maxAge: '1d', etag: false }));
+app.use('/pages', express.static(pagesDir, cacheConfig));
+app.use('/styles', express.static(stylesDir, cacheConfig));
+app.use('/scripts', express.static(scriptsDir, cacheConfig));
+app.use('/assets', express.static(assetsDir, cacheConfig));
 app.use('/assets', express.static(assetsDir, { maxAge: '1d', etag: false }));
 
 // Default route to SPA index
 app.get('/', (req, res) => {
-    res.sendFile(path.join(rootDir, 'index.html'));
+    const indexPath = path.join(rootDir, 'index.html');
+    
+    // Read and inject timestamps for cache busting
+    let html = fs.readFileSync(indexPath, 'utf8');
+    
+    // Get file modification times
+    const files = [
+        { path: 'src/styles/app.css', pattern: /src\/styles\/app\.css\?v=[^"]+/g },
+        { path: 'pages/css/chordGenerator.css', pattern: /pages\/css\/chordGenerator\.css\?v=[^"]+/g },
+        { path: 'pages/css/chordProgression.css', pattern: /pages\/css\/chordProgression\.css\?v=[^"]+/g },
+        { path: 'pages/css/musicTheory.css', pattern: /pages\/css\/musicTheory\.css\?v=[^"]+/g },
+        { path: 'pages/css/progressionInfo.css', pattern: /pages\/css\/progressionInfo\.css\?v=[^"]+/g },
+        { path: 'src/scripts/app.js', pattern: /src\/scripts\/app\.js\?v=[^"]+/g },
+        { path: 'pages/js/chordProgression.js', pattern: /pages\/js\/chordProgression\.js\?v=[^"]+/g },
+        { path: 'pages/js/chordGenerator.js', pattern: /pages\/js\/chordGenerator\.js\?v=[^"]+/g },
+        { path: 'pages/js/progressInfo.js', pattern: /pages\/js\/progressInfo\.js\?v=[^"]+/g },
+        { path: 'pages/js/musicTheory.js', pattern: /pages\/js\/musicTheory\.js\?v=[^"]+/g }
+    ];
+    
+    files.forEach(({ path: filePath, pattern }) => {
+        try {
+            const fullPath = path.join(rootDir, filePath);
+            const stats = fs.statSync(fullPath);
+            const timestamp = stats.mtime.getTime();
+            html = html.replace(pattern, `${filePath}?v=${timestamp}`);
+        } catch (err) {
+            console.warn(`Could not get timestamp for ${filePath}`);
+        }
+    });
+    
+    res.send(html);
 });
 
 // Request logging

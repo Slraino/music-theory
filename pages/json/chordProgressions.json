@@ -46,8 +46,11 @@
     "note": "b6",
     "progressions": [
       {
-        "chords": ["b6"],
-        "music": []
+        "chords": ["b6", "b7", "1"],
+        "theory": ["Mario Cadence"],
+        "music": [
+          { "artist": "K-ON!", "title": "Cagayake!GIRLS ", "part": "Chorus", "genre": "Jpop" }
+        ]
       }
     ]
   },
@@ -55,7 +58,8 @@
     "note": "5",
     "progressions": [
       {
-        "chords": ["5"],
+        "chords": ["5", "6m", "4", "1"],
+        "theory": ["Axis Progression"],
         "music": []
       }
     ]
@@ -64,7 +68,18 @@
     "note": "#4",
     "progressions": [
       {
-        "chords": ["#4"],
+        "chords": ["#4dim", "7dim", "3m", "6m"],
+        "theory": ["王道進行 variation"],
+        "music": []
+      },
+      {
+        "chords": ["#4dim", "4m/b6", "3m", "6m"],
+        "theory": ["王道進行 variation"],
+        "music": []
+      },
+      {
+        "chords": ["#4dim", "4m/b6", "3m", "b3"],
+        "theory": [],
         "music": []
       }
     ]
@@ -73,8 +88,252 @@
     "note": "4",
     "progressions": [
       {
-        "chords": ["4"],
+        "chords": ["4", "7dim", "3m", "6m"],
+        "theory": ["王道進行 variation"],
         "music": []
+      },
+      {
+        "chords": ["4", "b7", "3m", "3m"],
+        "theory": [],
+        "music": []
+      },
+      {
+        "chords": ["4", "b7", "3m", "6m"],
+        "theory": ["王道進行 variation"],
+        "music": []
+      },
+      {
+        "chords": ["4", "b7", "2m", "5"],
+        "theory": [],
+        "music": []
+      },
+      {
+        "chords": ["4", "b7", "1"],
+        "theory": ["Back Door Progression"],
+        "music": []
+      },
+      {
+        "chords": [["4"], ["5"], ["6m"], ["7dim", "1"]],
+        "theory": [],
+        "music": [
+          { "artist":"上田麗奈", "title":"リテラチュア", "part":"Chorus", "genre":"Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "5", "6m", "6m"],
+        "theory": [],
+        "music": [
+          { "artist": "坂本龍一", "title": "Merry Christmas Mr. Lawrence", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "Lia", "title": "鳥の詩", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "nomico", "title": "Bad Apple!!", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": [["4"], ["5"], ["6m"], ["5", "1"]],
+        "theory": [],
+        "music": [
+          { "artist":"フレデリック", "title":"オドループ", "part":"Chorus", "genre":"Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "5", "6m", "3m"],
+        "theory": [],
+        "music": [
+          { "artist": "LiSA", "title": "紅蓮華", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "ZUTOMAYO", "title": "眩しいDNAだけ", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "ChouCho", "title": "カワルミライ", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "5", "6m", "1"],
+        "theory": [],
+        "music": [
+          { "artist": "ヨルシカ", "title": "雨とカプチー", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "YOASOBI", "title": "アンコール", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "蝶々P", "title": "心做し", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "Aimer", "title": "Ref:rain", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "カンザキイオリ", "title": "命に嫌われている。", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "5", "3m", "6m"],
+        "theory": ["王道進行"],
+        "music": [
+          { "artist": ["DAOKO", "米津玄師"], "title": "打上花火", "part": "Chorus", "genre": "Jpop" },  
+          { "artist"  : "KEMU VOXX", "title": "六兆年と一夜物語", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "花澤香菜", "title": "戀愛循環", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "HoneyWorks", "title": "可愛くてごめん", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "5", "3", "6m"],
+        "theory": ["王道進行 variation"],
+        "music": []
+      },
+      {
+        "chords": [["4"], ["5"], ["3m", "3/#5"], ["6m"]],
+        "theory": ["王道進行 variation"],
+        "music": [
+          { "artist": "ヨルシカ", "title": "言って。", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": [["4add9"], ["5sus"], ["1/3", "5sus"], ["6m"]],
+        "theory": ["王道進行 variation"],
+        "music": [
+          { "artist": "ヨルシカ", "title": "春泥棒", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": [
+          [["4"], ["5"], ["3m"], ["6m"]],
+          [["4"], ["37", "37/#5"], ["6m"], ["5", "1"]]
+        ],
+        "theory": ["王道進行 variation"],
+        "music": [
+          { "artist": "YOASOBI", "title": "怪物", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "5", "#5dim", "6m"],
+        "theory": ["王道進行 variation"],
+        "music": []
+      },
+      {
+        "chords": [["4"], ["5"], ["3m"], ["6m", "3m/5"]],
+        "theory": ["王道進行 variation"],
+        "music": []
+      },
+      {
+        "chords": ["4", "5", "1", "6m"],
+        "theory": ["王道進行 variation"]
+      },
+      {
+        "chords": ["4", "5", "1", "1"],
+        "theory": ["王道進行 variation"],
+        "music": [
+          { "artist": "HoneyWorks", "title": "可愛くてごめん", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": [
+          [["4"], ["1"], ["4"], ["5"]],
+          [["4"], ["5"], ["b6"], ["b7"]]
+        ],
+        "theory": ["王道進行 variation"],
+        "music": [
+          { "artist": "K-ON!", "title": "Cagayake!GIRLS", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": [
+          [["4M7"], ["4mM7"], ["3m7"], ["67"]],
+          [["2m7"], ["57"], ["1M7"], ["#4hdim"]]
+        ],
+        "theory": ["王道進行 variation"],
+        "music": [
+          { "artist": "藤井風", "title": "きらり", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "4m", "3m", "6m"],
+        "thoery": ["王道進行 variation"],
+        "music": []
+      },
+      {
+        "chords": ["4", "4m", "3m", "3dim"],
+        "thoery": ["王道進行 variation"],
+        "music": []
+      },
+      {
+        "chords": ["4", "4m", "3m", "b3dim"],
+        "thoery": ["王道進行 variation"],
+        "music": [
+          { "artist": "まふまふ", "title": "女の子になりたい", "part": "Intro", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": [["4"], ["37"], ["6m"], ["5m", "17"]],
+        "thoery": ["丸サ進行"],
+        "music": [
+          { "artist": "YOASOBI", "title": "夜に駆ける", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "imase", "title": "Night Dancer", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "3", "6m", "1"],
+        "thoery": ["丸サ進行 variation"],
+        "music": [
+          { "artist": "Ado", "title": "うっせぇわ", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "ZUTOMAYO", "title": "お勉強しといてよ", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "3m", "6m", "1"],
+        "thoery": ["丸サ進行 variation"],
+        "music": [
+          { "artist": "YOASOBI", "title": "アイドル", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "3m", "6m", "#4dim"],
+        "thoery": ["丸サ進行 variation"],
+        "music": []
+      },
+      {
+        "chords": ["4", "3m", "5", "6"],
+        "music": [
+          { "artist": "茅原実里", "title": "優しい忘却", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "3m", "b3", "5"],
+        "music": []
+      },
+      {
+        "chords": [["4"], ["1/3"], ["b3"], ["5sus", "5"]],
+        "music": []
+      },
+      {
+        "chords": ["4", "3m", "2", "5"],
+        "music": []
+      },
+      {
+        "chords": ["4", "3m", "2m", "1"],
+        "music": []
+      },
+      {
+        "chords": [["4"], ["1", "2"], ["4"], ["5"]],
+        "music": [
+          { "artist": "back number", "title": "クリスマスソング", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "1", "4", "1"],
+        "music": [
+          { "artist": "back number", "title": "クリスマスソング", "part": "Verse", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["4", "2m", "5", "1"],
+        "music": []
+      },
+      {
+        "chords": ["4", "2", "5m", "1"],
+        "music": []
+      },
+      {
+        "chords": ["4", "1", "6m", "5"],
+        "music": []
+      },
+      {
+        "chords": ["4", "1", "5", "6m"],
+        "thoery": ["Axis Progression"],
+        "music": [
+          { "artist": "米津玄師", "title": "Lemon", "part": "Chorus", "genre": "Jpop" },
+          { "artist": "米津玄師", "title": "アイネクライネ", "part": "Chorus", "genre": "Jpop" },
+          { " artist": "ヨルシカ", "title": " ただ君に晴れ", "part": "Chorus", "genre": "Jpop" }
+        ]
       }
     ]
   },
@@ -82,7 +341,19 @@
     "note": "3",
     "progressions": [
       {
-        "chords": ["3"],
+        "chords": ["3m", "5", "6m", "1"],
+        "music": []
+      },
+      {
+        "chords": ["3m", "4", "#5dim", "6m"],
+        "music": []
+      },
+      {
+        "chords": ["3m", "4", "5", "6m"],
+        "music": []
+      },
+      {
+        "chords": ["3m", "4", "5", "1"],
         "music": []
       }
     ]
@@ -100,7 +371,57 @@
     "note": "2",
     "progressions": [
       {
-        "chords": ["2"],
+        "chords": ["2", "5", "b7", "6m"],
+        "music": []
+      },
+      {
+        "chords": ["2", "5", "b7", "5"],
+        "music": []
+      },
+      {
+        "chords": ["2", "5", "1"],
+        "music": []
+      },
+      {
+        "chords": ["2", "5", "1", "6m"],
+        "music": []
+      },
+      {
+        "chords": ["2", "5", "1", "4"],
+        "music": []
+      },
+      {
+        "chords": ["2m", "5", "1mM7"],
+        "music": []
+      },
+      {
+        "chords": ["2m", "3m", "6m7", "6"],
+        "music": [
+          { "artist": "米津玄師", "title": "死神", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["2m7", "37", "6m7", "67"],
+        "music": [
+          { "artist": "Eve", "title": "擬劇論", "part": "Chorus", "genre": "Jpop" }
+        ]
+      },
+      {
+        "chords": ["2m", "3m", "4", "5"],
+        "music": []
+      },
+      {
+        "chords": ["2m", "3m", "4", "3m"],
+        "music": []
+      },
+      {
+        "chords": ["2m", "2m", "5", "5"],
+        "music": [
+          { "artist": "7!!", "title": "Orange", "part": "Chorus", "genre": "Jpop", "subgenre": "Pop Rock" }
+        ]
+      },
+      {
+        "chords": ["2m", "17", "4", "5"],
         "music": []
       }
     ]
@@ -117,27 +438,37 @@
   {
     "note": "1",
     "progressions": [
-      {
-        "chords": ["1", "5/7", "5m/b7", "4/6", "4m/b6", "1/5", "2/#4", "5"],
-        "music": []
-      },
-      {
+       {
         "chords": ["1", "7dim", "6m", "b6"],
         "theory": ["Modal Interchange"],
         "music": []
       },
       {
-        "chords": ["1", "5", "6m", "3m/5", "4", "1/3", "2m", "5"],
-        "theory": ["Cannon Progression"],
+        "chords": [
+          [["1"], ["5/7"], ["5m/b7"], ["4/6"]],
+          [["4m/b6"], ["1/5"], ["2/#4"], ["5"]]
+        ],
+        "theory": ["Chromatic Descending", "Secondary Dominant", "Modal Interchange"],
         "music": []
       },
       {
-        "chords": ["1", "7hdim", "6m", "5m", "4M7", "1/3", "2M7", "4/5"],
-        "music": []
+        "chords": [
+          [["1"], ["5/7"], ["6m"], ["3m/5"]],
+          [["4"], ["1/3"], ["2m"], ["5"]]
+        ],
+        "theory": ["Canon Progression"],
+        "music": [
+          { "artist": "GReeeeN", "title": "キセキ", "part": "Verse", "genre": "Jpop" }
+        ]
       },
       {
-        "chords": ["1", "7hdim", "6m", "5m", "4"],
-        "music": []
+        "chords": [
+          [["1"], ["7hdim", "3/#5"], ["6m"], ["5m", "17"]],
+          [["4M7"], ["1/3"], ["2M7"], ["4/5", "4m/5"]]
+        ],
+        "music": [
+          { "artist": "Official髭男dism", "title": "Pretender", "part": "Chorus", "genre": "Jpop" }
+        ]
       },
       {
         "chords": ["1", "b7", "6m", "4"],
@@ -175,6 +506,11 @@
       },
       {
         "chords": ["1", "5", "6m", "27"],
+        "music": []
+      },
+      {
+        "chords": ["1", "5", "6m", "3m"],
+        "theory": ["Modal Interchange"],
         "music": []
       },
       {
@@ -228,7 +564,7 @@
         "music": []
       },
       {
-        "chords": ["1", "3", "6"],
+        "chords": ["1", "1", "3o", "6m"],
         "music": [
           { "artist": "Aira Yuuki", "title": "Violet Snow", "part": "Chorus", "genre": "Jpop" }
         ]
@@ -247,7 +583,7 @@
         ]
       },
       {
-        "chords": ["1", "3", "2", "5"],
+        "chords": ["1", "3m", "2m", "5"],
         "music": []
       },
       {

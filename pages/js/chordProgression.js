@@ -30,7 +30,6 @@ async function getProgressions() {
     try {
         // Use centralized DataService instead of duplicating fetch logic
         const progressions = await DataService.getChordProgressions();
-        console.log('DataService returned progressions:', progressions);
         return progressions;
     } catch (error) {
         console.error('Failed to get progressions:', error);
@@ -40,27 +39,34 @@ async function getProgressions() {
 
 // Render progressions to the page
 async function renderProgressions() {
-    console.log('renderProgressions called');
-    const progs = await getProgressions();
-    console.log('Got progressions:', progs.length, progs);
-    progressionsData = progs;
-    
     const list = document.getElementById('progressionsList');
     if (!list) {
         console.error('progressionsList element not found!');
         return;
     }
     
-    list.innerHTML = '';
+    LoadingManager.showLoading('progressionsList');
     
-    const boxesWrapper = document.createElement('div');
-    boxesWrapper.className = 'boxes-wrapper';
+    try {
+        const progs = await getProgressions();
+        progressionsData = progs;
+        
+        if (!progs || progs.length === 0) {
+            throw new Error('No progressions loaded');
+        }
+        
+        LoadingManager.showContent('progressionsList');
     
-    const contentWrapper = document.createElement('div');
-    contentWrapper.className = 'content-wrapper';
-    
-    const groups = {};
-    progs.forEach((prog, idx) => {
+        list.innerHTML = '';
+        
+        const boxesWrapper = document.createElement('div');
+        boxesWrapper.className = 'boxes-wrapper';
+        
+        const contentWrapper = document.createElement('div');
+        contentWrapper.className = 'content-wrapper';
+        
+        const groups = {};
+        progs.forEach((prog, idx) => {
         let key = prog.title.charAt(0);
         
         if ((key === 'b' || key === '#') && prog.title.length > 1) {
@@ -114,7 +120,6 @@ async function renderProgressions() {
             let allContent = '';
             
             groups[key].forEach((prog) => {
-                console.log('Processing prog:', prog.title, 'has progressions:', prog.progressions?.length || 0);
                 // Check if we have progressions data from JSON
                 if (prog.progressions && prog.progressions.length > 0) {
                     prog.progressions.forEach((progression) => {
@@ -124,11 +129,44 @@ async function renderProgressions() {
                             const progressionId = chordsToProgressionId(progression.chords);
                             const encodedLine = encodeURIComponent(progressionId);
                             
-                            let gridHTML = `<div class="progression-grid clickable-line" data-prog-index="${prog.origIndex}" data-line="${encodedLine}">`;
+                            // Check for multi-phrase structure (3-level array)
+                            const isMultiPhrase = progression.chords.length > 0 && 
+                                Array.isArray(progression.chords[0]) && 
+                                progression.chords[0].length > 0 && 
+                                Array.isArray(progression.chords[0][0]);
                             
-                            // Handle nested arrays (bars with multiple chords)
-                            if (Array.isArray(progression.chords[0])) {
-                                // Each element is a bar (array of chords)
+                            if (isMultiPhrase) {
+                                // Multi-phrase: [[["1"], ["4"]], [["5"], ["6m"]]]
+                                let phraseGroupHTML = `<div class="phrase-group">`;
+                                
+                                progression.chords.forEach((phrase) => {
+                                    phraseGroupHTML += `<div class="progression-grid" data-prog-index="${prog.origIndex}" data-line="${encodedLine}">`;
+                                    
+                                    phrase.forEach((barChords) => {
+                                        const isMultiChord = Array.isArray(barChords) && barChords.length > 1;
+                                        const multiClass = isMultiChord ? ' multi-chord' : '';
+                                        phraseGroupHTML += `<div class="progression-bar${multiClass}">`;
+                                        
+                                        if (Array.isArray(barChords)) {
+                                            barChords.forEach((chord) => {
+                                                phraseGroupHTML += `<span class="chord-item">${escapeHtml(chord)}</span>`;
+                                            });
+                                        } else {
+                                            phraseGroupHTML += `<span class="chord-item">${escapeHtml(barChords)}</span>`;
+                                        }
+                                        
+                                        phraseGroupHTML += `</div>`;
+                                    });
+                                    
+                                    phraseGroupHTML += `</div>`;
+                                });
+                                
+                                phraseGroupHTML += `</div>`;
+                                allContent += phraseGroupHTML;
+                            } else if (Array.isArray(progression.chords[0])) {
+                                // Single phrase with bars: [["6m"], ["4"], ["5"], ["1"]]
+                                let gridHTML = `<div class="progression-grid" data-prog-index="${prog.origIndex}" data-line="${encodedLine}">`;
+                                
                                 progression.chords.forEach((barChords) => {
                                     const isMultiChord = Array.isArray(barChords) && barChords.length > 1;
                                     const multiClass = isMultiChord ? ' multi-chord' : '';
@@ -144,17 +182,22 @@ async function renderProgressions() {
                                     
                                     gridHTML += `</div>`;
                                 });
+                                
+                                gridHTML += `</div>`;
+                                allContent += gridHTML;
                             } else {
-                                // Simple array (backward compatibility) - treat as 1 chord per bar
+                                // Simple array: ["1", "4", "5", "1"]
+                                let gridHTML = `<div class="progression-grid" data-prog-index="${prog.origIndex}" data-line="${encodedLine}">`;
+                                
                                 progression.chords.forEach((chord) => {
                                     gridHTML += `<div class="progression-bar">`;
                                     gridHTML += `<span class="chord-item">${escapeHtml(chord)}</span>`;
                                     gridHTML += `</div>`;
                                 });
+                                
+                                gridHTML += `</div>`;
+                                allContent += gridHTML;
                             }
-                            
-                            gridHTML += `</div>`;
-                            allContent += `<div class="progression-notes">${gridHTML}</div>`;
                         }
                     });
                 }
@@ -170,10 +213,10 @@ async function renderProgressions() {
     list.appendChild(contentWrapper);
     
     list.addEventListener('click', (e) => {
-        const clickableLine = e.target.closest('.clickable-line');
-        if (clickableLine) {
-            const progIndex = parseInt(clickableLine.getAttribute('data-prog-index'));
-            const encodedLine = clickableLine.getAttribute('data-line');
+        const progressionGrid = e.target.closest('.progression-grid');
+        if (progressionGrid) {
+            const progIndex = parseInt(progressionGrid.getAttribute('data-prog-index'));
+            const encodedLine = progressionGrid.getAttribute('data-line');
             if (typeof showDetail === 'function') {
                 showDetail(progIndex, encodedLine);
             }
@@ -191,6 +234,10 @@ async function renderProgressions() {
         if (previousContainer) {
             previousContainer.classList.remove('collapsed');
         }
+    }
+    } catch (error) {
+        console.error('Error rendering progressions:', error);
+        LoadingManager.showError('progressionsList');
     }
 }
 

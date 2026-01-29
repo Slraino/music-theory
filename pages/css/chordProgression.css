@@ -11,16 +11,16 @@
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    gap: 20px;
+    gap: 1.25rem;
     align-items: flex-start;
     justify-content: center;
     overflow-x: auto;
     overflow-y: hidden;
-    padding-bottom: 10px;
+    padding-block-end: 0.625rem;
     line-height: 0;
     width: 100%;
-    margin-bottom: 30px;
-    height: 50px;
+    margin-block-end: 1.875rem;
+    height: 3.125rem;
 }
 
 .boxes-wrapper::-webkit-scrollbar {
@@ -39,8 +39,8 @@
 }
 
 .group-box {
-    padding: 0 !important;
-    margin: 0 !important;
+    padding: 0;
+    margin: 0;
     border: none;
     background: transparent;
     border-radius: 0;
@@ -53,28 +53,28 @@
     background: var(--brand);
     color: var(--bg);
     padding: 0;
-    width: 50px;
-    height: 50px;
-    min-width: 50px;
-    min-height: 50px;
+    width: 3.125rem;
+    height: 3.125rem;
+    min-width: 3.125rem;
+    min-height: 3.125rem;
     font-size: 1em;
     font-weight: 900;
     cursor: pointer;
-    border-radius: 0px;
+    border-radius: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 0;
-    margin-right: 0;
+    margin-inline-end: 0;
     user-select: none;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all var(--transition-default) cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     z-index: 1;
 }
 
 .group-title-box:hover {
-    background: #00ffcc;
+    background: var(--brand-soft);
 }
 
 /* Natural notes - white background, black text */
@@ -85,8 +85,8 @@
 .group-title-box[data-group-key="5"],
 .group-title-box[data-group-key="6"],
 .group-title-box[data-group-key="7"] {
-    background: #ffffff;
-    color: #000000;
+    background: var(--text);
+    color: var(--text-dark);
 }
 
 .group-title-box[data-group-key="1"]:hover,
@@ -96,7 +96,7 @@
 .group-title-box[data-group-key="5"]:hover,
 .group-title-box[data-group-key="6"]:hover,
 .group-title-box[data-group-key="7"]:hover {
-    background: #e0e0e0;
+    background: var(--text-muted);
 }
 
 /* Accidental notes - black background, white text */
@@ -105,8 +105,8 @@
 .group-title-box[data-group-key="#4"],
 .group-title-box[data-group-key="b6"],
 .group-title-box[data-group-key="b7"] {
-    background: #000000;
-    color: #ffffff;
+    background: var(--text-dark);
+    color: var(--text);
 }
 
 .group-title-box[data-group-key="b2"]:hover,
@@ -114,7 +114,7 @@
 .group-title-box[data-group-key="#4"]:hover,
 .group-title-box[data-group-key="b6"]:hover,
 .group-title-box[data-group-key="b7"]:hover {
-    background: #333333;
+    background: var(--bg-strong);
 }
 
 .group-title-text {
@@ -128,18 +128,17 @@
 
 .group-content-container {
     background: rgba(15, 15, 15, 0.98);
-    border-radius: 8px;
+    border-radius: 0.5rem;
     overflow-y: auto;
     transition: opacity 0.5s ease;
-    max-height: 600px;
+    max-height: 37.5rem;
     opacity: 1;
     width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+    margin-inline: auto;
 }
 
 .group-content-container::-webkit-scrollbar {
-    width: 8px;
+    width: 0.5rem;
 }
 
 .group-content-container::-webkit-scrollbar-track {
@@ -151,37 +150,37 @@
 }
 
 .group-content-container.collapsed {
-    max-height: 0 !important;
-    opacity: 0 !important;
-    margin-top: 0 !important;
-    border: none !important;
-    padding: 0 !important;
+    max-height: 0;
+    opacity: 0;
+    margin-block-start: 0;
+    border: none;
+    padding: 0;
     visibility: hidden;
 }
 
 .group-content-box {
-    padding: 25px;
+    padding: 1.5625rem;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 0.3125rem;
     background: rgba(15, 15, 15, 0.98);
-    border-left: 4px solid var(--brand);
+    border-inline-start: 0.25rem solid var(--brand);
 }
 
 .progression-notes {
-    color: #e0e0e0;
+    color: var(--text);
     font-size: 1.5em;
-    margin: 8px 0;
+    margin-block: 0.25rem;
     line-height: 1.2;
-    padding: 6px;
+    padding: 0;
 }
 
 .styled-text {
     color: var(--brand);
     font-weight: bold;
     font-size: 1.15em;
-    padding: 2px 6px;
-    border-radius: 3px;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.1875rem;
 }
 
 .bullet-dot {
@@ -197,72 +196,86 @@
 }
 
 .crimson-text {
-    color: var(--brand) !important;
-}
-
-.clickable-line {
-    cursor: pointer;
-    transition: all 0.2s ease;
-    padding: 6px;
-    border-radius: 3px;
-    margin: 8px 0;
-    display: block;
-}
-
-.clickable-line:hover {
-    background: rgba(255, 23, 68, 0.1);
     color: var(--brand);
 }
 
-/* Progression Grid - Bar-based layout */
-.progression-grid {
+/* Phrase group container for multi-phrase progressions */
+#chordProgressionPage .phrase-group {
     display: flex;
-    gap: 12px;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background: rgba(10, 10, 15, 0.92);
+    border: none;
+    margin-block: 0.5rem;
+    transition: all var(--transition-fast);
+}
+
+#chordProgressionPage .phrase-group:hover {
+    background: #0b0b0b;
+}
+
+/* Progression Grid - Bar-based layout */
+#chordProgressionPage .progression-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
     align-items: stretch;
-    flex-wrap: wrap;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background: rgba(10, 10, 15, 0.92);
+    border: none;
+    transition: all var(--transition-fast);
+}
+
+/* Single progression (not in a phrase-group) */
+#chordProgressionPage .progression-grid:not(.phrase-group .progression-grid) {
+    padding: 0.5rem;
+    margin-block: 0.5rem;
+}
+
+#chordProgressionPage .progression-grid:not(.phrase-group .progression-grid):hover {
+    background: #0b0b0b;
 }
 
 /* Bar container - holds one or more chords */
-.progression-bar {
+#chordProgressionPage .progression-bar {
     display: flex;
-    gap: 6px;
+    gap: 0;
     align-items: center;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    min-width: 80px;
-    flex: 1;
-    transition: all 0.2s ease;
+    justify-content: space-evenly;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    width: 100%;
+    position: relative;
 }
 
-.progression-bar:hover {
-    background: rgba(255, 23, 68, 0.05);
-    border-color: var(--brand);
+#chordProgressionPage .progression-bar:not(:first-child) {
+    border-inline-start: 0.125rem solid rgba(255,255,255,0.08);
 }
 
 /* Individual chord within a bar */
-.chord-item {
+#chordProgressionPage .chord-item {
     color: var(--brand);
     font-weight: 600;
     font-size: 1.1em;
     white-space: nowrap;
+    position: relative;
 }
 
-/* When multiple chords in one bar, make them smaller */
-.progression-bar.multi-chord .chord-item {
-    font-size: 0.95em;
-}
-
-/* Bar separator visual */
-.progression-bar::after {
-    content: '|';
-    position: absolute;
-    right: -8px;
-    color: rgba(255, 255, 255, 0.2);
+/* Add separator between chords in multi-chord bars */
+#chordProgressionPage .progression-bar.multi-chord .chord-item:not(:last-child)::after {
+    content: '·';
+    margin-inline-start: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
     font-weight: 300;
 }
 
-.progression-bar:last-child::after {
-    content: '';
+/* When multiple chords in one bar, make them smaller */
+#chordProgressionPage .progression-bar.multi-chord .chord-item {
+    font-size: 0.95em;
 }

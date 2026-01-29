@@ -1,111 +1,290 @@
 /* Chord Generator page styles */
 
 .generator-container {
-    max-width: 900px;
+    max-width: 56.25rem;
     margin: 0 auto;
-    padding: 20px;
+    padding: 1.25rem;
 }
 
-.chord-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-    margin-top: 10px;
-}
-
-.chord-card {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 14px;
-    padding: 24px 18px;
+.key-selector {
+    margin-block-end: 1rem;
     text-align: center;
-    min-height: 140px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: center;
 }
 
-.chord-symbol {
-    font-size: 2.6em;
-    font-weight: 700;
-    color: #ffd6d6;
-    letter-spacing: 0.5px;
+.key-selector .left-spacer {
+    /* Empty spacer for left side */
 }
 
-.chord-notes {
-    margin-top: 10px;
-    color: #ffb6c1;
-    font-size: 1.05em;
-}
-
-.refresh-row {
+.key-selector .controls-right {
     display: flex;
-    justify-content: center;
-    margin-top: 18px;
+    gap: 1rem;
+    align-items: center;
+    justify-content: flex-end;
 }
 
-.refresh-btn {
-    padding: 12px 22px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.key-selector label {
+    color: var(--text);
+    margin-inline-end: 0.5rem;
+    font-weight: 600;
+}
+
+.key-selector select {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    border: 1px solid var(--brand);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.toggle-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background: var(--brand);
+    color: white;
     border: none;
-    border-radius: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.toggle-btn:hover {
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.25rem 0.5rem rgba(255, 23, 68, 0.3);
+}
+
+.refresh-btn.refresh-btn {
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-soft) 100%);
+    border: none;
+    border-radius: 0.5rem;
     color: #fff;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 5px 12px rgba(102,126,234,0.35);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-size: 0.9rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(255, 23, 68, 0.3);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.refresh-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 7px 16px rgba(102,126,234,0.45);
+.refresh-btn.refresh-btn:hover {
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.375rem 0.75rem rgba(255, 23, 68, 0.4);
+}
+
+#chordGeneratorPage .generator-music {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(10, 10, 15, 0.6);
+    border-radius: 0.5rem;
+}
+
+#chordGeneratorPage .generator-music .detail-line {
+    margin: 0.25rem 0;
+    color: var(--text-muted);
+    font-weight: 600;
 }
 
 .mini-label {
     text-align: center;
-    color: #ffc0cb;
-    margin-top: 6px;
+    color: var(--brand-soft);
+    margin-block-start: 0.375rem;
     font-size: 0.95em;
 }
 
 /* Progression Grid for Chord Generator */
-.progression-grid {
-    display: flex;
-    gap: 12px;
-    align-items: stretch;
-    flex-wrap: wrap;
-    margin: 20px 0;
+#chordGeneratorPage .progression-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem;
+    margin-block: 1.25rem;
+    width: 100%;
 }
 
-.progression-bar {
+#chordGeneratorPage .phrase-container {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    width: 100%;
+    background: rgba(10, 10, 15, 0.92);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    box-shadow: 0 0.5rem 2rem #000a;
+}
+
+#chordGeneratorPage .refresh-row {
+    display: grid;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+#chordGeneratorPage .refresh-row .refresh-cell {
     display: flex;
-    gap: 6px;
     align-items: center;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    min-width: 80px;
-    flex: 1;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+#chordGeneratorPage .refresh-row .chord-refresh {
+    flex: 0 0 auto;
+    min-width: 2.2rem;
+    margin: 0;
+    border-radius: 0.25rem;
+    background: rgba(30,30,40,0.85);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--brand);
+    font-size: 1.2em;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+#chordGeneratorPage .refresh-row .chord-refresh:hover {
+    background: var(--brand);
+    color: #fff;
+}
+
+#chordGeneratorPage .progression-bar {
+    display: flex !important;
+    gap: 0;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    min-width: 5rem;
+    flex: 1 1 0;
     position: relative;
 }
 
-.chord-item {
+#chordGeneratorPage .chord-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    position: relative;
+}
+
+#chordGeneratorPage .chord-item {
     color: var(--brand);
     font-weight: 600;
     font-size: 1.1em;
     white-space: nowrap;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    transition: background var(--transition-fast);
 }
 
-.progression-bar.multi-chord .chord-item {
+#chordGeneratorPage .chord-item.substituted {
+    color: #FA8072;
+}
+
+#chordGeneratorPage .chord-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.chord-selector {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0.5rem;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid var(--brand);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 1000;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+}
+
+.degree-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-height: 15rem;
+    overflow-y: auto;
+}
+
+.type-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 4rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    padding-left: 0.5rem;
+}
+
+.chord-selector.showing-types {
+    grid-template-columns: 1fr;
+}
+
+.chord-selector .degree-btn {
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--brand);
+    border-radius: 0.25rem;
+    color: var(--text);
+    font-size: 0.9em;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.chord-selector .degree-btn:hover {
+    background: var(--brand);
+    color: white;
+}
+
+.chord-selector .type-btn {
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--brand);
+    border-radius: 0.25rem;
+    color: var(--text);
+    font-size: 0.9em;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.chord-selector .type-btn:hover {
+    background: var(--brand);
+    color: white;
+}
+
+.chord-refresh {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--brand);
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.75em;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.chord-refresh:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+#chordGeneratorPage .progression-bar.multi-chord .chord-item {
     font-size: 0.95em;
 }
 
-.progression-bar::after {
-    content: '|';
-    position: absolute;
-    right: -8px;
-    color: rgba(255, 255, 255, 0.2);
-    font-weight: 300;
-}
-
-.progression-bar:last-child::after {
-    content: '';
+#chordGeneratorPage .progression-bar:not(:first-child) {
+    border-inline-start: 0.125rem solid rgba(255,255,255,0.08);
 }

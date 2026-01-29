@@ -41,9 +41,17 @@ function switchTheoryContent(theoryIndex, subIndex) {
 async function loadTheories() {
     const theoryList = document.getElementById('theoryList');
     
+    LoadingManager.showLoading('theoryList');
+    
     try {
         // Use centralized DataService instead of duplicating fetch logic
         const musicTheoryArray = await DataService.getMusicTheory();
+        
+        if (!musicTheoryArray || musicTheoryArray.length === 0) {
+            throw new Error('No music theory data loaded');
+        }
+        
+        LoadingManager.showContent('theoryList');
         
         // Clear old content first to prevent duplicates
         theoryList.innerHTML = '';
@@ -136,11 +144,11 @@ async function loadTheories() {
         
     } catch (error) {
         console.error('Error loading music theory data:', error);
-        theoryList.innerHTML = '<p style="color: #ff4444; text-align: center; margin-top: 40px;">Error loading music theory data. Please check music-theory.json file.</p>';
+        LoadingManager.showError('theoryList');
     }
 }
 
-// Format theory content (handles strings, arrays, and characteristics)
+// Format theory content
 function formatTheoryContent(info, characteristics, type) {
     let contentHtml = '';
     

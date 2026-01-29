@@ -8,7 +8,7 @@
     <meta name="description" content="Fantasia music theory tools: chord generator, chord progressions, and theory explorer.">
     <title>Fantasia</title>
     <link rel="stylesheet" href="./src/styles/app.css?v=1.1">
-    <link rel="stylesheet" href="./pages/css/chordGenerator.css?v=1.1">
+    <link rel="stylesheet" href="./pages/css/chordGenerator.css?v=1.2">
     <link rel="stylesheet" href="./pages/css/chordProgression.css?v=1.1">
     <link rel="stylesheet" href="./pages/css/musicTheory.css?v=1.1">
     <link rel="stylesheet" href="./pages/css/progressionInfo.css?v=1.1">
@@ -54,8 +54,10 @@
         <main id="mainContent">
             <!-- HOME PAGE -->
             <section id="homePage" class="page-section">
-                <section class="content-area" style="text-align: center;">
-                    
+                <section class="content-area" style="text-align: center; margin-bottom: 40px;">
+                    <p style="font-size: 1.2em; color: #e0e0e0; max-width: 600px; margin: 0 auto;">
+                        Explore music theory, generate chords, and discover progressions
+                    </p>
                 </section>
 
                 <div class="nav-category">
@@ -64,11 +66,6 @@
                             <div class="nav-box-icon">🎹</div>
                             <div class="nav-box-title">Chord Generator</div>
                         </a>
-                    </div>
-                </div>
-
-                <div class="nav-category">
-                    <div class="nav-boxes-container">
                         <a href="chord-progression.html" class="nav-box-card">
                             <div class="nav-box-icon">🎼</div>
                             <div class="nav-box-title">Chord Progression</div>
@@ -84,6 +81,23 @@
             <!-- CHORD PROGRESSION PAGE -->
             <section id="chordProgressionPage" class="page-section" style="display: none;">
                 <div id="progressionControls" class="progression-controls"></div>
+                
+                <!-- Skeleton Loading -->
+                <div id="progressionsSkeleton" class="skeleton-container" style="display: none;">
+                    <div class="skeleton skeleton-bar"></div>
+                    <div class="skeleton skeleton-bar"></div>
+                    <div class="skeleton skeleton-bar"></div>
+                    <div class="skeleton skeleton-bar"></div>
+                </div>
+                
+                <!-- Error Message -->
+                <div id="progressionsError" class="error-message">
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-title">Failed to Load Progressions</div>
+                    <div class="error-text">We couldn't load the chord progressions. Please check your connection and try again.</div>
+                    <button class="error-button" onclick="location.reload()">Reload Page</button>
+                </div>
+                
                 <div id="progressionsList" class="progressions-list">
                     <!-- Progressions render here -->
                 </div>
@@ -92,6 +106,24 @@
             <!-- PROGRESSION INFO PAGE -->
             <section id="progressionInfoPage" class="page-section" style="display: none;">
                 <div class="detail-controls" id="detailControls"></div>
+                
+                <!-- Skeleton Loading -->
+                <div id="progressionInfoSkeleton" class="skeleton-container" style="display: none;">
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text short"></div>
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text short"></div>
+                </div>
+                
+                <!-- Error Message -->
+                <div id="progressionInfoError" class="error-message">
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-title">Failed to Load Details</div>
+                    <div class="error-text">We couldn't load the progression details. Please try again.</div>
+                    <button class="error-button" onclick="history.back()">Go Back</button>
+                </div>
+                
                 <div class="detail-content" id="detailContent">
                     <!-- Detail content will be loaded here -->
                 </div>
@@ -99,6 +131,21 @@
 
             <!-- MUSIC THEORY PAGE -->
             <section id="musicTheoryPage" class="page-section" style="display: none;">
+                <!-- Skeleton Loading -->
+                <div id="theorySkeleton" class="skeleton-container" style="display: none;">
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-card"></div>
+                </div>
+                
+                <!-- Error Message -->
+                <div id="theoryError" class="error-message">
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-title">Failed to Load Music Theory</div>
+                    <div class="error-text">We couldn't load the music theory content. Please check your connection and try again.</div>
+                    <button class="error-button" onclick="location.reload()">Reload Page</button>
+                </div>
+                
                 <div class="theory-list-container" id="theoryList">
                     <!-- Theory list will be loaded here -->
                 </div>

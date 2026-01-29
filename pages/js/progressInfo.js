@@ -248,7 +248,7 @@ async function deleteDetailProgression() {
 }
 
 // Load and display progression detail
-function loadDetailView() {
+async function loadDetailView() {
     // Update the header title with the clicked line
     const titleToShow = currentLineTitle || 'Unknown';
     
@@ -265,73 +265,49 @@ function loadDetailView() {
         controlsDiv.innerHTML = ''; // Clear first
     }
     
-    // Use DataService to get progression info
-    DataService.getProgressionInfo()
-        .then(progressionInfo => {
-            let detailData = { theory: '', music: [] };
-            
-            // Try to find data by unique key or title
-            const keyToLoad = currentUniqueKey || currentLineTitle;
-            
-            if (progressionInfo[keyToLoad]) {
-                detailData = progressionInfo[keyToLoad];
-            } else {
-                // Try fuzzy match
-                const matchingKey = Object.keys(progressionInfo).find(key => 
-                    key.includes(currentLineTitle) || currentLineTitle.includes(key)
-                );
-                if (matchingKey) {
-                    detailData = progressionInfo[matchingKey];
-                }
+    LoadingManager.showLoading('detailContent');
+    
+    try {
+        const [progressionInfo, chordProgressions, musicTheory] = await Promise.all([
+            DataService.getProgressionInfo(),
+            DataService.getChordProgressions(),
+            DataService.getMusicTheory()
+        ]);
+        
+        let detailData = { theory: '', music: [] };
+        
+        // Try to find data by unique key or title
+        const keyToLoad = currentUniqueKey || currentLineTitle;
+        
+        if (progressionInfo[keyToLoad]) {
+            detailData = progressionInfo[keyToLoad];
+        } else {
+            // Try fuzzy match
+            const matchingKey = Object.keys(progressionInfo).find(key => 
+                key.includes(currentLineTitle) || currentLineTitle.includes(key)
+            );
+            if (matchingKey) {
+                detailData = progressionInfo[matchingKey];
             }
-            
-            renderDetailView(detailData);
-        })
-        .catch(error => {
-            console.error('Failed to load progressionInfo.json:', error);
-            renderDetailView({ theory: '', music: [] });
-        });
+        }
+        
+        const selectedProgression = findSelectedProgression(chordProgressions, currentLineTitle, currentProgId);
+        const theoryNames = selectedProgression && Array.isArray(selectedProgression.theory) ? selectedProgression.theory : [];
+        const combinedMusic = combineMusicExamples(selectedProgression?.music, detailData.music);
+        
+        // Store raw music theory for tooltip lookup
+        window.musicTheoryRaw = Array.isArray(musicTheory) ? musicTheory : [];
+        
+        LoadingManager.showContent('detailContent');
+        renderDetailView({ theoryNames, music: combinedMusic, extraTheoryText: detailData.theory });
+    } catch (error) {
+        console.error('Failed to load progression detail:', error);
+        LoadingManager.showError('detailContent');
+    }
 }
 
 function renderDetailView(detailData) {
-    
-    let theoryHtml = '';
-    let musicHtml = '';
-    
-    // Process theory section with tooltip support
-    let processedTheory = detailData.theory ? addTooltipsToContent(detailData.theory) : '';
-    
-    if (processedTheory) {
-        const theoryLines = processedTheory.split('\n');
-        for (let i = 0; i < theoryLines.length; i++) {
-            const line = theoryLines[i];
-            if (line.trim() && line.trim() !== '< Info >') {
-                const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
-                theoryHtml += `<p class="detail-line">${styledLine}</p>`;
-            } else if (line.trim() !== '< Info >' && line.trim() !== '') {
-                theoryHtml += `<p class="detail-line" style="height: 10px; margin: 0;"></p>`;
-            }
-        }
-    } else {
-        theoryHtml = '<p style="color: #888;">No theory content yet.</p>';
-    }
-    
-    // Process music section - now an array of music objects
-    if (detailData.music && Array.isArray(detailData.music) && detailData.music.length > 0) {
-        detailData.music.forEach(song => {
-            let songLine = '';
-            if (song.title) songLine += `<strong>${escapeHtml(song.title)}</strong>`;
-            if (song.artist) songLine += ` - ${escapeHtml(song.artist)}`;
-            if (song.part) songLine += ` <span style="color: #666;">(${escapeHtml(song.part)})</span>`;
-            if (song.genre) songLine += ` <span class="genre-badge">${escapeHtml(song.genre)}</span>`;
-            
-            if (songLine) {
-                musicHtml += `<p class="detail-line music-example">${songLine}</p>`;
-            }
-        });
-    } else {
-        musicHtml = '<p style="color: #888;">No music examples yet.</p>';
-    }
+    const sectionsHtml = buildSectionsHtml(detailData.theoryNames, detailData.extraTheoryText, detailData.music);
     
     // Find the visible detailContent within progressionInfoPage
     const detailContent = getVisibleDetailContent();
@@ -339,16 +315,242 @@ function renderDetailView(detailData) {
     
     detailContent.innerHTML = `
         <div class="detail-box">
-            <h2 class="detail-section-title">Theory</h2>
             <div class="detail-body">
-                ${theoryHtml}
-            </div>
-            <h2 class="detail-section-title">Music Examples</h2>
-            <div class="detail-body">
-                ${musicHtml}
+                ${sectionsHtml}
             </div>
         </div>
     `;
+
+    attachTheoryHoverHandlers(detailContent);
+}
+
+function findSelectedProgression(chordProgressions, progressionId, groupIndex) {
+    if (!Array.isArray(chordProgressions) || !progressionId) return null;
+    
+    const tryFindInGroup = (group) => {
+        if (!group || !Array.isArray(group.progressions)) return null;
+        return group.progressions.find(prog => {
+            if (!prog || !prog.chords) return false;
+            const id = chordsToProgressionId(prog.chords);
+            return id === progressionId;
+        }) || null;
+    };
+    
+    if (typeof groupIndex === 'number' && chordProgressions[groupIndex]) {
+        const found = tryFindInGroup(chordProgressions[groupIndex]);
+        if (found) return found;
+    }
+    
+    for (let i = 0; i < chordProgressions.length; i++) {
+        const found = tryFindInGroup(chordProgressions[i]);
+        if (found) return found;
+    }
+    
+    return null;
+}
+
+function buildSectionsHtml(theoryNames, extraTheoryText, musicList) {
+    let html = '';
+    
+    // Theory section
+    const theoryLine = formatTheoryNamesLine(theoryNames);
+    html += `
+        <div class="detail-section">
+            <div class="detail-section-title">Theory</div>
+            <div class="detail-section-body">
+                ${theoryLine}
+            </div>
+        </div>
+    `;
+    
+    // Optional extra notes from progressionInfo
+    if (extraTheoryText && extraTheoryText.trim()) {
+        html += `
+            <div class="detail-section">
+                <div class="detail-section-title">Notes</div>
+                <div class="detail-section-body">
+                    ${formatTheoryText(extraTheoryText)}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Music section
+    const musicHtml = formatMusicByArtist(musicList);
+    if (musicHtml) {
+        html += `
+            <div class="detail-section">
+                <div class="detail-section-title">Music</div>
+                <div class="detail-section-body">
+                    ${musicHtml}
+                </div>
+            </div>
+        `;
+    }
+    
+    return html || '<p style="color: #888;">No detail content yet.</p>';
+}
+
+function combineMusicExamples(primary, fallback) {
+    const list = [];
+    const addItem = (item) => {
+        if (!item || typeof item !== 'object') return;
+        list.push(item);
+    };
+    
+    if (Array.isArray(primary)) primary.forEach(addItem);
+    if (Array.isArray(fallback)) fallback.forEach(addItem);
+    
+    return list;
+}
+
+function formatMusicByArtist(musicList) {
+    if (!Array.isArray(musicList) || musicList.length === 0) {
+        return '<p class="detail-line" style="color: #888;">No music examples yet.</p>';
+    }
+    
+    const artistMap = new Map();
+    musicList.forEach(song => {
+        if (!song) return;
+        // Handle both string and array artist formats
+        let artistDisplay = '';
+        if (Array.isArray(song.artist)) {
+            artistDisplay = song.artist.join(', ');
+        } else if (song.artist) {
+            artistDisplay = song.artist.trim();
+        }
+        const title = song.title ? song.title.trim() : '';
+        if (!artistDisplay && !title) return;
+        const key = artistDisplay || 'Unknown Artist';
+        if (!artistMap.has(key)) artistMap.set(key, []);
+        if (title) artistMap.get(key).push(title);
+    });
+    
+    if (artistMap.size === 0) {
+        return '<p class="detail-line" style="color: #888;">No music examples yet.</p>';
+    }
+    
+    let html = '';
+    artistMap.forEach((titles, artist) => {
+        const uniqueTitles = Array.from(new Set(titles));
+        const line = uniqueTitles.length > 0
+            ? `${escapeHtml(artist)} - ${escapeHtml(uniqueTitles.join(', '))}`
+            : escapeHtml(artist);
+        html += `<p class="detail-line music-example">${line}</p>`;
+    });
+    
+    return html;
+}
+
+function buildTheoryContentMap(musicTheoryArray) {
+    const map = {};
+    musicTheoryArray.forEach(theory => {
+        if (!theory || !theory.name) return;
+        map[theory.name] = formatTheoryContent(theory.info, theory.characteristics, theory.type);
+        if (Array.isArray(theory.items)) {
+            theory.items.forEach(item => {
+                if (!item || !item.name) return;
+                map[item.name] = formatTheoryContent(item.info, item.characteristics, item.type);
+            });
+        }
+    });
+    return map;
+}
+
+function formatTheoryNamesLine(theoryNames) {
+    if (!Array.isArray(theoryNames) || theoryNames.length === 0) {
+        return '<p class="detail-line" style="color: #888;">No theory tags yet.</p>';
+    }
+    const safeNames = theoryNames.map(name => escapeHtml(name));
+    const spans = safeNames.map(name => `<span class="theory-link" data-theory-name="${name}">${name}</span>`);
+    return `<p class="detail-line">${spans.join(' ')}</p>`;
+}
+
+function attachTheoryHoverHandlers(container) {
+    if (!container || container.dataset.tooltipBound === 'true') return;
+    container.dataset.tooltipBound = 'true';
+
+    container.addEventListener('mouseover', (event) => {
+        const target = event.target.closest('.theory-link');
+        if (!target) return;
+        const name = target.getAttribute('data-theory-name');
+        if (name) showTheoryTooltip(name, event);
+    });
+
+    container.addEventListener('mouseout', (event) => {
+        const target = event.target.closest('.theory-link');
+        if (target) hideTheoryTooltip();
+    });
+}
+
+function formatTheoryContent(info, characteristics, type) {
+    let contentHtml = '';
+    
+    if (info) {
+        const infoArray = Array.isArray(info) ? info : [info];
+        infoArray.forEach(line => {
+            if (line && line.trim()) {
+                const styledLine = styleLine(line);
+                contentHtml += `<p class="detail-line">${styledLine}</p>`;
+            } else {
+                contentHtml += `<p class="detail-line" style="height: 10px; margin: 0;"></p>`;
+            }
+        });
+    }
+    
+    if (type && Array.isArray(type)) {
+        type.forEach(typeItem => {
+            if (typeItem && typeItem.trim()) {
+                const styledLine = styleLine(typeItem);
+                contentHtml += `<p class="detail-line"><span class="bullet-dot">●</span> ${styledLine}</p>`;
+            } else {
+                contentHtml += `<p class="detail-line" style="height: 10px; margin: 0;"></p>`;
+            }
+        });
+    }
+    
+    if (characteristics && Array.isArray(characteristics)) {
+        characteristics.forEach(char => {
+            if (char && char.trim()) {
+                const styledLine = styleLine(char);
+                contentHtml += `<p class="detail-line"><span class="bullet-dot">●</span> ${styledLine}</p>`;
+            }
+        });
+    }
+    
+    return contentHtml || '<p class="detail-line" style="color: #888;">No content available.</p>';
+}
+
+function styleLine(line) {
+    let styledLine = line.replace(/<(.*?)>/g, '\uE000HIGHLIGHT$1HIGHLIGHT\uE001');
+    styledLine = styledLine.replace(/^\u25cf\s*/, '\uE000BULLET\uE001');
+    const escapedLine = escapeHtml(styledLine);
+    let hasBullet = styledLine.includes('\uE000BULLET\uE001');
+    styledLine = escapedLine.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
+    styledLine = styledLine.replace(/\uE000HIGHLIGHT(.*?)HIGHLIGHT\uE001/g, '<span class="highlight-text">&lt;$1&gt;</span>');
+    if (hasBullet) {
+        styledLine = styledLine.replace(/\uE000BULLET\uE001/, '<span class="bullet-dot">●</span>     ');
+    }
+    return styledLine;
+}
+
+function formatTheoryText(text) {
+    let html = '';
+    const processed = text ? addTooltipsToContent(text) : '';
+    if (!processed) {
+        return '<p class="detail-line" style="color: #888;">No content yet.</p>';
+    }
+    const lines = processed.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.trim() && line.trim() !== '< Info >') {
+            const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<span class="bullet-dot">●</span> <span class="styled-text">$1</span>');
+            html += `<p class="detail-line">${styledLine}</p>`;
+        } else if (line.trim() !== '< Info >' && line.trim() !== '') {
+            html += `<p class="detail-line" style="height: 10px; margin: 0;"></p>`;
+        }
+    }
+    return html || '<p class="detail-line" style="color: #888;">No content yet.</p>';
 }
 
 // Load progression detail for SPA
@@ -418,12 +620,20 @@ function showTheoryTooltip(lineTitle, event) {
     
     const theoryName = lineTitle.trim();
     
-    // Get theory definition from Music Theory page storage
+    // Prefer in-memory music theory data if available
+    const rawTheory = Array.isArray(window.musicTheoryRaw) ? window.musicTheoryRaw : [];
+    const rawEntry = findTheoryEntryByName(theoryName, rawTheory);
+    let tooltipContent = '';
+    
+    if (rawEntry) {
+        tooltipContent = buildTooltipContentFromEntry(rawEntry);
+    }
+    
+    // Fallback: Get theory definition from Music Theory page storage
     const musicTheory = JSON.parse(localStorage.getItem('musicTheory')) || {};
     
     // Try to find exact match first
     let theoryData = musicTheory[theoryName];
-    let tooltipContent = '';
     
     // If not found, try case-insensitive search
     if (!theoryData) {
@@ -548,6 +758,36 @@ function showTheoryTooltip(lineTitle, event) {
     tooltip.style.display = 'block';
     
 
+}
+
+function findTheoryEntryByName(name, musicTheoryArray) {
+    if (!name || !Array.isArray(musicTheoryArray)) return null;
+    const lower = name.toLowerCase();
+    for (const theory of musicTheoryArray) {
+        if (theory?.name && theory.name.toLowerCase() === lower) {
+            return theory;
+        }
+        if (Array.isArray(theory?.items)) {
+            const foundItem = theory.items.find(item => item?.name && item.name.toLowerCase() === lower);
+            if (foundItem) return foundItem;
+        }
+    }
+    return null;
+}
+
+function buildTooltipContentFromEntry(entry) {
+    let html = '';
+    const info = entry.info;
+    const infoArray = Array.isArray(info) ? info : (info ? [info] : []);
+    infoArray.forEach(line => {
+        if (line && line.trim()) {
+            html += `<p class="tooltip-line">${styleLine(line)}</p>`;
+        }
+    });
+    if (!html) {
+        html = '<p class="tooltip-line" style="color: #999; font-style: italic;">No info available.</p>';
+    }
+    return html;
 }
 
 // Hide theory tooltip

@@ -50,6 +50,16 @@
         ]
       },
       {
+        "name": "Chord Type",
+        "info": "Based on common interval structures",
+        "type": [
+          "Major",
+          "Minor",
+          "Diminished",
+          "Augmented"
+        ]
+      },
+      {
         "name": "Model Interchange",
         "info": "Borrowing chords from parallel modes",
         "type": [
