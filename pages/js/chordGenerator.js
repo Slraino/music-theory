@@ -151,6 +151,9 @@ function renderChordGeneratorPage() {
                 <button class="toggle-btn" onclick="toggleDisplay()">
                     ${showDegrees ? 'Show Notes' : 'Show Degrees'}
                 </button>
+                <button id="generatorPreviewToggle" class="toggle-btn" onclick="toggleGeneratorPreview()" style="background: linear-gradient(135deg, #FF6B6B 0%, #FF8A80 100%);">
+                    🎬 Preview
+                </button>
             </div>
         </div>
         <div id="progressionDisplay" class="progression-grid"></div>
@@ -178,6 +181,27 @@ function toggleDisplay() {
     showDegrees = !showDegrees;
     renderChordGeneratorPage(); // Re-render to update button text
     refreshChords(); // Re-render current progression
+}
+
+// Toggle generator preview on/off
+window.toggleGeneratorPreview = function() {
+    const btn = document.getElementById('generatorPreviewToggle');
+    if (btn) {
+        const isEnabled = window.generatorPreviewEnabled !== false;
+        window.generatorPreviewEnabled = !isEnabled;
+        
+        if (window.generatorPreviewEnabled) {
+            btn.style.background = 'linear-gradient(135deg, #FF6B6B 0%, #FF8A80 100%)';
+            btn.textContent = '🎬 Preview';
+        } else {
+            btn.style.background = 'linear-gradient(135deg, #666 0%, #888 100%)';
+            btn.textContent = '🚫 Preview';
+            // Clear any active preview when disabling
+            if (window.clearBackgroundPreview) {
+                window.clearBackgroundPreview();
+            }
+        }
+    }
 }
 
 function refreshChords() {
@@ -340,6 +364,9 @@ function setupGeneratorMusicHoverHandlers(container) {
     const handleMouseOver = (event) => {
         const link = event.target.closest('.music-link');
         if (!link || !container.contains(link)) return;
+
+        // Check if preview is enabled in chord generator
+        if (window.generatorPreviewEnabled === false) return;
 
         const videoId = link.dataset.videoId;
         const clipStart = link.dataset.start || '0';
