@@ -335,6 +335,8 @@ function setupGeneratorMusicHoverHandlers(container) {
     if (!container || container.dataset.musicHoverBound === 'true') return;
     container.dataset.musicHoverBound = 'true';
 
+    let currentVideoId = null;
+
     const handleMouseOver = (event) => {
         const link = event.target.closest('.music-link');
         if (!link || !container.contains(link)) return;
@@ -344,16 +346,13 @@ function setupGeneratorMusicHoverHandlers(container) {
 
         if (typeof window.setBackgroundPreview === 'function') {
             window.setBackgroundPreview(videoId, clipStart);
+            currentVideoId = videoId;
         }
     };
 
     const handleMouseOut = (event) => {
-        const link = event.target.closest('.music-link');
-        if (link && container.contains(link)) {
-            if (typeof window.clearBackgroundPreview === 'function') {
-                window.clearBackgroundPreview();
-            }
-        }
+        // Don't clear on mouseout, keep preview open
+        // Preview will only clear when hovering to a different title
     };
 
     container.addEventListener('mouseover', handleMouseOver);

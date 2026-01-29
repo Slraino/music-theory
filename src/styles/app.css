@@ -78,7 +78,7 @@ body {
     z-index: 0;
     opacity: 0;
     transition: opacity var(--transition-default);
-    pointer-events: none;
+    pointer-events: auto;
     background: #000;
     overflow: hidden;
 }

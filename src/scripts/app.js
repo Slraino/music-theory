@@ -570,7 +570,7 @@ function ensureBackgroundVideoOverlay() {
 function buildBackgroundYoutubeUrl(videoId, clipStart = 0) {
     if (!videoId) return '';
     const start = clipStart || 0;
-    return `https://www.youtube.com/embed/${videoId}?start=${start}&autoplay=1&mute=0&controls=0&modestbranding=1&playsinline=1&rel=0&disablekb=1&fs=0`;
+    return `https://www.youtube.com/embed/${videoId}?start=${start}&autoplay=1&mute=0&controls=1&modestbranding=1&playsinline=1&rel=0&disablekb=0&fs=1`;
 }
 
 window.setBackgroundPreview = (videoId, clipStart = 0) => {
