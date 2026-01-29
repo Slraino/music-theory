@@ -153,6 +153,51 @@ main {
     line-height: 1.6;
 }
 
+/* Music example links */
+.music-link {
+    color: var(--brand);
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(255, 23, 68, 0.5);
+    transition: all 0.3s ease;
+}
+
+.music-link:hover {
+    color: #fff;
+    border-bottom-color: #fff;
+}
+
+.music-preview {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(255, 23, 68, 0.05);
+    border-left: 3px solid var(--brand);
+    border-radius: 4px;
+}
+
+.music-title {
+    font-weight: 600;
+    color: var(--brand);
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.music-preview iframe {
+    max-width: 100%;
+    border-radius: 4px;
+    aspect-ratio: 560 / 315;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .music-preview {
+        padding: 10px;
+    }
+    
+    .music-preview iframe {
+        width: 100%;
+    }
+}
+
 /* === FOOTER === */
 footer {
     padding: clamp(0.75rem, 3vw, 1.75rem);

@@ -78,7 +78,7 @@ assets/
 
 pages/
 └── json/ → Data files
-    ├── chordProgressions.json
+    ├── chordProgression.json
     └── musicTheory.json
 ```
 

@@ -90,7 +90,7 @@ Treated as: `[["6m"], ["4"], ["5"], ["1"]]`
 
 ## How to Add New Progressions
 
-1. **Add to chordProgressions.json:**
+1. **Add to chordProgression.json:**
 ```json
 {
   "note": "6",

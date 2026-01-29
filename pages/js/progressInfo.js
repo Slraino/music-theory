@@ -421,12 +421,13 @@ function formatMusicByArtist(musicList) {
         }
         const title = song.title ? song.title.trim() : '';
         const part = song.part ? song.part.trim() : '';
+        const youtubeId = song.youtubeId ? song.youtubeId.trim() : '';
+        const clipStart = song.clipStart ? parseInt(song.clipStart) : 0;
         if (!artistDisplay && !title) return;
         const key = artistDisplay || 'Unknown Artist';
         if (!artistMap.has(key)) artistMap.set(key, []);
         if (title) {
-            const titleWithPart = part ? `${title} (${part})` : title;
-            artistMap.get(key).push(titleWithPart);
+            artistMap.get(key).push({ title, part, youtubeId, clipStart });
         }
     });
     
@@ -436,9 +437,32 @@ function formatMusicByArtist(musicList) {
     
     let html = '';
     artistMap.forEach((titles, artist) => {
-        const uniqueTitles = Array.from(new Set(titles));
-        const line = uniqueTitles.length > 0
-            ? `${escapeHtml(artist)} - ${escapeHtml(uniqueTitles.join(', '))}`
+        const seen = new Set();
+        const titleHtml = titles
+            .map(item => {
+                const titleWithPart = item.part ? `${item.title} (${item.part})` : item.title;
+                const key = `${titleWithPart}::${item.youtubeId || ''}`;
+                if (seen.has(key)) return null;
+                seen.add(key);
+
+                const safeTitle = escapeHtml(titleWithPart);
+                if (!item.youtubeId) return safeTitle;
+                
+                const startParam = item.clipStart && item.clipStart > 0 ? `&start=${item.clipStart}` : '';
+                const iframeUrl = `https://www.youtube.com/embed/${encodeURIComponent(item.youtubeId)}?${startParam}`;
+                return `<div class="music-preview">
+                    <div class="music-title">${safeTitle}</div>
+                    <iframe width="560" height="315" src="${escapeHtml(iframeUrl)}" 
+                        title="${safeTitle}" frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen style="max-width: 100%; height: auto;"></iframe>
+                </div>`;
+            })
+            .filter(Boolean)
+            .join('');
+
+        const line = titleHtml
+            ? `${escapeHtml(artist)} - ${titleHtml}`
             : escapeHtml(artist);
         html += `<p class="detail-line music-example">${line}</p>`;
     });

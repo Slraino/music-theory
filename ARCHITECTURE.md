@@ -4,7 +4,7 @@
 
 ### Hybrid Approach (Option 2: Separate JSON Files)
 - **Content Data (JSON)**: Always fetched from JSON files - all users see the same content
-  - `pages/json/chordProgressions.json` - Chord patterns organized by root note
+  - `pages/json/chordProgression.json` - Chord patterns organized by root note
   - `pages/json/progressionInfo.json` - Theory explanations and music examples indexed by progression ID
   - `pages/json/musicTheory.json` - Music theory educational content
 - **User Preferences**: Stored persistently in IndexedDB/localStorage
@@ -36,7 +36,7 @@
 
 ## JSON File Structure
 
-### chordProgressions.json
+### chordProgression.json
 Contains chord patterns organized by root note with **bar-based structure**:
 
 ```json
@@ -123,7 +123,7 @@ Contains theory and music examples indexed by progression ID:
 ## Page Usage
 
 ### Chord Progression Page
-- Displays list of all chord progressions from `chordProgressions.json`
+- Displays list of all chord progressions from `chordProgression.json`
 - Shows chord patterns grouped by root note
 - Clicking a progression navigates to Progression Info page
 

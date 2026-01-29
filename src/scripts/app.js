@@ -12,7 +12,7 @@ const DataService = {
         }
         
         try {
-            const response = await fetch('pages/json/chordProgressions.json');
+            const response = await fetch('pages/json/chordProgression.json');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -39,10 +39,10 @@ const DataService = {
             
             // Cache in memory for this session only
             this.chordProgressions = progressions;
-            console.log(`✓ Loaded ${progressions.length} progression groups from chordProgressions.json`);
+            console.log(`✓ Loaded ${progressions.length} progression groups from chordProgression.json`);
             return progressions;
         } catch (error) {
-            console.error('Failed to load chordProgressions.json:', error);
+            console.error('Failed to load chordProgression.json:', error);
             console.warn('Using default fallback progressions (12 chromatic notes)');
 
             // Fallback defaults - 12 chromatic notes with empty progressions
