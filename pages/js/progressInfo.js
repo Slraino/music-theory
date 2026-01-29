@@ -420,10 +420,14 @@ function formatMusicByArtist(musicList) {
             artistDisplay = song.artist.trim();
         }
         const title = song.title ? song.title.trim() : '';
+        const part = song.part ? song.part.trim() : '';
         if (!artistDisplay && !title) return;
         const key = artistDisplay || 'Unknown Artist';
         if (!artistMap.has(key)) artistMap.set(key, []);
-        if (title) artistMap.get(key).push(title);
+        if (title) {
+            const titleWithPart = part ? `${title} (${part})` : title;
+            artistMap.get(key).push(titleWithPart);
+        }
     });
     
     if (artistMap.size === 0) {

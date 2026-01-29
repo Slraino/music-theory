@@ -236,10 +236,14 @@ function renderGeneratorMusic(musicList) {
             artistDisplay = song.artist.trim();
         }
         const title = song.title ? song.title.trim() : '';
+        const part = song.part ? song.part.trim() : '';
         if (!artistDisplay && !title) return;
         const key = artistDisplay || 'Unknown Artist';
         if (!artistMap.has(key)) artistMap.set(key, []);
-        if (title) artistMap.get(key).push(title);
+        if (title) {
+            const titleWithPart = part ? `${title} (${part})` : title;
+            artistMap.get(key).push(titleWithPart);
+        }
     });
 
     if (artistMap.size === 0) {
@@ -513,11 +517,6 @@ async function playProgression() {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
     
-    // Try to load samples if not loaded
-    if (!samplesLoaded) {
-        await loadPianoSamples();
-    }
-    
     if (currentBars.length === 0) return;
     
     // Reset voice leading for new progression
@@ -554,22 +553,13 @@ function playChord(degree, startTime, duration) {
     const voicing = getClosestVoicing(chordTones, previousVoicing);
     previousVoicing = voicing;
     
-    // Play bass note
-    if (samplesLoaded && Object.keys(pianoSamples).length > 0) {
-        playSampledNote(bassFreq, startTime, duration, 0.28); // Bass reduced 3dB
-        
-        // Play voiced chord
-        voicing.forEach(freq => {
-            playSampledNote(freq, startTime, duration, 0.25);
-        });
-    } else {
-        // Fallback to synthesis
-        playSynthNote(bassFreq, startTime, duration, 0.28);
-        
-        voicing.forEach(freq => {
-            playSynthNote(freq, startTime, duration, 0.25);
-        });
-    }
+    // Play bass note with synthesis
+    playSynthNote(bassFreq, startTime, duration, 0.28);
+    
+    // Play voiced chord
+    voicing.forEach(freq => {
+        playSynthNote(freq, startTime, duration, 0.25);
+    });
 }
 
 function playSampledNote(frequency, startTime, duration, volume = 0.3) {
