@@ -85,6 +85,7 @@ body {
 
 .bg-video-overlay.is-active {
     opacity: 1;
+    z-index: 1000;
 }
 
 .bg-video-overlay iframe {
@@ -92,6 +93,7 @@ body {
     height: 100%;
     border: 0;
     object-fit: cover;
+    pointer-events: auto;
 }
 
 @supports (height: 100dvh) {
