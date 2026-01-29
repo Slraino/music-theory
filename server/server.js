@@ -10,10 +10,10 @@ const PORT = process.env.PORT || 3000;
 // Security headers
 app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     res.setHeader('X-XSS-Protection', '1; mode=block');
-    // Allow scripts, inline handlers, and eval (needed for some client libs)
-    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; media-src 'self';");
+    // Allow scripts, inline handlers, eval, and YouTube iframes
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; media-src 'self'; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com;");
     next();
 });
 
@@ -46,8 +46,8 @@ app.use('/scripts', express.static(scriptsDir, cacheConfig));
 app.use('/assets', express.static(assetsDir, cacheConfig));
 app.use('/assets', express.static(assetsDir, { maxAge: '1d', etag: false }));
 
-// Default route to SPA index
-app.get('/', (req, res) => {
+// Default route to SPA index (handle all SPA routes)
+app.get(['/', '/index.html', '/chord-generator', '/chord-generator.html', '/chord-progression', '/chord-progression.html', '/music-theory', '/music-theory.html', '/progression-info', '/progression-info.html'], (req, res) => {
     const indexPath = path.join(rootDir, 'index.html');
     
     // Read and inject timestamps for cache busting

@@ -44,20 +44,7 @@
         "music": []
       },
       {
-        "chords": [
-          [
-            ["6m7"],
-            ["6m7", "b6m7"],
-            ["5m7"],
-            ["1"]
-          ],
-          [
-            ["4M7"],
-            ["4M7"],
-            ["3sus"],
-            ["3"]
-          ]
-        ],
+        "chords": [[["6m7"], ["6m7", "b6m7"], ["5m7"], ["1"]], [["4M7"], ["4M7"], ["3sus"], ["3"]]],
         "theory": [],
         "music": [
           { "artist": "Eve",  "title": "廻廻奇譚",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
@@ -67,22 +54,17 @@
         "chords": ["6m", "4", "5", "1"],
         "theory": ["小室進行"],
         "music": [
-          { "artist": "Joe Hisaishi",  "title": "Summer",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "黒うさP",  "title": "千本桜",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "cosMo",  "title": "初音ミクの消失",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "しゃろう",  "title": "You and Me",  "part": "Chorus",  "genre": "Bgm",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "さユり",  "title": "花の塔",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "Ado",  "title": "ギラギラ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "ナノウ",  "title": "ハロ／ハワユ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { "artist": "Joe Hisaishi",  "title": "Summer",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "l0GN40EL1VU",  "clipStart": 102 },
+          { "artist": "黒うさP",  "title": "千本桜",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "shs0rAiwsGQ",  "clipStart": 57 },
+          { "artist": "cosMo",  "title": "初音ミクの消失",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "VWVtIg5cdDU",  "clipStart": 107 },
+          { "artist": "しゃろう",  "title": "You and Me",  "part": "Chorus",  "genre": "Bgm",  "youtubeId": "WtRHih2nZxk",  "clipStart": 12 },
+          { "artist": "さユり",  "title": "花の塔",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "Rwzy6Qt8gq8",  "clipStart": 37 },
+          { "artist": "Ado",  "title": "ギラギラ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "sOiMD45QGLs",  "clipStart": 86 },
+          { "artist": "ナノウ",  "title": "ハロ／ハワユ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "-M4sAQYi6r4",  "clipStart": 116 }
         ]
       },
       {
-        "chords": [
-          ["6m"],
-          ["4"],
-          ["5"],
-          ["1", "5/7"]
-        ],
+        "chords": [["6m"], ["4"], ["5"], ["1", "5/7"]],
         "theory": ["小室進行 variation"],
         "music": [
           { "artist": "164",  "title": "天之弱",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
@@ -108,12 +90,7 @@
         ]
       },
       {
-        "chords": [
-          ["6m"],
-          ["3m"],
-          ["4"],
-          ["7", "1"]
-        ],
+        "chords": [["6m"], ["3m"], ["4"], ["7", "1"]],
         "theory": [],
         "music": []
       },
@@ -125,12 +102,7 @@
         ]
       },
       {
-        "chords": [
-          ["6m"],
-          ["3m"],
-          ["4"],
-          ["5", "1"]
-        ],
+        "chords": [["6m"], ["3m"], ["4"], ["5", "1"]],
         "theory": [],
         "music": [
           { "artist": "GReeeeN",  "title": "キセキ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
@@ -266,12 +238,7 @@
         "music": []
       },
       {
-        "chords": [
-          ["4"],
-          ["5"],
-          ["6m"],
-          ["7dim", "1"]
-        ],
+        "chords": [["4"], ["5"], ["6m"], ["7dim", "1"]],
         "theory": [],
         "music": [
           { "artist": "上田麗奈",  "title": "リテラチュア",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
@@ -287,12 +254,7 @@
         ]
       },
       {
-        "chords": [
-          ["4"],
-          ["5"],
-          ["6m"],
-          ["5", "1"]
-        ],
+        "chords": [["4"], ["5"], ["6m"], ["5", "1"]],
         "theory": [],
         "music": [
           { "artist": "フレデリック",  "title": "オドループ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
@@ -329,12 +291,7 @@
         ]
       },
       {
-        "chords": [
-          ["4M7"],
-          ["4/5"],
-          ["3m7"],
-          ["6m7", "b6m7", "5m7", "1"]
-        ],
+        "chords": [["4M7"], ["4/5"], ["3m7"], ["6m7", "b6m7", "5m7", "1"]],
         "theory": ["王道進行 variation", "Chromatic Descending"],
         "music": [
           { "artist": "結束バンド",  "title": "星座になれたら",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
@@ -346,44 +303,21 @@
         "music": []
       },
       {
-        "chords": [
-          ["4"],
-          ["5"],
-          ["3m", "3/#5"],
-          ["6m"]
-        ],
+        "chords": [["4"], ["5"], ["3m", "3/#5"], ["6m"]],
         "theory": ["王道進行 variation"],
         "music": [
           { "artist": "ヨルシカ",  "title": "言って。",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": [
-          ["4add9"],
-          ["5sus"],
-          ["1/3", "5sus"],
-          ["6m"]
-        ],
+        "chords": [["4add9"], ["5sus"], ["1/3", "5sus"], ["6m"]],
         "theory": ["王道進行 variation"],
         "music": [
           { "artist": "ヨルシカ",  "title": "春泥棒",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": [
-          [
-            ["4"],
-            ["5"],
-            ["3m"],
-            ["6m"]
-          ],
-          [
-            ["4"],
-            ["37", "37/#5"],
-            ["6m"],
-            ["5", "1"]
-          ]
-        ],
+        "chords": [[["4"], ["5"], ["3m"], ["6m"]], [["4"], ["37", "37/#5"], ["6m"], ["5", "1"]]],
         "theory": ["王道進行 variation"],
         "music": [
           { "artist": "YOASOBI",  "title": "怪物",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
@@ -395,12 +329,7 @@
         "music": []
       },
       {
-        "chords": [
-          ["4"],
-          ["5"],
-          ["3m"],
-          ["6m", "3m/5"]
-        ],
+        "chords": [["4"], ["5"], ["3m"], ["6m", "3m/5"]],
         "theory": ["王道進行 variation"],
         "music": []
       },
@@ -416,40 +345,14 @@
         ]
       },
       {
-        "chords": [
-          [
-            ["4"],
-            ["5"],
-            ["1"],
-            ["5"]
-          ],
-          [
-            ["4"],
-            ["5"],
-            ["b6"],
-            ["b7"]
-          ]
-        ],
+        "chords": [[["4"], ["5"], ["1"], ["5"]], [["4"], ["5"], ["b6"], ["b7"]]],
         "theory": ["王道進行 variation"],
         "music": [
           { "artist": "K-ON!",  "title": "Cagayake!GIRLS",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": [
-          [
-            ["4M7"],
-            ["4mM7"],
-            ["3m7"],
-            ["67"]
-          ],
-          [
-            ["2m7"],
-            ["57"],
-            ["1M7"],
-            ["#4hdim"]
-          ]
-        ],
+        "chords": [[["4M7"], ["4mM7"], ["3m7"], ["67"]], [["2m7"], ["57"], ["1M7"], ["#4hdim"]]],
         "theory": ["王道進行 variation"],
         "music": [
           { "artist": "藤井風",  "title": "きらり",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
@@ -473,12 +376,7 @@
         ]
       },
       {
-        "chords": [
-          ["4"],
-          ["37"],
-          ["6m"],
-          ["5m", "17"]
-        ],
+        "chords": [["4"], ["37"], ["6m"], ["5m", "17"]],
         "thoery": ["丸サ進行"],
         "music": [
           { "artist": "YOASOBI",  "title": "夜に駆ける",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
@@ -516,12 +414,7 @@
         "music": []
       },
       {
-        "chords": [
-          ["4"],
-          ["1/3"],
-          ["b3"],
-          ["5sus", "5"]
-        ],
+        "chords": [["4"], ["1/3"], ["b3"], ["5sus", "5"]],
         "music": []
       },
       {
@@ -533,12 +426,7 @@
         "music": []
       },
       {
-        "chords": [
-          ["4"],
-          ["1", "2"],
-          ["4"],
-          ["5"]
-        ],
+        "chords": [["4"], ["1", "2"], ["4"], ["5"]],
         "music": [
           { "artist": "back number",  "title": "クリスマスソング",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
@@ -684,58 +572,19 @@
         "music": []
       },
       {
-        "chords": [
-          [
-            ["1"],
-            ["5/7"],
-            ["5m/b7"],
-            ["4/6"]
-          ],
-          [
-            ["4m/b6"],
-            ["1/5"],
-            ["2/#4"],
-            ["5"]
-          ]
-        ],
+        "chords": [[["1"], ["5/7"], ["5m/b7"], ["4/6"]], [["4m/b6"], ["1/5"], ["2/#4"], ["5"]]],
         "theory": ["Chromatic Descending", "Secondary Dominant", "Modal Interchange"],
         "music": []
       },
       {
-        "chords": [
-          [
-            ["1"],
-            ["5/7"],
-            ["6m"],
-            ["3m/5"]
-          ],
-          [
-            ["4"],
-            ["1/3"],
-            ["2m"],
-            ["5"]
-          ]
-        ],
+        "chords": [[["1"], ["5/7"], ["6m"], ["3m/5"]], [["4"], ["1/3"], ["2m"], ["5"]]],
         "theory": ["Canon Progression"],
         "music": [
           { "artist": "GReeeeN",  "title": "キセキ",  "part": "Verse",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": [
-          [
-            ["1"],
-            ["7hdim", "3/#5"],
-            ["6m"],
-            ["5m", "17"]
-          ],
-          [
-            ["4M7"],
-            ["1/3"],
-            ["2M7"],
-            ["4/5", "4m/5"]
-          ]
-        ],
+        "chords": [[["1"], ["7hdim", "3/#5"], ["6m"], ["5m", "17"]], [["4M7"], ["1/3"], ["2M7"], ["4/5", "4m/5"]]],
         "music": [
           { "artist": "Official髭男dism",  "title": "Pretender",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
@@ -809,12 +658,7 @@
         ]
       },
       {
-        "chords": [
-          ["1", "5m", "17"],
-          ["4"],
-          ["5"],
-          ["6m"]
-        ],
+        "chords": [["1", "5m", "17"], ["4"], ["5"], ["6m"]],
         "theory": ["Chromatic Descending", "Pedal Note", "Line Cliche"],
         "music": [
           { "artist": "Debussy",  "title": "Clair de Lune",  "part": "Bar59",  "genre": "Classical",  "subgenre": "Impressionism",  "youtubeId": "",  "clipStart": 0 }

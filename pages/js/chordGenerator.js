@@ -217,6 +217,45 @@ function refreshChords() {
     renderGeneratorMusic(randomProgression.music || []);
 }
 
+// Check if current progression matches any in the database and show music examples
+function checkAndShowMusicExamples() {
+    if (!allProgressions || allProgressions.length === 0) {
+        renderGeneratorMusic([]);
+        return;
+    }
+
+    // Flatten currentBars into a single array for comparison
+    const currentChords = currentBars.flat(Infinity).filter(c => c && typeof c === 'string');
+    
+    // Search through all progressions for a match
+    let matchedMusic = [];
+    
+    // allProgressions has been transformed to { phrases: [...], music: [...] }
+    for (const prog of allProgressions) {
+        // Get chords from phrases structure
+        let progChords = [];
+        
+        if (prog.phrases && Array.isArray(prog.phrases)) {
+            // Flatten all phrases into a single chord array
+            progChords = prog.phrases.flat(Infinity).filter(c => c && typeof c === 'string');
+        }
+        
+        // Compare chord arrays
+        if (progChords.length === currentChords.length) {
+            const isMatch = progChords.every((chord, idx) => chord === currentChords[idx]);
+            
+            if (isMatch) {
+                if (prog.music && prog.music.length > 0) {
+                    matchedMusic = prog.music;
+                    break;
+                }
+            }
+        }
+    }
+    
+    renderGeneratorMusic(matchedMusic);
+}
+
 function renderGeneratorMusic(musicList) {
     const container = document.getElementById('generatorMusic');
     if (!container) return;
@@ -255,36 +294,87 @@ function renderGeneratorMusic(musicList) {
     let html = '';
     artistMap.forEach((titles, artist) => {
         const seen = new Set();
-        const titleHtml = titles
-            .map(item => {
-                const titleWithPart = item.part ? `${item.title} (${item.part})` : item.title;
-                const key = `${titleWithPart}::${item.youtubeId || ''}`;
-                if (seen.has(key)) return null;
-                seen.add(key);
+        const titleLinks = [];
+        
+        titles.forEach(item => {
+            const titleWithPart = item.part ? `${item.title} (${item.part})` : item.title;
+            const key = `${titleWithPart}::${item.youtubeId || ''}`;
+            if (seen.has(key)) return;
+            seen.add(key);
 
-                const safeTitle = escapeHtml(titleWithPart);
-                if (!item.youtubeId) return safeTitle;
-                
-                const startParam = item.clipStart && item.clipStart > 0 ? `&start=${item.clipStart}` : '';
-                const iframeUrl = `https://www.youtube.com/embed/${encodeURIComponent(item.youtubeId)}?${startParam}`;
-                return `<div class="music-preview">
-                    <div class="music-title">${safeTitle}</div>
-                    <iframe width="560" height="315" src="${escapeHtml(iframeUrl)}" 
-                        title="${safeTitle}" frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen style="max-width: 100%; height: auto;"></iframe>
-                </div>`;
-            })
-            .filter(Boolean)
-            .join('');
+            const safeTitle = escapeHtml(titleWithPart);
+            if (!item.youtubeId) {
+                titleLinks.push(safeTitle);
+                return;
+            }
+            
+            const iframeUrl = buildYoutubeEmbedUrl(item.youtubeId, item.clipStart || 0, false);
+            const tooltipId = `tooltip-${Math.random().toString(36).substr(2, 9)}`;
+            
+            // Create link with separate tooltip in document
+            titleLinks.push(`<a class="music-link" data-tooltip="${tooltipId}" data-video-id="${item.youtubeId}" data-start="${item.clipStart || 0}">${safeTitle}</a>`);
+            html += `<div class="music-tooltip" id="${tooltipId}" style="display: none;">
+                <iframe width="560" height="315" src="${escapeHtml(iframeUrl)}" 
+                    title="${safeTitle}" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen></iframe>
+            </div>`;
+        });
 
-        const line = titleHtml
-            ? `${escapeHtml(artist)} - ${titleHtml}`
+        const line = titleLinks.length > 0
+            ? `${escapeHtml(artist)} - ${titleLinks.join(', ')}`
             : escapeHtml(artist);
         html += `<p class="detail-line music-example">${line}</p>`;
     });
 
     container.innerHTML = html;
+    setupGeneratorMusicHoverHandlers(container);
+}
+
+function setupGeneratorMusicHoverHandlers(container) {
+    if (!container || container.dataset.musicHoverBound === 'true') return;
+    container.dataset.musicHoverBound = 'true';
+
+    const handleMouseOver = (event) => {
+        const link = event.target.closest('.music-link');
+        if (!link || !container.contains(link)) return;
+
+        const videoId = link.dataset.videoId;
+        const clipStart = link.dataset.start || '0';
+
+        if (typeof window.setBackgroundPreview === 'function') {
+            window.setBackgroundPreview(videoId, clipStart);
+        }
+    };
+
+    const handleMouseOut = (event) => {
+        const link = event.target.closest('.music-link');
+        if (link && container.contains(link)) {
+            if (typeof window.clearBackgroundPreview === 'function') {
+                window.clearBackgroundPreview();
+            }
+        }
+    };
+
+    container.addEventListener('mouseover', handleMouseOver);
+    container.addEventListener('mouseout', handleMouseOut);
+
+    container._musicHoverHandlers = { handleMouseOver, handleMouseOut };
+}
+
+function buildYoutubeEmbedUrl(videoId, clipStart = 0, autoplay = false) {
+    if (!videoId) return '';
+    const autoplayParam = autoplay ? '1' : '0';
+    return `https://www.youtube.com/embed/${videoId}?start=${clipStart}&autoplay=${autoplayParam}`;
+}
+
+function cleanupGeneratorMusicHoverHandlers(container) {
+    if (!container || !container._musicHoverHandlers) return;
+    const { handleMouseOver, handleMouseOut } = container._musicHoverHandlers;
+    container.removeEventListener('mouseover', handleMouseOver);
+    container.removeEventListener('mouseout', handleMouseOut);
+    delete container._musicHoverHandlers;
+    delete container.dataset.musicHoverBound;
 }
 
 // Get diatonic parent chord (handles slash chords and chromatic alterations)
@@ -457,6 +547,8 @@ function showChordTypes(typeList, chordTypes, barIndex, chordIndex) {
             // Rebuild phrases from currentBars for display
             const phrases = [currentBars];
             updateChordGrid(phrases);
+            // Check for matching progressions and show music examples
+            checkAndShowMusicExamples();
             // Remove the entire chord selector
             typeList.closest('.chord-selector').remove();
         };
@@ -501,6 +593,9 @@ function replaceWithSubstitute(barIndex, chordIndex, currentDegree) {
     // Rebuild phrases from currentBars for display
     const phrases = [currentBars];
     updateChordGrid(phrases);
+    
+    // Check for matching progressions and show music examples
+    checkAndShowMusicExamples();
 }
 
 // Audio playback functionality

@@ -322,6 +322,7 @@ function renderDetailView(detailData) {
     `;
 
     attachTheoryHoverHandlers(detailContent);
+    setupProgressInfoMusicHoverHandlers(detailContent);
 }
 
 function findSelectedProgression(chordProgressions, progressionId, groupIndex) {
@@ -448,15 +449,18 @@ function formatMusicByArtist(musicList) {
                 const safeTitle = escapeHtml(titleWithPart);
                 if (!item.youtubeId) return safeTitle;
                 
-                const startParam = item.clipStart && item.clipStart > 0 ? `&start=${item.clipStart}` : '';
-                const iframeUrl = `https://www.youtube.com/embed/${encodeURIComponent(item.youtubeId)}?${startParam}`;
-                return `<div class="music-preview">
-                    <div class="music-title">${safeTitle}</div>
+                const iframeUrl = buildYoutubeEmbedUrl(item.youtubeId, item.clipStart || 0, false);
+                const tooltipId = `tooltip-${Math.random().toString(36).substr(2, 9)}`;
+                
+                // Create link with separate tooltip in document
+                html += `<div class="music-tooltip" id="${tooltipId}" style="display: none;">
                     <iframe width="560" height="315" src="${escapeHtml(iframeUrl)}" 
                         title="${safeTitle}" frameborder="0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen style="max-width: 100%; height: auto;"></iframe>
+                        allowfullscreen></iframe>
                 </div>`;
+                
+                return `<a class="music-link" data-tooltip="${tooltipId}" data-video-id="${item.youtubeId}" data-start="${item.clipStart || 0}">${safeTitle}</a>`;
             })
             .filter(Boolean)
             .join('');
@@ -468,6 +472,52 @@ function formatMusicByArtist(musicList) {
     });
     
     return html;
+}
+
+function buildYoutubeEmbedUrl(videoId, clipStart = 0, autoplay = false) {
+    if (!videoId) return '';
+    const autoplayParam = autoplay ? '1' : '0';
+    return `https://www.youtube.com/embed/${videoId}?start=${clipStart}&autoplay=${autoplayParam}`;
+}
+
+function setupProgressInfoMusicHoverHandlers(container) {
+    if (!container || container.dataset.musicHoverBound === 'true') return;
+    container.dataset.musicHoverBound = 'true';
+
+    const handleMouseOver = (event) => {
+        const link = event.target.closest('.music-link');
+        if (!link || !container.contains(link)) return;
+
+        const videoId = link.dataset.videoId;
+        const clipStart = link.dataset.start || '0';
+
+        if (typeof window.setBackgroundPreview === 'function') {
+            window.setBackgroundPreview(videoId, clipStart);
+        }
+    };
+
+    const handleMouseOut = (event) => {
+        const link = event.target.closest('.music-link');
+        if (link && container.contains(link)) {
+            if (typeof window.clearBackgroundPreview === 'function') {
+                window.clearBackgroundPreview();
+            }
+        }
+    };
+
+    container.addEventListener('mouseover', handleMouseOver);
+    container.addEventListener('mouseout', handleMouseOut);
+
+    container._musicHoverHandlers = { handleMouseOver, handleMouseOut };
+}
+
+function cleanupProgressInfoMusicHoverHandlers(container) {
+    if (!container || !container._musicHoverHandlers) return;
+    const { handleMouseOver, handleMouseOut } = container._musicHoverHandlers;
+    container.removeEventListener('mouseover', handleMouseOver);
+    container.removeEventListener('mouseout', handleMouseOut);
+    delete container._musicHoverHandlers;
+    delete container.dataset.musicHoverBound;
 }
 
 function buildTheoryContentMap(musicTheoryArray) {

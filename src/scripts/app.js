@@ -450,7 +450,22 @@ class Router {
             });
         }
 
-        this.loadPage('index.html');
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.page) {
+                this.loadPage(e.state.page, false);
+            }
+        });
+
+        // Load the current page based on URL
+        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+        const pageToLoad = currentPath === '' || currentPath === '/' ? 'index.html' : currentPath;
+        this.loadPage(pageToLoad);
+        
+        // Set initial browser state
+        if (window.location.protocol !== 'file:') {
+            window.history.replaceState({ page: pageToLoad }, '', pageToLoad);
+        }
     }
 
     navigate(page) {
@@ -466,6 +481,8 @@ class Router {
             console.error('Page not found:', page);
             return;
         }
+
+        this.cleanupPage();
 
         // Add current page to history before navigating
         if (addToHistory && this.currentPage && this.currentPage !== page) {
@@ -509,6 +526,21 @@ class Router {
         this.currentPage = page;
     }
 
+    cleanupPage() {
+        document.querySelectorAll('.music-tooltip').forEach(el => el.remove());
+        const generatorContainer = document.getElementById('generatorMusic');
+        if (typeof cleanupGeneratorMusicHoverHandlers === 'function') {
+            cleanupGeneratorMusicHoverHandlers(generatorContainer);
+        }
+        const progressInfoContainer = document.getElementById('detailContent');
+        if (typeof cleanupProgressInfoMusicHoverHandlers === 'function') {
+            cleanupProgressInfoMusicHoverHandlers(progressInfoContainer);
+        }
+        if (typeof window.clearBackgroundPreview === 'function') {
+            window.clearBackgroundPreview();
+        }
+    }
+
     initPage(page) {
         const pageConfig = this.pages[page];
         if (pageConfig?.init) {
@@ -522,6 +554,43 @@ document.addEventListener('DOMContentLoaded', () => {
     router = new Router();
     router.init();
 });
+
+function ensureBackgroundVideoOverlay() {
+    let overlay = document.getElementById('bgVideoOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'bgVideoOverlay';
+        overlay.className = 'bg-video-overlay';
+        overlay.innerHTML = '<iframe title="Background Preview" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+        document.body.appendChild(overlay);
+    }
+    return overlay;
+}
+
+function buildBackgroundYoutubeUrl(videoId, clipStart = 0) {
+    if (!videoId) return '';
+    const start = clipStart || 0;
+    return `https://www.youtube.com/embed/${videoId}?start=${start}&autoplay=1&mute=0&controls=0&modestbranding=1&playsinline=1&rel=0&disablekb=1&fs=0`;
+}
+
+window.setBackgroundPreview = (videoId, clipStart = 0) => {
+    const overlay = ensureBackgroundVideoOverlay();
+    const iframe = overlay.querySelector('iframe');
+    const url = buildBackgroundYoutubeUrl(videoId, clipStart);
+    if (!url) return;
+    if (iframe.src !== url) {
+        iframe.src = url;
+    }
+    overlay.classList.add('is-active');
+};
+
+window.clearBackgroundPreview = () => {
+    const overlay = document.getElementById('bgVideoOverlay');
+    if (!overlay) return;
+    const iframe = overlay.querySelector('iframe');
+    iframe.src = '';
+    overlay.classList.remove('is-active');
+};
 
 /* ==================== SOUND EFFECTS ==================== */
 const MUSIC_PLAYLIST = [
