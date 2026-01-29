@@ -574,6 +574,8 @@ function buildBackgroundYoutubeUrl(videoId, clipStart = 0) {
 }
 
 window.setBackgroundPreview = (videoId, clipStart = 0) => {
+    if (window.videoPreviewEnabled === false) return;
+    
     const overlay = ensureBackgroundVideoOverlay();
     const iframe = overlay.querySelector('iframe');
     const url = buildBackgroundYoutubeUrl(videoId, clipStart);
@@ -836,6 +838,8 @@ class SoundEffects {
         const volumeLabel = document.getElementById('volumeLabel');
         const sfxSlider = document.getElementById('sfxSlider');
         const sfxLabel = document.getElementById('sfxLabel');
+        const previewToggleBtn = document.getElementById('previewToggleBtn');
+        const previewLabel = document.getElementById('previewLabel');
 
         // Initialize slider values
         if (volumeSlider) {
@@ -867,6 +871,31 @@ class SoundEffects {
             sfxToggleBtn.addEventListener('click', () => {
                 this.setSfxEnabled(!this.sfxEnabled);
                 updateState();
+            });
+        }
+
+        // Video Preview toggle
+        if (previewToggleBtn && previewLabel) {
+            let previewEnabled = localStorage.getItem('previewEnabled') !== 'false';
+            
+            const updatePreviewState = () => {
+                previewToggleBtn.classList.toggle('active', previewEnabled);
+                previewToggleBtn.textContent = previewEnabled ? '🎬' : '🚫';
+                previewLabel.textContent = previewEnabled ? 'Preview: On' : 'Preview: Off';
+                window.videoPreviewEnabled = previewEnabled;
+                localStorage.setItem('previewEnabled', previewEnabled);
+            };
+            
+            updatePreviewState();
+            
+            previewToggleBtn.addEventListener('click', () => {
+                previewEnabled = !previewEnabled;
+                updatePreviewState();
+                
+                // Clear preview if disabling
+                if (!previewEnabled && typeof window.clearBackgroundPreview === 'function') {
+                    window.clearBackgroundPreview();
+                }
             });
         }
 
