@@ -85,8 +85,6 @@ body {
 
 .bg-video-overlay.is-active {
     opacity: 1;
-    pointer-events: auto;
-    z-index: 50;
 }
 
 .bg-video-overlay iframe {
