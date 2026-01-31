@@ -1,22 +1,5 @@
 {
-  "6m-4-5-1": {
-    "theory": "",
-    "music": []
-  },
-  "6m,4,5-1-5/7-1": {
-    "theory": "Example with 3 chords in first bar",
-    "music": []
-  },
-  "6m-4-5-1,3/7": {
-    "theory": "",
-    "music": []
-  },
-  "6m-3m-4-5": {
-    "theory": "",
-    "music": []
-  },
-  "6m,3m-4-1-5": {
-    "theory": "",
-    "music": []
-  }
+  "progressions": {},
+  "categories": [],
+  "tags": []
 }

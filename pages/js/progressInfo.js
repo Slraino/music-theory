@@ -485,10 +485,44 @@ function setupProgressInfoMusicHoverHandlers(container) {
     container.dataset.musicHoverBound = 'true';
 
     let currentVideoId = null;
+    let disabledTooltip = null;
 
     const handleMouseOver = (event) => {
         const link = event.target.closest('.music-link');
         if (!link || !container.contains(link)) return;
+
+        // Check if preview is enabled globally (default is disabled)
+        if (window.videoPreviewEnabled !== true) {
+            // Show disabled tooltip
+            if (!disabledTooltip) {
+                disabledTooltip = document.createElement('div');
+                disabledTooltip.className = 'preview-disabled-tooltip';
+                disabledTooltip.textContent = '▶ YouTube Premium or Disable Adblock';
+                disabledTooltip.style.cssText = `
+                    position: fixed;
+                    background: rgba(0, 0, 0, 0.95);
+                    color: #fff;
+                    padding: 10px 14px;
+                    border-radius: 4px;
+                    font-size: 0.9em;
+                    z-index: 10000;
+                    pointer-events: none;
+                    white-space: nowrap;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+                `;
+                document.body.appendChild(disabledTooltip);
+            }
+            
+            const rect = link.getBoundingClientRect();
+            disabledTooltip.style.left = (rect.left + rect.width / 2 - 80) + 'px';
+            disabledTooltip.style.top = (rect.top - 40) + 'px';
+            disabledTooltip.style.display = 'block';
+            return;
+        }
+
+        if (disabledTooltip) {
+            disabledTooltip.style.display = 'none';
+        }
 
         const videoId = link.dataset.videoId;
         const clipStart = link.dataset.start || '0';
@@ -500,8 +534,10 @@ function setupProgressInfoMusicHoverHandlers(container) {
     };
 
     const handleMouseOut = (event) => {
-        // Don't clear on mouseout, keep preview open
-        // Preview will only clear when hovering to a different title
+        // Hide tooltip on mouseout
+        if (disabledTooltip) {
+            disabledTooltip.style.display = 'none';
+        }
     };
 
     container.addEventListener('mouseover', handleMouseOver);

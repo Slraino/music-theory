@@ -3,7 +3,7 @@
     "note": "7",
     "progressions": [
       {
-        "chords": ["7dim", "3m", "6m", "6m"],
+        "chords": ["7o", "3m", "6m", "6m"],
         "theory": [],
         "music": []
       }
@@ -22,12 +22,12 @@
     "note": "6",
     "progressions": [
       {
-        "chords": ["6m7", "b6m7", "5m7", "#4hdim"],
+        "chords": ["6m7", "b6m7", "5m7", "#4ø7"],
         "theory": ["Chromatic Descending"],
         "music": []
       },
       {
-        "chords": ["6m", "b6aug", "1/5", "#4hdim"],
+        "chords": ["6m", "b6+", "1/5", "#4ø7"],
         "theory": ["Line Chilche", "Chromatic Descending"],
         "music": [
           { "artist": "μ's",  "title": "Snow Halation",  "part": "Pre-chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
@@ -188,22 +188,22 @@
     "note": "#4",
     "progressions": [
       {
-        "chords": ["#4dim", "7dim", "3m", "6m"],
+        "chords": ["#4o", "7o", "3m", "6m"],
         "theory": ["王道進行 variation"],
         "music": []
       },
       {
-        "chords": ["#4dim", "4m/b6", "3hdim/b7", "6m"],
+        "chords": ["#4o", "4m/b6", "3ø7/b7", "6m"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["#4dim", "4m/b6", "3m", "6m"],
+        "chords": ["#4o", "4m/b6", "3m", "6m"],
         "theory": ["王道進行 variation"],
         "music": []
       },
       {
-        "chords": ["#4dim", "4m/b6", "3m", "b3"],
+        "chords": ["#4o", "4m/b6", "3m", "b3"],
         "theory": [],
         "music": []
       }
@@ -213,7 +213,7 @@
     "note": "4",
     "progressions": [
       {
-        "chords": ["4", "7dim", "3m", "6m"],
+        "chords": ["4", "7o", "3m", "6m"],
         "theory": ["王道進行 variation"],
         "music": []
       },
@@ -238,7 +238,7 @@
         "music": []
       },
       {
-        "chords": [["4"], ["5"], ["6m"], ["7dim", "1"]],
+        "chords": [[["4"], ["5"], ["6m"], ["7o", "1"]]],
         "theory": [],
         "music": [
           { "artist": "上田麗奈",  "title": "リテラチュア",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
@@ -310,7 +310,7 @@
         ]
       },
       {
-        "chords": [["4add9"], ["5sus"], ["1/3", "5sus"], ["6m"]],
+        "chords": [["4(9)"], ["5sus"], ["1/3", "5sus"], ["6m"]],
         "theory": ["王道進行 variation"],
         "music": [
           { "artist": "ヨルシカ",  "title": "春泥棒",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
@@ -324,7 +324,7 @@
         ]
       },
       {
-        "chords": ["4", "5", "#5dim", "6m"],
+        "chords": ["4", "5", "#5o", "6m"],
         "theory": ["王道進行 variation"],
         "music": []
       },
@@ -352,7 +352,7 @@
         ]
       },
       {
-        "chords": [[["4M7"], ["4mM7"], ["3m7"], ["67"]], [["2m7"], ["57"], ["1M7"], ["#4hdim"]]],
+        "chords": [[["4M7"], ["4mM7"], ["3m7"], ["67"]], [["2m7"], ["57"], ["1M7"], ["#4ø7"]]],
         "theory": ["王道進行 variation"],
         "music": [
           { "artist": "藤井風",  "title": "きらり",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
@@ -364,12 +364,12 @@
         "music": []
       },
       {
-        "chords": ["4", "4m", "3m", "3dim"],
+        "chords": ["4", "4m", "3m", "3o"],
         "thoery": ["王道進行 variation"],
         "music": []
       },
       {
-        "chords": ["4", "4m", "3m", "b3dim"],
+        "chords": ["4", "4m", "3m", "b3o"],
         "thoery": ["王道進行 variation"],
         "music": [
           { "artist": "まふまふ",  "title": "女の子になりたい",  "part": "Intro",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
@@ -399,7 +399,7 @@
         ]
       },
       {
-        "chords": ["4", "3m", "6m", "#4dim"],
+        "chords": ["4", "3m", "6m", "#4o"],
         "thoery": ["丸サ進行 variation"],
         "music": []
       },
@@ -419,6 +419,10 @@
       },
       {
         "chords": ["4", "3m", "2", "5"],
+        "music": []
+      },
+      {
+        "chords": ["4", "3m", "2", "b2m"],
         "music": []
       },
       {
@@ -473,7 +477,7 @@
         "music": []
       },
       {
-        "chords": ["3m", "4", "#5dim", "6m"],
+        "chords": ["3m", "4", "#5o", "6m"],
         "music": []
       },
       {
@@ -567,7 +571,7 @@
     "note": "1",
     "progressions": [
       {
-        "chords": ["1", "7dim", "6m", "b6"],
+        "chords": ["1", "7o", "6m", "b6"],
         "theory": ["Modal Interchange"],
         "music": []
       },
@@ -584,7 +588,7 @@
         ]
       },
       {
-        "chords": [[["1"], ["7hdim", "3/#5"], ["6m"], ["5m", "17"]], [["4M7"], ["1/3"], ["2M7"], ["4/5", "4m/5"]]],
+        "chords": [[["1"], ["7ø7", "3/#5"], ["6m"], ["5m", "17"]], [["4M7"], ["1/3"], ["2M7"], ["4/5", "4m/5"]]],
         "music": [
           { "artist": "Official髭男dism",  "title": "Pretender",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
@@ -607,7 +611,7 @@
         "music": []
       },
       {
-        "chords": ["1", "b6dim", "6m", "b7"],
+        "chords": ["1", "b6o", "6m", "b7"],
         "music": []
       },
       {
@@ -683,12 +687,6 @@
         "music": []
       },
       {
-        "chords": ["1", "1", "3o", "6m"],
-        "music": [
-          { "artist": "Aira Yuuki",  "title": "Violet Snow",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
-        ]
-      },
-      {
         "chords": ["1", "3m", "6m", "5"],
         "music": [
           { "artist": "SEKAI NO OWARI",  "title": "Silent",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
@@ -703,6 +701,10 @@
       },
       {
         "chords": ["1", "3m", "2m", "5"],
+        "music": []
+      },
+      {
+        "chords": ["1M9", "b3M7(13)", "b2M7(13)", "7M9"],
         "music": []
       },
       {
@@ -722,7 +724,13 @@
         ]
       },
       {
-        "chords": ["1M7", "17", "1add6", "1+"],
+        "chords": ["1", "1", "3o", "6m"],
+        "music": [
+          { "artist": "Aira Yuuki",  "title": "Violet Snow",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+        ]
+      },
+      {
+        "chords": ["1M7", "17", "1(6)", "1+"],
         "theory": ["Chromatic Descending", "Pedal Note", "Line Cliche"],
         "music": []
       },
@@ -732,7 +740,7 @@
         "music": []
       },
       {
-        "chords": ["1(no3)", "1add6(no3)", "1(no3)", "1add6(no3)"],
+        "chords": ["1(no3)", "1(6, no3)", "1(no3)", "1(6, no3)"],
         "music": []
       },
       {

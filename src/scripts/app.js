@@ -1,9 +1,35 @@
+// ==================== APP CONFIGURATION ====================
+const AppConfig = {
+    // Audio settings
+    DEFAULT_MUSIC_VOLUME: 0.15,
+    DEFAULT_SFX_VOLUME: 50,
+    VOLUME_FADE_STEP: 0.1,
+    VOLUME_FADE_INTERVAL: 100,
+    YOUTUBE_FADE_INTERVAL: 500,
+    TRACK_RETRY_DELAY: 2000,
+    TRACK_END_DELAY: 500,
+    
+    // Sound effect frequencies
+    SFX_HOVER_FREQ: 700,
+    SFX_CLICK_FREQ: 1200,
+    SFX_CLICK_END_FREQ: 600,
+    SFX_HOVER_VOLUME: 0.05,
+    SFX_CLICK_VOLUME: 0.1,
+    SFX_HOVER_DURATION: 0.12,
+    SFX_CLICK_DURATION: 0.15,
+    
+    // Database
+    DB_NAME: 'MusicTheoryDB',
+    DB_VERSION: 2
+};
+
 // ==================== DATA SERVICE (Session-only cache) ====================
 const DataService = {
     chordProgressions: null,
     musicTheory: null,
     progressionInfo: null,
     chordGeneratorData: null,
+    systemTransfer: null,
     
     async getChordProgressions() {
         // Return cached if already loaded this session
@@ -148,6 +174,37 @@ const DataService = {
             return {};
         }
     },
+
+    async getSystemTransfer() {
+        // Return cached if already loaded this session
+        if (this.systemTransfer) {
+            return this.systemTransfer;
+        }
+
+        try {
+            const response = await fetch('pages/json/systemTransfer.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Validate data structure (should be object)
+            if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+                throw new Error('Invalid data format: expected object');
+            }
+
+            // Cache in memory for this session only
+            this.systemTransfer = data;
+            console.log('✓ Loaded systemTransfer.json');
+            return data;
+        } catch (error) {
+            console.error('Failed to load systemTransfer.json:', error);
+            console.warn('Using empty fallback for system transfer data');
+            this.systemTransfer = {};
+            return {};
+        }
+    },
     
     // Clear cache (for testing/refresh)
     clearCache() {
@@ -155,6 +212,7 @@ const DataService = {
         this.musicTheory = null;
         this.progressionInfo = null;
         this.chordGeneratorData = null;
+        this.systemTransfer = null;
     }
 };
 
@@ -193,19 +251,30 @@ const LoadingManager = {
 // ==================== INDEXEDDB (Settings ONLY) ====================
 class MusicTheoryDB {
     constructor() {
-        this.dbName = 'MusicTheoryDB';
-        this.version = 2; // Incremented version to trigger upgrade
+        this.dbName = AppConfig.DB_NAME;
+        this.version = AppConfig.DB_VERSION;
         this.db = null;
         this.ready = false;
+        this._initPromise = null;
     }
 
     async init() {
-        return new Promise((resolve, reject) => {
+        // Return existing promise if already initializing
+        if (this._initPromise) return this._initPromise;
+        
+        this._initPromise = new Promise((resolve, reject) => {
             const request = indexedDB.open(this.dbName, this.version);
 
             request.onerror = () => {
                 console.error('IndexedDB error:', request.error);
-                reject(request.error);
+                this._initPromise = null;
+                
+                // Handle version error by recreating database
+                if (request.error?.name === 'VersionError') {
+                    this._handleVersionError().then(resolve).catch(reject);
+                } else {
+                    reject(request.error);
+                }
             };
 
             request.onsuccess = () => {
@@ -228,6 +297,24 @@ class MusicTheoryDB {
                 if (!db.objectStoreNames.contains('settings')) {
                     db.createObjectStore('settings', { keyPath: 'key' });
                 }
+            };
+        });
+        
+        return this._initPromise;
+    }
+    
+    async _handleVersionError() {
+        console.log('Deleting old database and recreating...');
+        return new Promise((resolve, reject) => {
+            const deleteRequest = indexedDB.deleteDatabase(this.dbName);
+            deleteRequest.onsuccess = () => {
+                console.log('Database deleted, reinitializing...');
+                this._initPromise = null;
+                this.init().then(resolve).catch(reject);
+            };
+            deleteRequest.onerror = () => {
+                console.error('Failed to delete database:', deleteRequest.error);
+                reject(deleteRequest.error);
             };
         });
     }
@@ -351,23 +438,6 @@ db.init().then(() => {
     db.migrateFromLocalStorage();
 }).catch(error => {
     console.error('Failed to initialize IndexedDB:', error);
-    
-    // If version error, delete and recreate the database
-    if (error.name === 'VersionError') {
-        console.log('Deleting old database and recreating...');
-        const deleteRequest = indexedDB.deleteDatabase('MusicTheoryDB');
-        deleteRequest.onsuccess = () => {
-            console.log('Database deleted, reinitializing...');
-            db.init().then(() => {
-                db.migrateFromLocalStorage();
-            }).catch(err => {
-                console.error('Failed to reinitialize after delete:', err);
-            });
-        };
-        deleteRequest.onerror = () => {
-            console.error('Failed to delete database:', deleteRequest.error);
-        };
-    }
 });
 
 /* ==================== ROUTER ==================== */
@@ -539,6 +609,10 @@ class Router {
         if (typeof window.clearBackgroundPreview === 'function') {
             window.clearBackgroundPreview();
         }
+        // Cleanup chord generator resources
+        if (typeof window.cleanupChordGenerator === 'function') {
+            window.cleanupChordGenerator();
+        }
     }
 
     initPage(page) {
@@ -605,6 +679,7 @@ window.clearBackgroundPreview = () => {
 };
 
 let youTubeVolumeCheckInterval;
+let musicFadeInInterval; // Track fadeIn interval to prevent stacking
 
 function startYouTubeVolumeControl(iframe) {
     stopYouTubeVolumeControl();
@@ -615,30 +690,36 @@ function startYouTubeVolumeControl(iframe) {
                 // Fade out music to 0% volume
                 let currentVol = soundEffects.audioElement.volume;
                 if (currentVol > 0) {
-                    soundEffects.audioElement.volume = Math.max(0, currentVol - 0.1);
+                    soundEffects.audioElement.volume = Math.max(0, currentVol - AppConfig.VOLUME_FADE_STEP);
                 }
             }
         } catch (e) {
             // Ignore errors
         }
-    }, 500);
+    }, AppConfig.YOUTUBE_FADE_INTERVAL);
 }
 
 function stopYouTubeVolumeControl() {
     clearInterval(youTubeVolumeCheckInterval);
     
+    // Clear any existing fadeIn to prevent stacking
+    if (musicFadeInInterval) {
+        clearInterval(musicFadeInInterval);
+        musicFadeInInterval = null;
+    }
+    
     // Restore music volume
     if (soundEffects && soundEffects.audioElement && soundEffects.musicPlaying) {
         const targetVol = soundEffects.musicVolume;
-        const currentVol = soundEffects.audioElement.volume;
         
-        const fadeInInterval = setInterval(() => {
+        musicFadeInInterval = setInterval(() => {
             if (soundEffects.audioElement.volume < targetVol) {
-                soundEffects.audioElement.volume = Math.min(targetVol, soundEffects.audioElement.volume + 0.1);
+                soundEffects.audioElement.volume = Math.min(targetVol, soundEffects.audioElement.volume + AppConfig.VOLUME_FADE_STEP);
             } else {
-                clearInterval(fadeInInterval);
+                clearInterval(musicFadeInInterval);
+                musicFadeInInterval = null;
             }
-        }, 100);
+        }, AppConfig.VOLUME_FADE_INTERVAL);
     }
 }
 
@@ -661,12 +742,34 @@ class SoundEffects {
         this.initialized = false;
         this.musicPlaying = false;
         this.musicGain = null;
-        this.musicVolume = localStorage.getItem('musicVolume') ? parseFloat(localStorage.getItem('musicVolume')) : 0.15;
-        this.shouldPlayMusic = localStorage.getItem('musicEnabled') !== 'false';
-        this.sfxVolume = localStorage.getItem('sfxVolume') ? parseFloat(localStorage.getItem('sfxVolume')) : 50;
-        this.sfxEnabled = localStorage.getItem('sfxEnabled') !== 'false';
+        this.musicVolume = AppConfig.DEFAULT_MUSIC_VOLUME;
+        this.shouldPlayMusic = true;
+        this.sfxVolume = AppConfig.DEFAULT_SFX_VOLUME;
+        this.sfxEnabled = true;
         this.audioElement = null;
         this.currentTrackIndex = 0;
+        this._settingsLoaded = false;
+    }
+    
+    async loadSettings() {
+        if (this._settingsLoaded) return;
+        try {
+            if (db.ready) {
+                const musicVol = await db.get('settings', 'musicVolume');
+                const musicEnabled = await db.get('settings', 'musicEnabled');
+                const sfxVol = await db.get('settings', 'sfxVolume');
+                const sfxEnabled = await db.get('settings', 'sfxEnabled');
+                
+                if (musicVol !== null) this.musicVolume = musicVol;
+                if (musicEnabled !== null) this.shouldPlayMusic = musicEnabled;
+                if (sfxVol !== null) this.sfxVolume = sfxVol;
+                if (sfxEnabled !== null) this.sfxEnabled = sfxEnabled;
+                
+                this._settingsLoaded = true;
+            }
+        } catch (e) {
+            console.warn('Failed to load audio settings from IndexedDB:', e);
+        }
     }
 
     init() {
@@ -687,15 +790,15 @@ class SoundEffects {
     }
 
     playHoverSound() {
-        this._playSoundEffect(700, 0.05, 0.12);
+        this._playSoundEffect(AppConfig.SFX_HOVER_FREQ, AppConfig.SFX_HOVER_VOLUME, AppConfig.SFX_HOVER_DURATION);
     }
 
     playClickSound() {
-        this._playSoundEffect(1200, 0.1, 0.15, 600);
+        this._playSoundEffect(AppConfig.SFX_CLICK_FREQ, AppConfig.SFX_CLICK_VOLUME, AppConfig.SFX_CLICK_DURATION, AppConfig.SFX_CLICK_END_FREQ);
     }
 
     playSoftBeepSound() {
-        this._playSoundEffect(700, 0.05, 0.12);
+        this._playSoundEffect(AppConfig.SFX_HOVER_FREQ, AppConfig.SFX_HOVER_VOLUME, AppConfig.SFX_HOVER_DURATION);
     }
 
     playToneSound(frequency, volumeFactor, duration, endFrequency = null) {
@@ -724,7 +827,6 @@ class SoundEffects {
 
     setMusicVolume(volume) {
         this.musicVolume = Math.max(0, Math.min(1, volume / 100));
-        localStorage.setItem('musicVolume', this.musicVolume);
         if (typeof db !== 'undefined' && db.ready) {
             db.set('settings', 'musicVolume', this.musicVolume).catch(() => {});
         }
@@ -735,7 +837,6 @@ class SoundEffects {
 
     setSfxVolume(volume) {
         this.sfxVolume = Math.max(0, Math.min(100, volume));
-        localStorage.setItem('sfxVolume', this.sfxVolume);
         if (typeof db !== 'undefined' && db.ready) {
             db.set('settings', 'sfxVolume', this.sfxVolume).catch(() => {});
         }
@@ -743,7 +844,6 @@ class SoundEffects {
 
     setSfxEnabled(enabled) {
         this.sfxEnabled = enabled;
-        localStorage.setItem('sfxEnabled', enabled ? 'true' : 'false');
         if (typeof db !== 'undefined' && db.ready) {
             db.set('settings', 'sfxEnabled', enabled).catch(() => {});
         }
@@ -776,7 +876,7 @@ class SoundEffects {
 
     playNextTrackAfterDelay() {
         if (this.musicPlaying) {
-            setTimeout(() => this.playNextTrack(), 2000);
+            setTimeout(() => this.playNextTrack(), AppConfig.TRACK_RETRY_DELAY);
         }
     }
 
@@ -785,7 +885,6 @@ class SoundEffects {
         if (!this.audioContext) this.init();
 
         this.musicPlaying = true;
-        localStorage.setItem('musicEnabled', 'true');
         if (typeof db !== 'undefined' && db.ready) {
             db.set('settings', 'musicEnabled', true).catch(() => {});
         }
@@ -796,7 +895,7 @@ class SoundEffects {
             this.audioElement.volume = this.musicVolume;
 
             this.audioElement.addEventListener('ended', () => {
-                setTimeout(() => this.playNextTrack(), 500);
+                setTimeout(() => this.playNextTrack(), AppConfig.TRACK_END_DELAY);
             });
 
             this.audioElement.addEventListener('error', (err) => {
@@ -810,7 +909,6 @@ class SoundEffects {
 
     stopBackgroundMusic() {
         this.musicPlaying = false;
-        localStorage.setItem('musicEnabled', 'false');
         if (typeof db !== 'undefined' && db.ready) {
             db.set('settings', 'musicEnabled', false).catch(() => {});
         }
@@ -827,7 +925,10 @@ class SoundEffects {
         });
     }
 
-    initUI() {
+    async initUI() {
+        // Load settings from IndexedDB first
+        await this.loadSettings();
+        
         // Attach to existing buttons
         this.attachToElements(document.querySelectorAll('button, a, .clickable-line, .back-btn, .group-title'));
 
@@ -863,41 +964,19 @@ class SoundEffects {
 
         // SFX toggle
         if (sfxToggleBtn) {
-            const updateState = () => {
+            const updateSfxState = () => {
                 sfxToggleBtn.classList.toggle('active', this.sfxEnabled);
                 sfxToggleBtn.textContent = this.sfxEnabled ? '🔊' : '🔇';
             };
-            updateState();
+            updateSfxState();
             sfxToggleBtn.addEventListener('click', () => {
                 this.setSfxEnabled(!this.sfxEnabled);
-                updateState();
+                updateSfxState();
             });
         }
 
-        // Video Preview toggle
-        if (previewToggleBtn && previewLabel) {
-            let previewEnabled = localStorage.getItem('previewEnabled') !== 'false';
-            
-            const updatePreviewState = () => {
-                previewToggleBtn.classList.toggle('active', previewEnabled);
-                previewToggleBtn.textContent = previewEnabled ? '🎬' : '🚫';
-                previewLabel.textContent = previewEnabled ? 'Preview: On' : 'Preview: Off';
-                window.videoPreviewEnabled = previewEnabled;
-                localStorage.setItem('previewEnabled', previewEnabled);
-            };
-            
-            updatePreviewState();
-            
-            previewToggleBtn.addEventListener('click', () => {
-                previewEnabled = !previewEnabled;
-                updatePreviewState();
-                
-                // Clear preview if disabling
-                if (!previewEnabled && typeof window.clearBackgroundPreview === 'function') {
-                    window.clearBackgroundPreview();
-                }
-            });
-        }
+        // Video Preview disabled by default (no setting in control panel)
+        window.videoPreviewEnabled = false;
 
         // Music toggle
         if (musicToggleBtn) {
