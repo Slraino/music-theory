@@ -70,7 +70,7 @@ let lastProgressionIndex = -1;
 let recentProgressionIndices = [];
 let isSubstituted = [];
 let isProgressionModified = false; // Track if user has manually modified the progression
-let bpm = 200;
+let isSubstituteMode = false; // Track if substitute mode is active
 let originalPhrases = null; // Store original phrases when showing song-specific chords
 let currentlyPlayingSong = null; // Track currently playing song for display
 let currentProgressionName = null; // Track current progression name for variation message
@@ -121,7 +121,6 @@ function showSongChords(song, progressionName) {
         // Show variation message in tooltip, keep progression name visible
         showVariationMessage(progressionName, songPhrases);
         
-        console.log('Showing song-specific chords for:', song.title, song.chordVariation);
         return true;
     } catch (error) {
         console.error('Error in showSongChords:', error);
@@ -141,7 +140,6 @@ function restoreSongChords() {
     // Restore original progression name display
     restoreProgressionNameDisplay();
     
-    console.log('Restored original chords');
     originalPhrases = null;
 }
 
@@ -152,6 +150,12 @@ function showVariationMessage(progressionName, songPhrases) {
 
     // Keep the progression name visible, but apply variation styling if non-diatonic
     updateProgressionNameDisplay(progressionName || [], songPhrases || []);
+
+    // Ensure the progression name tag has the variation class (for chordVariation songs)
+    const tag = container.querySelector('.progression-name-tag');
+    if (tag && !tag.classList.contains('variation')) {
+        tag.classList.add('variation');
+    }
 
     const mainName = progressionName && Array.isArray(progressionName)
         ? progressionName.filter(name => name.toLowerCase() !== 'variation').join(' ')
@@ -173,7 +177,7 @@ function restoreProgressionNameDisplay() {
 }
 
 function attachVariationTooltipToProgressionDisplay(message) {
-    const display = document.getElementById('progressionDisplay');
+    const display = document.getElementById('progressionNameDisplay');
     if (!display) return;
 
     display.dataset.variationTooltip = message;
@@ -193,7 +197,7 @@ function attachVariationTooltipToProgressionDisplay(message) {
         tooltip.textContent = text;
         const rect = display.getBoundingClientRect();
         tooltip.style.left = rect.left + 'px';
-        tooltip.style.top = (rect.top - 36) + 'px';
+        tooltip.style.top = (rect.bottom + 8) + 'px';
         tooltip.style.display = 'block';
     };
 
@@ -209,7 +213,7 @@ function attachVariationTooltipToProgressionDisplay(message) {
 }
 
 function detachVariationTooltipFromProgressionDisplay() {
-    const display = document.getElementById('progressionDisplay');
+    const display = document.getElementById('progressionNameDisplay');
     if (!display) return;
 
     if (display._variationTooltipHandlers) {
@@ -229,6 +233,166 @@ function getCurrentPhrases() {
     return [currentBars.map(bar => Array.isArray(bar) ? bar : [bar])];
 }
 
+// Check if a single chord is diatonic in major key
+// Convert formula notation (e.g., ["1", "b3", "5"]) to semitone intervals
+function formulaToIntervals(formula, defaultDegrees, accidentals) {
+    if (!formula || !Array.isArray(formula)) return [0, 4, 7]; // Default major triad
+    
+    // Build degree to semitone map from defaultDegrees
+    const degreeMap = {};
+    if (defaultDegrees) {
+        defaultDegrees.forEach(d => {
+            degreeMap[d.degree] = d.system;
+        });
+    }
+    // Fallback defaults
+    if (!degreeMap['1']) {
+        Object.assign(degreeMap, { '1': 0, '2': 2, '3': 4, '4': 5, '5': 7, '6': 9, '7': 11, '9': 14, '11': 17, '13': 21 });
+    }
+    
+    // Build accidental adjustment map
+    const accidentalMap = {};
+    if (accidentals) {
+        accidentals.forEach(a => {
+            accidentalMap[a.accidental] = a.adjustment;
+        });
+    }
+    // Fallback defaults
+    if (!accidentalMap['b']) {
+        Object.assign(accidentalMap, { 'bb': -2, 'b': -1, '#': 1, '##': 2 });
+    }
+    
+    return formula.map(note => {
+        // Parse accidental and degree from note (e.g., "b3", "#5", "bb7", "1")
+        const match = note.match(/^(bb|##|b|#)?(\d+)$/);
+        if (!match) return 0;
+        
+        const accidental = match[1] || '';
+        const degree = match[2];
+        
+        let semitone = degreeMap[degree] || 0;
+        semitone += accidentalMap[accidental] || 0;
+        
+        return semitone;
+    });
+}
+
+// Build chord intervals map from chordIntervals formulas
+function buildChordIntervalsMap(chordIntervals, defaultDegrees, accidentals) {
+    const map = { '': [0, 4, 7] }; // Default major triad
+    
+    if (!chordIntervals) return map;
+    
+    // Process all categories
+    const categories = ['triads', 'sixths', 'sevenths', 'ninths', 'elevenths', 'thirteenths', 'suspended', 'altered', 'powerChords'];
+    categories.forEach(category => {
+        if (chordIntervals[category] && Array.isArray(chordIntervals[category])) {
+            chordIntervals[category].forEach(chord => {
+                if (chord.symbol !== undefined && chord.formula) {
+                    map[chord.symbol] = formulaToIntervals(chord.formula, defaultDegrees, accidentals);
+                }
+            });
+        }
+    });
+    
+    return map;
+}
+
+function isChordDiatonic(chord) {
+    // Get data from systemTransfer if available, otherwise use defaults
+    const diatonicPitchesArray = (systemTransferData && systemTransferData.diatonicPitches) 
+        ? systemTransferData.diatonicPitches 
+        : [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26, 28];
+    const diatonicPitches = new Set(diatonicPitchesArray);
+    
+    // Build degree to semitone map
+    const degreeToSemitone = {};
+    if (systemTransferData && systemTransferData.defaultDegrees) {
+        systemTransferData.defaultDegrees.forEach(d => {
+            degreeToSemitone[d.degree] = d.system;
+        });
+        // Add octave extensions
+        degreeToSemitone['8'] = 12;
+        degreeToSemitone['10'] = 16;
+        degreeToSemitone['12'] = 19;
+        degreeToSemitone['14'] = 23;
+    } else {
+        Object.assign(degreeToSemitone, { '1': 0, '2': 2, '3': 4, '4': 5, '5': 7, '6': 9, '7': 11,
+            '8': 12, '9': 14, '10': 16, '11': 17, '12': 19, '13': 21, '14': 23 });
+    }
+    
+    // Build chord intervals map from formulas, or use pre-computed map if available
+    let qualityIntervals;
+    if (systemTransferData && systemTransferData.chordIntervalsMap) {
+        // Use pre-computed map if available (faster)
+        qualityIntervals = systemTransferData.chordIntervalsMap;
+    } else if (systemTransferData && systemTransferData.chordIntervals) {
+        // Build from formulas
+        qualityIntervals = buildChordIntervalsMap(
+            systemTransferData.chordIntervals,
+            systemTransferData.defaultDegrees,
+            systemTransferData.accidentalsAlgorithm
+        );
+    } else {
+        qualityIntervals = { '': [0, 4, 7], 'm': [0, 3, 7], 'o': [0, 3, 6], '7': [0, 4, 7, 10], 'M7': [0, 4, 7, 11] };
+    }
+    
+    // Handle slash chords - parse both chord and bass note
+    const slashParts = chord.split('/');
+    const baseChord = slashParts[0];
+    const bassNote = slashParts[1] || null; // e.g., "7" in "5/7"
+    
+    // Extract degree with possible alteration and quality
+    // Degree is only 1-7 (single digit), everything after is quality
+    const degreeMatch = baseChord.match(/^([b#]?)([1-7])(.*)/);
+    if (!degreeMatch) return true;
+    
+    const alteration = degreeMatch[1];
+    const degreeNum = degreeMatch[2];
+    const quality = degreeMatch[3];
+    
+    // Get root pitch from degree
+    let rootPitch = degreeToSemitone[degreeNum];
+    if (rootPitch === undefined) return true; // Unknown degree
+    
+    // Apply alteration to root
+    if (alteration === 'b') rootPitch -= 1;
+    if (alteration === '#') rootPitch += 1;
+    
+    // Get intervals for this quality (default to major triad if unknown)
+    const intervals = qualityIntervals[quality] || [0, 4, 7];
+    
+    // Check all pitches in the chord (root + each interval)
+    for (const interval of intervals) {
+        const absolutePitch = rootPitch + interval;
+        // Normalize to within our diatonic set range (0-28)
+        const normalizedPitch = absolutePitch % 24;
+        if (!diatonicPitches.has(normalizedPitch)) {
+            return false; // This note is not in major scale
+        }
+    }
+    
+    // Check bass note if it's a slash chord
+    if (bassNote) {
+        const bassMatch = bassNote.match(/^([b#]?)(\d+)/);
+        if (bassMatch) {
+            const bassAlteration = bassMatch[1];
+            const bassDegreeNum = bassMatch[2];
+            let bassPitch = degreeToSemitone[bassDegreeNum];
+            if (bassPitch !== undefined) {
+                if (bassAlteration === 'b') bassPitch -= 1;
+                if (bassAlteration === '#') bassPitch += 1;
+                const normalizedBassPitch = bassPitch % 24;
+                if (!diatonicPitches.has(normalizedBassPitch)) {
+                    return false; // Bass note is not diatonic
+                }
+            }
+        }
+    }
+    
+    return true; // All notes are diatonic
+}
+
 // Visual-only update of chord grid (doesn't affect currentBars)
 function updateChordGridVisualOnly(phrases) {
     const display = document.getElementById('progressionDisplay');
@@ -236,21 +400,12 @@ function updateChordGridVisualOnly(phrases) {
 
     display.innerHTML = '';
 
-    const displayPhrases = (phrases || []).map(phrase => ({ bars: phrase, isPlaceholder: false }));
-    const barsPerPhrase = (phrases && phrases[0] && phrases[0].length) || currentBars.length || 4;
-
-    if (displayPhrases.length < 2) {
-        const placeholderBars = Array.from({ length: barsPerPhrase }, () => ['']);
-        displayPhrases.push({ bars: placeholderBars, isPlaceholder: true });
-    }
+    const displayPhrases = (phrases || []).map(phrase => ({ bars: phrase }));
 
     displayPhrases.forEach(phraseData => {
         const phraseContainer = document.createElement('div');
         phraseContainer.className = 'phrase-container';
         phraseContainer.classList.add('song-specific-display'); // Mark as visual-only
-        if (phraseData.isPlaceholder) {
-            phraseContainer.classList.add('phrase-placeholder');
-        }
 
         phraseData.bars.forEach(bar => {
             const barDiv = document.createElement('div');
@@ -266,6 +421,10 @@ function updateChordGridVisualOnly(phrases) {
 
                 const chordDiv = document.createElement('div');
                 chordDiv.className = 'chord-item';
+                // Add substituted class for non-diatonic chords (salmon color)
+                if (!isChordDiatonic(degree)) {
+                    chordDiv.classList.add('substituted');
+                }
                 const displayText = showDegrees ? degree : chordGenerator.degreeToNote(selectedKey, degree);
                 chordDiv.textContent = displayText;
 
@@ -283,14 +442,25 @@ function updateChordGridVisualOnly(phrases) {
 // Normalize chord data to phrases format
 // phrases = [[bar, bar, bar], [bar, bar, bar]] where bar = [chord, chord, ...]
 function normalizePhrases(chords) {
-    if (!chords || !Array.isArray(chords)) return [[[1]]];
+    if (!chords || !Array.isArray(chords)) return [[["1"]]];
     
     // Check if first element is an array
     if (chords.length > 0 && Array.isArray(chords[0])) {
         // Check if first element of first element is also an array (fully nested phrases format)
+        // e.g., [[["4"], ["5"]], [["3m"], ["6m"]]] - 2 phrases, each with 2 bars
         if (chords[0].length > 0 && Array.isArray(chords[0][0])) {
-            // Already in phrases format: [[["4"], ["5"]], [["3m"], ["6m"]]]
             return chords;
+        }
+        
+        // Check if inner arrays contain only strings (bars format, not phrases)
+        // e.g., [["4M7"], ["4/5"], ["3m7"], ["6m7", "b6m7"]] - 1 phrase with 4 bars
+        const allInnerAreStringArrays = chords.every(item => 
+            Array.isArray(item) && item.every(el => typeof el === 'string')
+        );
+        
+        if (allInnerAreStringArrays) {
+            // This is bars format - wrap in single phrase
+            return [chords];
         }
         
         // It's chordVariation format: [["4", "5", "3m", "6m"], ["4", "5", "1", "1"]]
@@ -303,9 +473,10 @@ function normalizePhrases(chords) {
         });
     }
     
-    // Simple array of chords: ["4", "5", "3m", "6m"]
-    // Convert to single phrase with single-chord bars
-    return [chords.map(c => [c])];
+    // Simple/mixed array of chords: ["6m", "4", "5", ["1", "5/7"]]
+    // Some elements are strings (single chord bar), some are arrays (multi-chord bar)
+    // Convert to single phrase with proper bar format
+    return [chords.map(c => Array.isArray(c) ? c : [c])];
 }
 
 const KEYS = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
@@ -589,19 +760,15 @@ function renderChordGeneratorPage() {
 
     container.innerHTML = `
         <div class="key-selector">
-            <div class="left-spacer" id="progressionNameDisplay"></div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <div class="controls-left">
+                    <button class="icon-btn" title="Mouse Selection" style="opacity: 0.6;">🖱️</button>
+                    <button class="icon-btn" title="Chord Substitute" onclick="toggleSubstituteMode()" style="opacity: 0.6;">🔀</button>
+                </div>
+                <div class="left-spacer" id="progressionNameDisplay"></div>
+            </div>
             <button class="refresh-btn refresh-btn" onclick="refreshChords()">🔄 Refresh</button>
             <div class="controls-right">
-                <button class="toggle-btn" onclick="playProgression()" style="background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);">
-                    ▶️ Play
-                </button>
-                <div>
-                    <label>BPM:</label>
-                    <input type="range" id="bpmSlider" min="60" max="200" value="200" 
-                           oninput="updateBPM(this.value)" 
-                           style="width: 80px; vertical-align: middle;">
-                    <span id="bpmDisplay" style="font-size: 0.85em; color: #888;">200</span>
-                </div>
                 <div>
                     <label>Key:</label>
                     <select id="keySelect" onchange="changeKey(this.value)">
@@ -617,7 +784,9 @@ function renderChordGeneratorPage() {
             </div>
         </div>
         <div id="progressionDisplay" class="progression-grid"></div>
-        <div id="generatorMusic" class="generator-music"></div>
+        <div id="generatorMusicContainer" class="generator-music-container">
+            <div id="generatorMusic" class="generator-music"></div>
+        </div>
     `;
     
     // Setup tooltip on preview button
@@ -630,13 +799,31 @@ function changeKey(key) {
     refreshChords(); // Re-render current progression with new key
 }
 
-// Update BPM control
-window.updateBPM = function(value) {
-    bpm = parseInt(value);
-    const display = document.getElementById('bpmDisplay');
-    if (display) {
-        display.textContent = value;
+// Toggle chord substitute mode
+window.toggleSubstituteMode = function() {
+    isSubstituteMode = !isSubstituteMode;
+    const btn = document.querySelector('.icon-btn[title="Chord Substitute"]');
+    const display = document.getElementById('progressionDisplay');
+    
+    if (btn) {
+        if (isSubstituteMode) {
+            btn.style.opacity = '1';
+            btn.style.background = 'rgba(255, 200, 100, 0.3)';
+            btn.style.borderColor = 'rgba(255, 200, 100, 0.6)';
+        } else {
+            btn.style.opacity = '0.6';
+            btn.style.background = 'rgba(255, 255, 255, 0.1)';
+            btn.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        }
     }
+    
+    // Update cursor on progression display
+    if (display) {
+        display.style.cursor = isSubstituteMode ? 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\'><text x=\'0\' y=\'20\' font-size=\'20\'>🔀</text></svg>"), auto' : 'default';
+    }
+    
+    // Hide indicator when switching modes
+    hideAddIndicator();
 }
 
 // Toggle between degrees and notes
@@ -769,8 +956,8 @@ function refreshChords() {
             currentBars.push(bar);
             const parents = bar.map(chord => getDiatonicParent(chord));
             currentParents.push(parents);
-            // Mark as substituted if chord is different from its diatonic parent
-            isSubstituted.push(bar.map((chord, idx) => chord !== parents[idx]));
+            // Mark as substituted if chord is not diatonic (uses isChordDiatonic for proper pitch checking)
+            isSubstituted.push(bar.map(chord => !isChordDiatonic(chord)));
         });
     });
     
@@ -784,6 +971,56 @@ function refreshChords() {
     updateChordGrid(randomProgression.phrases);
     renderGeneratorMusic(randomProgression.music || [], randomProgression.progressionName);
     updateProgressionNameDisplay(randomProgression.progressionName, randomProgression.phrases);
+}
+
+// Check if current progression is a variation of the base progression
+// by comparing chords rather than relying on progressionName labels
+function isProgressionVariation(baseName, phrases) {
+    if (!baseName || !phrases || !allProgressions || allProgressions.length === 0) {
+        return false;
+    }
+    
+    // Flatten current chords for comparison
+    const currentChords = phrases.flat(Infinity).filter(c => c && typeof c === 'string');
+    if (currentChords.length === 0) return false;
+    
+    // Find the "base" progression - one with this name but WITHOUT "variation" in its name
+    let baseProgression = null;
+    for (const prog of allProgressions) {
+        if (!prog.progressionName || !Array.isArray(prog.progressionName)) continue;
+        
+        // Check if this progression has the same base name
+        const progBaseName = prog.progressionName.filter(n => n.toLowerCase() !== 'variation').join(' ');
+        if (progBaseName !== baseName) continue;
+        
+        // Check if this is the base (no "variation" label)
+        const hasVariationLabel = prog.progressionName.some(n => n.toLowerCase() === 'variation');
+        if (!hasVariationLabel) {
+            baseProgression = prog;
+            break;
+        }
+    }
+    
+    // If no base progression found, check if any chord is non-diatonic
+    if (!baseProgression) {
+        return !isProgressionDiatonic(phrases);
+    }
+    
+    // Flatten base progression chords
+    const baseChords = baseProgression.phrases.flat(Infinity).filter(c => c && typeof c === 'string');
+    
+    // Compare: if chords differ from base, it's a variation
+    if (currentChords.length !== baseChords.length) {
+        return true; // Different length = variation
+    }
+    
+    for (let i = 0; i < currentChords.length; i++) {
+        if (currentChords[i] !== baseChords[i]) {
+            return true; // Different chord = variation
+        }
+    }
+    
+    return false; // Chords match base = not a variation
 }
 
 // Check if a chord progression is fully diatonic
@@ -895,15 +1132,12 @@ function updateProgressionNameDisplay(progressionName, phrases) {
         return;
     }
     
-    // Check if the progression is diatonic based on actual chords
-    const isDiatonic = isProgressionDiatonic(phrases);
-    // Check if "variation" is explicitly in the progressionName array
-    const hasVariationLabel = progressionName.some(name => name.toLowerCase() === 'variation');
+    // Get the main progression name (without "variation" label)
     const mainName = progressionName.filter(name => name.toLowerCase() !== 'variation').join(' ');
     const displayName = mainName || progressionName.join(' ');
     
-    // Show as variation (salmon) if either: has "variation" label OR is non-diatonic
-    const isVariation = hasVariationLabel || !isDiatonic;
+    // Check if this is a variation by comparing chords with base progression
+    const isVariation = isProgressionVariation(mainName, phrases);
     
     if (isVariation) {
         container.innerHTML = `<span class="progression-name-tag variation" data-tooltip="This is a variation of ${escapeHtml(displayName)}">${escapeHtml(displayName)}</span>`;
@@ -977,14 +1211,14 @@ function checkAndShowMusicExamples() {
             
             if (isMatch) {
                 matchedMusic = prog.music || [];
-                matchedProgressionName = prog.progressionName || [];
-                matchedPhrases = prog.phrases || [];
+                matchedProgressionName = prog.progressionName || null;
+                matchedPhrases = prog.phrases || null;
                 break;
             }
         }
     }
 
-    if (matchedProgressionName && matchedPhrases) {
+    if (matchedPhrases && matchedMusic.length > 0) {
         currentProgressionName = matchedProgressionName;
         currentProgressionChords = matchedPhrases;
         updateProgressionNameDisplay(matchedProgressionName, matchedPhrases);
@@ -1226,8 +1460,6 @@ function autoPlayRandomMusic() {
         const clipStart = randomSong.clipStart || 0;
         const clipDuration = 15;
         
-        console.log('Auto-playing:', randomSong.title, 'from', currentMusicList.length, 'songs, duration:', clipDuration);
-        
         // Show song-specific chords if available
         if (randomSong.chordVariation) {
             showSongChords(randomSong, currentMusicProgressionName);
@@ -1402,10 +1634,6 @@ function updateChordGrid(phrases) {
         const phraseContainer = document.createElement('div');
         phraseContainer.className = 'phrase-container';
 
-        // Controls row below the phrase (refresh buttons only)
-        const controlsRow = document.createElement('div');
-        controlsRow.className = 'controls-row';
-
         phrase.forEach(bar => {
             const barIndex = barGlobalIndex++;
             const barDiv = document.createElement('div');
@@ -1418,6 +1646,8 @@ function updateChordGrid(phrases) {
             let cachedChordWrappers = null; // Cache DOM query
             
             barDiv.onmousemove = (e) => {
+                if (isSubstituteMode) return; // Don't show + indicator in substitute mode
+                
                 const mouseX = e.clientX;
                 
                 // Cache chord wrappers query (invalidated when bar content changes)
@@ -1457,10 +1687,6 @@ function updateChordGrid(phrases) {
                 e.preventDefault();
             };
 
-            // Controls cell for this bar
-            const controlsCell = document.createElement('div');
-            controlsCell.className = 'controls-cell';
-
             bar.forEach((degree, chordIndex) => {
                 const chordWrapper = document.createElement('div');
                 chordWrapper.className = 'chord-wrapper';
@@ -1472,27 +1698,35 @@ function updateChordGrid(phrases) {
                 }
                 const displayText = showDegrees ? degree : chordGenerator.degreeToNote(selectedKey, degree);
                 chordDiv.textContent = displayText;
-                chordDiv.title = 'Click: remove | Right-click: change chord';
+                chordDiv.title = 'Click: remove/substitute | Right-click: change chord';
                 
-                // Show - indicator when hovering over chord
+                // Show - indicator when hovering over chord (only when not in substitute mode)
                 chordDiv.onmouseenter = () => {
-                    // Get chord position for indicator
-                    const rect = chordDiv.getBoundingClientRect();
-                    showRemoveIndicator(rect.right + 8, rect.top + rect.height / 2);
+                    if (!isSubstituteMode) {
+                        // Get chord position for indicator
+                        const rect = chordDiv.getBoundingClientRect();
+                        showRemoveIndicator(rect.right + 8, rect.top + rect.height / 2);
+                    }
                 };
                 
                 chordDiv.onmousemove = (e) => {
-                    showRemoveIndicator(e.clientX, e.clientY);
+                    if (!isSubstituteMode) {
+                        showRemoveIndicator(e.clientX, e.clientY);
+                    }
                 };
                 
                 chordDiv.onmouseleave = () => {
                     hideAddIndicator();
                 };
                 
-                // Single click to remove chord
+                // Single click - substitute if in substitute mode, otherwise remove
                 chordDiv.onclick = (e) => {
                     e.stopPropagation();
-                    removeChordFromBar(barIndex, chordIndex);
+                    if (isSubstituteMode) {
+                        replaceWithSubstitute(barIndex, chordIndex, degree);
+                    } else {
+                        removeChordFromBar(barIndex, chordIndex);
+                    }
                 };
                 
                 // Right-click to open chord selector
@@ -1504,25 +1738,12 @@ function updateChordGrid(phrases) {
 
                 chordWrapper.appendChild(chordDiv);
                 barDiv.appendChild(chordWrapper);
-
-                // Refresh button for this chord (in controls row)
-                const refreshBtn = document.createElement('button');
-                refreshBtn.className = 'chord-control-btn';
-                refreshBtn.innerHTML = '🔄';
-                refreshBtn.title = 'Substitute chord (same function)';
-                refreshBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    replaceWithSubstitute(barIndex, chordIndex, degree);
-                };
-                controlsCell.appendChild(refreshBtn);
             });
 
             phraseContainer.appendChild(barDiv);
-            controlsRow.appendChild(controlsCell);
         });
 
         display.appendChild(phraseContainer);
-        display.appendChild(controlsRow);
     });
 
     // Always reserve space for a second phrase row to prevent layout shift
@@ -1550,10 +1771,7 @@ function updateChordGrid(phrases) {
         
         display.appendChild(reservedPhrase);
         
-        // Empty controls row for reserved phrase
-        const reservedControls = document.createElement('div');
-        reservedControls.className = 'controls-row phrase-reserved';
-        display.appendChild(reservedControls);
+        display.appendChild(reservedPhrase);
     }
 }
 
@@ -1723,8 +1941,8 @@ function showChordTypes(typeList, chordTypes, barIndex, chordIndex) {
             // Update parent if user manually selects a new diatonic chord
             const newParent = getDiatonicParent(degree);
             currentParents[barIndex][chordIndex] = newParent;
-            // Mark as substituted if different from parent
-            isSubstituted[barIndex][chordIndex] = (degree !== newParent);
+            // Mark as substituted if chord is not diatonic
+            isSubstituted[barIndex][chordIndex] = !isChordDiatonic(degree);
             // Rebuild phrases from currentBars for display
             const phrases = [currentBars];
             updateChordGrid(phrases);
@@ -1773,8 +1991,8 @@ function replaceWithSubstitute(barIndex, chordIndex, currentDegree) {
     
     currentBars[barIndex][chordIndex] = newDegree;
     
-    // Mark as substituted if different from parent, otherwise mark as parent
-    isSubstituted[barIndex][chordIndex] = (newDegree !== parentDegree);
+    // Mark as substituted if chord is not diatonic
+    isSubstituted[barIndex][chordIndex] = !isChordDiatonic(newDegree);
     
     // Rebuild phrases from currentBars for display
     const phrases = [currentBars];
@@ -1782,476 +2000,6 @@ function replaceWithSubstitute(barIndex, chordIndex, currentDegree) {
     
     // Check for matching progressions and show music examples
     checkAndShowMusicExamples();
-}
-
-// Audio playback functionality
-let audioContext = null;
-let previousVoicing = null; // Track previous chord voicing for voice leading
-
-async function playProgression() {
-    try {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        
-        // Resume audio context if suspended (browser autoplay policy)
-        if (audioContext.state === 'suspended') {
-            await audioContext.resume();
-        }
-        
-        if (currentBars.length === 0) return;
-        
-        // Reset voice leading for new progression
-        previousVoicing = null;
-        
-        // Calculate bar duration from BPM (assuming 4/4 time)
-        const barDuration = (60 / bpm) * 4; // 4 beats per bar
-        let currentTime = audioContext.currentTime;
-        
-        currentBars.forEach((bar) => {
-            const chordDuration = barDuration / bar.length;
-            let barTime = currentTime;
-            
-            bar.forEach((degree) => {
-                playChord(degree, barTime, chordDuration);
-                barTime += chordDuration;
-            });
-            currentTime += barDuration;
-        });
-    } catch (error) {
-        console.error('Failed to play progression:', error);
-    }
-}
-
-function playChord(degree, startTime, duration) {
-    // Get actual notes for the chord
-    const note = chordGenerator.degreeToNote(selectedKey, degree);
-    
-    // Extract bass note (root or slash bass)
-    let bassNote;
-    let mainChord = degree;
-    
-    if (degree.includes('/')) {
-        // Split main chord and bass degree
-        const parts = degree.split('/');
-        mainChord = parts[0];
-        const bassDegree = parts[1];
-        
-        // Convert bass degree to actual note (extract just degree number with accidentals, no quality)
-        const bassDegreeMatch = bassDegree.match(/^[b#]?[1-7]/);
-        if (bassDegreeMatch) {
-            const cleanBassDegree = bassDegreeMatch[0];
-            bassNote = chordGenerator.degreeToNote(selectedKey, cleanBassDegree);
-            // Extract just the note name (remove any quality that got appended)
-            const bassMatch = bassNote.match(/^[A-G][#b]?/);
-            bassNote = bassMatch ? bassMatch[0] : bassNote;
-        } else {
-            // Fallback: try to extract note from bassDegree directly
-            const bassMatch = bassDegree.match(/^[A-G][#b]?/);
-            bassNote = bassMatch ? bassMatch[0] : getBassNote(note);
-        }
-    } else {
-        bassNote = getBassNote(note);
-    }
-    
-    const bassFreq = getNoteFrequency(bassNote, ChordGenConfig.BASS_OCTAVE);
-    
-    // Get chord tones (without bass)
-    // Use the main chord (without slash) for voicing
-    const chordTones = getChordTones(chordGenerator.degreeToNote(selectedKey, mainChord));
-    
-    // Apply voice leading to get smooth voicing
-    const voicing = getClosestVoicing(chordTones, previousVoicing);
-    previousVoicing = voicing;
-    
-    // Play bass note with synthesis
-    playSynthNote(bassFreq, startTime, duration, ChordGenConfig.BASS_VOLUME);
-    
-    // Play voiced chord
-    voicing.forEach(freq => {
-        playSynthNote(freq, startTime, duration, ChordGenConfig.CHORD_VOLUME);
-    });
-}
-
-function playSynthNote(freq, startTime, duration, volume = ChordGenConfig.SYNTH_VOLUME) {
-    try {
-        if (!audioContext) return;
-        
-        // Synthesis fallback (piano-like sound)
-        const oscillator1 = audioContext.createOscillator();
-        const oscillator2 = audioContext.createOscillator();
-        const oscillator3 = audioContext.createOscillator();
-        
-        const gainNode1 = audioContext.createGain();
-        const gainNode2 = audioContext.createGain();
-        const gainNode3 = audioContext.createGain();
-        const masterGain = audioContext.createGain();
-        
-        oscillator1.type = 'triangle';
-        oscillator2.type = 'sine';
-        oscillator3.type = 'sine';
-        
-        oscillator1.frequency.setValueAtTime(freq, startTime);
-        oscillator2.frequency.setValueAtTime(freq * 2, startTime);
-        oscillator3.frequency.setValueAtTime(freq * 3, startTime);
-        
-        gainNode1.gain.setValueAtTime(ChordGenConfig.HARMONIC_1_GAIN, startTime);
-        gainNode2.gain.setValueAtTime(ChordGenConfig.HARMONIC_2_GAIN, startTime);
-        gainNode3.gain.setValueAtTime(ChordGenConfig.HARMONIC_3_GAIN, startTime);
-        
-        masterGain.gain.setValueAtTime(0, startTime);
-        masterGain.gain.linearRampToValueAtTime(volume, startTime + ChordGenConfig.ATTACK_TIME);
-        masterGain.gain.setValueAtTime(volume, startTime + duration * ChordGenConfig.RELEASE_START);
-        masterGain.gain.exponentialRampToValueAtTime(ChordGenConfig.MIN_GAIN, startTime + duration * ChordGenConfig.RELEASE_END);
-        
-        oscillator1.connect(gainNode1);
-        oscillator2.connect(gainNode2);
-        oscillator3.connect(gainNode3);
-        
-        gainNode1.connect(masterGain);
-        gainNode2.connect(masterGain);
-        gainNode3.connect(masterGain);
-        masterGain.connect(audioContext.destination);
-        
-        oscillator1.start(startTime);
-        oscillator2.start(startTime);
-        oscillator3.start(startTime);
-        
-        oscillator1.stop(startTime + duration);
-        oscillator2.stop(startTime + duration);
-        oscillator3.stop(startTime + duration);
-    } catch (error) {
-        console.warn('Failed to play synth note:', error);
-    }
-}
-
-// Voice Leading System
-
-// Get bass note from chord symbol (always uses root, even for slash chords)
-function getBassNote(chordSymbol) {
-    // Check for slash chord (e.g., C/E or 1/3)
-    if (chordSymbol.includes('/')) {
-        const parts = chordSymbol.split('/');
-        const bassNote = parts[1]; // The note after the slash
-        // Extract just the note name (handle cases like "3m" or just "3")
-        const bassMatch = bassNote.match(/^[A-G][#b]?/);
-        return bassMatch ? bassMatch[0] : bassNote;
-    }
-    // Return root note (before slash or entire symbol)
-    const rootMatch = chordSymbol.match(/^[A-G][#b]?/);
-    return rootMatch ? rootMatch[0] : 'C';
-}
-
-// Get note frequency for specific octave
-function getNoteFrequency(noteName, octave = 4) {
-    const noteFrequencies = {
-        'C': 16.35, 'C#': 17.32, 'Db': 17.32,
-        'D': 18.35, 'D#': 19.45, 'Eb': 19.45,
-        'E': 20.60, 'F': 21.83, 'F#': 23.12, 'Gb': 23.12,
-        'G': 24.50, 'G#': 25.96, 'Ab': 25.96,
-        'A': 27.50, 'A#': 29.14, 'Bb': 29.14,
-        'B': 30.87
-    };
-    
-    const baseFreq = noteFrequencies[noteName] || 16.35;
-    return baseFreq * Math.pow(2, octave);
-}
-
-// Get chord tones as note names (without octave)
-function getChordTones(chordSymbol) {
-    // Remove slash chord bass if present
-    const mainChord = chordSymbol.split('/')[0];
-    
-    // Extract root and quality
-    const rootMatch = mainChord.match(/^[A-G][#b]?/);
-    const root = rootMatch ? rootMatch[0] : 'C';
-    const quality = mainChord.slice(root.length);
-    
-    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const rootIndex = noteNames.findIndex(n => n === root || n === root.replace('b', '#'));
-    
-    if (rootIndex === -1) return [root];
-    
-    let intervals = [];
-    let alterations = []; // Track alterations like #5, b9, etc.
-    
-    // Extract alterations from quality (e.g., M7#5 -> #5, m7b9 -> b9)
-    const alterationMatches = quality.match(/(bb|##|b|#)([1-9])/g);
-    if (alterationMatches) {
-        alterationMatches.forEach(alt => {
-            alterations.push(alt);
-        });
-    }
-    
-    // Determine intervals based on chord quality
-    // Try systemTransfer first for data-driven approach
-    const systemIntervals = getChordIntervalsFromSystemTransfer(quality);
-    if (systemIntervals) {
-        intervals = systemIntervals;
-    }
-    // Fallback to hardcoded values if systemTransfer not available or quality not found
-    else if (quality.includes('mM7') || quality === 'mM7') {
-        intervals = [0, 3, 7, 11]; // Minor major 7th
-    } else if (quality.includes('m7') || quality === 'm7') {
-        intervals = [0, 3, 7, 10]; // Minor 7th
-    } else if (quality.includes('maj7') || quality === 'M7' || quality === 'Δ7') {
-        intervals = [0, 4, 7, 11]; // Major 7th
-    } else if (quality.includes('7')) {
-        intervals = [0, 4, 7, 10]; // Dominant 7th
-    } else if (quality.includes('6')) {
-        // Sixth chords
-        if (quality.includes('m6')) {
-            intervals = [0, 3, 7, 9]; // Minor sixth
-        } else if (quality.includes('69')) {
-            intervals = [0, 4, 7, 9, 2]; // Major sixth add nine
-        } else if (quality.includes('m69')) {
-            intervals = [0, 3, 7, 9, 2]; // Minor sixth add nine
-        } else {
-            intervals = [0, 4, 7, 9]; // Major sixth
-        }
-    } else if (quality.includes('ø7') || quality.includes('hdim')) {
-        intervals = [0, 3, 6, 10]; // Half-diminished 7th
-    } else if (quality.includes('o7')) {
-        intervals = [0, 3, 6, 9]; // Fully diminished 7th (double flat 7th)
-    } else if (quality.includes('dim') || quality.includes('o')) {
-        intervals = [0, 3, 6]; // Diminished triad
-    } else if (quality.includes('m')) {
-        intervals = [0, 3, 7]; // Minor
-    } else if (quality.includes('aug') || quality.includes('+')) {
-        intervals = [0, 4, 8]; // Augmented
-    } else if (quality.includes('sus4')) {
-        intervals = [0, 5, 7]; // Sus4
-    } else if (quality.includes('sus2')) {
-        intervals = [0, 2, 7]; // Sus2
-    } else if (quality.includes('sus')) {
-        intervals = [0, 5, 7]; // Sus (default to Sus4)
-    } else if (quality.includes('add') || quality.includes('(')) {
-        // Handle add chords (both old "add" format and new parentheses format)
-        intervals = [0, 4, 7]; // Start with major triad
-        
-        // NEW FORMAT: Parse parentheses notation like (9), (6), (13), (6, no3), etc.
-        if (quality.includes('(')) {
-            const parenMatch = quality.match(/\(([^)]+)\)/);
-            if (parenMatch) {
-                const content = parenMatch[1]; // e.g., "9", "6", "13", "6, no3"
-                const parts = content.split(',').map(p => p.trim()); // Split by comma
-                
-                parts.forEach(part => {
-                    // Handle additions (numbers like 9, 11, 13, 6, etc. with optional # or b)
-                    if (/^(bb|##|b|#)?\d+$/.test(part)) {
-                        const systemInterval = getDegreeIntervalFromSystemTransfer(part);
-                        if (systemInterval !== null) {
-                            if (!intervals.includes(systemInterval)) {
-                                intervals.push(systemInterval);
-                            }
-                            return;
-                        }
-
-                        // Extract accidental (# or b) and number
-                        const accidentalMatch = part.match(/^([#b])?(\d+)$/);
-                        const accidental = accidentalMatch?.[1] || ''; // '#', 'b', or ''
-                        const num = parseInt(accidentalMatch?.[2]);
-                        let interval;
-                        
-                        // Convert note number to base interval
-                        if (num === 2 || num === 9) interval = 2;  // 9 = 2 octave up
-                        else if (num === 4 || num === 11) interval = 5; // 11 = 4 octave up
-                        else if (num === 6 || num === 13) interval = 9; // 13 = 6 octave up
-                        else if (num === 5) interval = 7;
-                        
-                        // Adjust interval based on accidental
-                        if (interval !== undefined) {
-                            if (accidental === '#') {
-                                interval += 1; // Raise by semitone
-                            } else if (accidental === 'b') {
-                                interval -= 1; // Lower by semitone
-                            }
-                            
-                            if (!intervals.includes(interval)) {
-                                intervals.push(interval);
-                            }
-                        }
-                    }
-                    // Handle removals (no3, no5, etc.) - handled in final pass below
-                    else if (part.includes('no')) {
-                        // These will be processed by applyOmissionsToIntervals at the end
-                    }
-                });
-            }
-        }
-        // OLD FORMAT: Legacy "add" notation (for backward compatibility)
-        else if (quality.includes('add')) {
-            if (quality.includes('add2') || quality.includes('add9')) {
-                if (!intervals.includes(2)) intervals.push(2);
-            } else if (quality.includes('add#4')) {
-                if (!intervals.includes(6)) intervals.push(6);
-            } else if (quality.includes('add4')) {
-                if (!intervals.includes(5)) intervals.push(5);
-            } else if (quality.includes('add6')) {
-                if (!intervals.includes(9)) intervals.push(9);
-            } else if (quality.includes('add#5')) {
-                if (!intervals.includes(8)) intervals.push(8);
-            }
-            
-            // Handle removals (no3), (no5), etc. for old format - handled in final pass below
-        }
-        
-        // Sort intervals
-        intervals.sort((a, b) => a - b);
-    } else {
-        intervals = [0, 4, 7]; // Major
-    }
-    
-    // Apply omissions (no3, no5, etc.) from systemTransfer - centralized final pass
-    intervals = applyOmissionsToIntervals(intervals, quality);
-    
-    // Apply alterations extracted from quality (e.g., M7#5 -> apply #5)
-    intervals = applyAlterationsToIntervals(intervals, alterations);
-    
-    // Convert intervals to note names
-    return intervals.map(interval => {
-        const noteIndex = (rootIndex + interval) % 12;
-        return noteNames[noteIndex];
-    });
-}
-
-function applyAlterationsToIntervals(intervals, alterations) {
-    if (!alterations || alterations.length === 0) return intervals;
-    
-    const result = [...intervals];
-    
-    alterations.forEach(alt => {
-        const match = alt.match(/(bb|##|b|#)?(\d+)/);
-        if (!match) return;
-        
-        const accidental = match[1] || '';
-        const degree = match[2];
-        
-        // Get base interval from systemTransferData.defaultDegrees
-        let baseInterval = null;
-        
-        if (systemTransferData && systemTransferData.defaultDegrees) {
-            const degreeEntry = systemTransferData.defaultDegrees.find(d => d.degree === degree);
-            if (degreeEntry && typeof degreeEntry.system === 'number') {
-                baseInterval = degreeEntry.system % 12;
-            }
-        }
-        
-        // Fallback if systemTransferData not available
-        if (baseInterval === null) {
-            const degreeIntervals = {
-                '2': 2, '3': 4, '4': 5, '5': 7, '6': 9, '7': 11, '9': 14, '11': 17, '13': 21
-            };
-            if (degreeIntervals[degree] !== undefined) {
-                baseInterval = degreeIntervals[degree] % 12;
-            }
-        }
-        
-        if (baseInterval !== null) {
-            // Apply accidental adjustment
-            let adjustment = getAccidentalAdjustment(accidental, systemTransferData);
-            let targetInterval = (baseInterval + adjustment) % 12;
-            
-            // Find and replace the base interval or add if not present
-            const existingIndex = result.indexOf(baseInterval);
-            if (existingIndex !== -1) {
-                result[existingIndex] = targetInterval;
-            } else {
-                result.push(targetInterval);
-            }
-        }
-    });
-    
-    return result;
-}
-
-// Get all possible voicings of chord tones within range
-function getAllVoicings(chordTones) {
-    const voicings = [];
-    const minOctave = ChordGenConfig.MIN_OCTAVE;
-    const maxOctave = ChordGenConfig.MAX_OCTAVE;
-    
-    // Generate all combinations of octaves for each chord tone
-    function generateVoicings(tones, currentVoicing, toneIndex) {
-        if (toneIndex === tones.length) {
-            // Check if voicing is within reasonable range
-            const freqs = currentVoicing.map(v => getNoteFrequency(v.note, v.octave));
-            const minFreq = Math.min(...freqs);
-            const maxFreq = Math.max(...freqs);
-            
-            // Keep voicings within configured range
-            if (maxFreq / minFreq <= ChordGenConfig.MAX_VOICING_RANGE) {
-                voicings.push(freqs);
-            }
-            return;
-        }
-        
-        const tone = tones[toneIndex];
-        for (let octave = minOctave; octave <= maxOctave; octave++) {
-            generateVoicings(tones, [...currentVoicing, { note: tone, octave }], toneIndex + 1);
-        }
-    }
-    
-    generateVoicings(chordTones, [], 0);
-    return voicings;
-}
-
-// Find closest voicing to previous chord (voice leading)
-function getClosestVoicing(chordTones, previousVoicing) {
-    if (!previousVoicing || previousVoicing.length === 0) {
-        // First chord - use middle voicing
-        return chordTones.map(tone => getNoteFrequency(tone, ChordGenConfig.MIN_OCTAVE));
-    }
-    
-    const allVoicings = getAllVoicings(chordTones);
-    
-    if (allVoicings.length === 0) {
-        // Fallback
-        return chordTones.map(tone => getNoteFrequency(tone, ChordGenConfig.MIN_OCTAVE));
-    }
-    
-    // Find voicing with minimum total voice movement
-    let bestVoicing = allVoicings[0];
-    let minMovement = Infinity;
-    
-    for (const voicing of allVoicings) {
-        const movement = calculateVoiceMovement(previousVoicing, voicing);
-        if (movement < minMovement) {
-            minMovement = movement;
-            bestVoicing = voicing;
-        }
-    }
-    
-    return bestVoicing;
-}
-
-// Calculate total semitone movement between two voicings
-function calculateVoiceMovement(voicing1, voicing2) {
-    // Match voices using optimal assignment (simple greedy approach)
-    const used = new Set();
-    let totalMovement = 0;
-    
-    for (const freq1 of voicing1) {
-        let minDist = Infinity;
-        let closestIndex = -1;
-        
-        voicing2.forEach((freq2, index) => {
-            if (!used.has(index)) {
-                const semitones = Math.abs(12 * Math.log2(freq2 / freq1));
-                if (semitones < minDist) {
-                    minDist = semitones;
-                    closestIndex = index;
-                }
-            }
-        });
-        
-        if (closestIndex !== -1) {
-            used.add(closestIndex);
-            totalMovement += minDist;
-        }
-    }
-    
-    return totalMovement;
 }
 
 // ==================== CLEANUP ====================
@@ -2283,15 +2031,8 @@ function cleanupChordGenerator() {
     // Remove any tooltips created by this page
     document.querySelectorAll('.preview-disabled-tooltip, .music-tooltip').forEach(el => el.remove());
     
-    // Close audio context if open
-    if (audioContext && audioContext.state !== 'closed') {
-        audioContext.close().catch(() => {});
-        audioContext = null;
-    }
-    
     // Reset state
     chordSelectorOpen = false;
-    previousVoicing = null;
 }
 
 // Export cleanup function for router to call

@@ -3,7 +3,6 @@
 ## What to do next ##
 app
 - Color management improve
-- turn 90 degree for vertical screen
 - Paid app consider once the website is start getting complete
 - Security system
 - User feedback system
@@ -20,7 +19,6 @@ chordGenerator
 - Music theory json Chord substitution update
 - chord refresh button not matched with chords, they should be sync
 - button ui are too messy
-- Progression playing animation -> bg color change...
 
 musicTheory
 - Chord Progression theory eg. cannon, axis progression...

@@ -35,23 +35,28 @@
     }
   },
 
+  "diatonicPitches": [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26, 28],
+
   "chordIntervals": {
     "triads": [
-      { "symbol": "M", "formula": ["1", "3", "5"] },
+      { "symbol": "", "formula": ["1", "3", "5"] },
       { "symbol": "m", "formula": ["1", "b3", "5"] },
       { "symbol": "o", "formula": ["1", "b3", "b5"] },
       { "symbol": "+", "formula": ["1", "3", "#5"] }
     ],
     "sixths": [
-      { "symbol": "6", "formula": ["1", "3", "6"] },
-      { "symbol": "m6", "formula": ["1", "b3", "6"] },
-      { "symbol": "69", "formula": ["1", "3", "6", "9"] },
-      { "symbol": "m69", "formula": ["1", "b3", "6", "9"] }
+      { "symbol": "6", "formula": ["1", "3", "5", "6"] },
+      { "symbol": "m6", "formula": ["1", "b3", "5", "6"] },
+      { "symbol": "69", "formula": ["1", "3", "5", "6", "9"] },
+      { "symbol": "m69", "formula": ["1", "b3", "5", "6", "9"] },
+      { "symbol": "(6)", "formula": ["1", "3", "5", "6"] },
+      { "symbol": "(6, no3)", "formula": ["1", "5", "6"] }
     ],
     "sevenths": [
       { "symbol": "M7", "formula": ["1", "3", "5", "7"] },
       { "symbol": "m7", "formula": ["1", "b3", "5", "b7"] },
       { "symbol": "7", "formula": ["1", "3", "5", "b7"] },
+      { "symbol": "ø", "formula": ["1", "b3", "b5", "b7"] },
       { "symbol": "ø7", "formula": ["1", "b3", "b5", "b7"] },
       { "symbol": "o7", "formula": ["1", "b3", "b5", "bb7"] },
       { "symbol": "mM7", "formula": ["1", "b3", "5", "7"] },
@@ -59,24 +64,63 @@
       { "symbol": "+7", "formula": ["1", "3", "#5", "b7"] },
       { "symbol": "oM7", "formula": ["1", "b3", "b5", "7"] }
     ],
-    "extended": [
-      { "symbol": "9", "formula": ["9"] },
-      { "symbol": "11", "formula": ["9", "11"] },
-      { "symbol": "13", "formula": ["9", "11", "13"] }
+    "ninths": [
+      { "symbol": "9", "formula": ["1", "3", "5", "b7", "9"] },
+      { "symbol": "M9", "formula": ["1", "3", "5", "7", "9"] },
+      { "symbol": "m9", "formula": ["1", "b3", "5", "b7", "9"] },
+      { "symbol": "add9", "formula": ["1", "3", "5", "9"] },
+      { "symbol": "madd9", "formula": ["1", "b3", "5", "9"] },
+      { "symbol": "7b9", "formula": ["1", "3", "5", "b7", "b9"] },
+      { "symbol": "7#9", "formula": ["1", "3", "5", "b7", "#9"] }
     ],
-    "suspended": {
-      "sus4": { "replacesAnyThird": true, "with": "4" },
-      "sus2": { "replacesAnyThird": true, "with": "2" },
-      "sus": { "replacesAnyThird": true, "with": "4" }
-    },
-    "omitted": {
-      "no1": { "remove": [0] },
-      "no3": { "remove": [3, 4] },
-      "no5": { "remove": [7] },
-      "no7": { "remove": [10, 11] },
-      "no9": { "remove": [2, 14] },
-      "no11": { "remove": [5, 17] },
-      "no13": { "remove": [9, 21] }
+    "elevenths": [
+      { "symbol": "11", "formula": ["1", "3", "5", "b7", "9", "11"] },
+      { "symbol": "m11", "formula": ["1", "b3", "5", "b7", "9", "11"] },
+      { "symbol": "M11", "formula": ["1", "3", "5", "7", "9", "11"] },
+      { "symbol": "7#11", "formula": ["1", "3", "5", "b7", "#11"] },
+      { "symbol": "9#11", "formula": ["1", "3", "5", "b7", "9", "#11"] },
+      { "symbol": "M7#11", "formula": ["1", "3", "5", "7", "#11"] },
+      { "symbol": "M9#11", "formula": ["1", "3", "5", "7", "9", "#11"] },
+      { "symbol": "add#11", "formula": ["1", "3", "5", "#11"] }
+    ],
+    "thirteenths": [
+      { "symbol": "13", "formula": ["1", "3", "5", "b7", "9", "11", "13"] },
+      { "symbol": "m13", "formula": ["1", "b3", "5", "b7", "9", "11", "13"] },
+      { "symbol": "M13", "formula": ["1", "3", "5", "7", "9", "11", "13"] },
+      { "symbol": "7b13", "formula": ["1", "3", "5", "b7", "b13"] },
+      { "symbol": "13b9", "formula": ["1", "3", "5", "b7", "b9", "13"] }
+    ],
+    "suspended": [
+      { "symbol": "sus", "formula": ["1", "4", "5"] },
+      { "symbol": "sus4", "formula": ["1", "4", "5"] },
+      { "symbol": "sus2", "formula": ["1", "2", "5"] },
+      { "symbol": "7sus", "formula": ["1", "4", "5", "b7"] },
+      { "symbol": "7sus4", "formula": ["1", "4", "5", "b7"] },
+      { "symbol": "9sus", "formula": ["1", "4", "5", "b7", "9"] },
+      { "symbol": "9sus4", "formula": ["1", "4", "5", "b7", "9"] }
+    ],
+    "omitted": [
+      { "symbol": "no1", "removes": "1" },
+      { "symbol": "no3", "removes": "3" },
+      { "symbol": "no5", "removes": "5" },
+      { "symbol": "no7", "removes": "7" },
+      { "symbol": "no9", "removes": "9" },
+      { "symbol": "no11", "removes": "11" },
+      { "symbol": "no13", "removes": "13" }
+    ],
+    "extensions": [
+      { "symbol": "6", "adds": "6" },
+      { "symbol": "9", "adds": "9" },
+      { "symbol": "b9", "adds": "b9" },
+      { "symbol": "#9", "adds": "#9" },
+      { "symbol": "11", "adds": "11" },
+      { "symbol": "#11", "adds": "#11" },
+      { "symbol": "13", "adds": "13" },
+      { "symbol": "b13", "adds": "b13" }
+    ],
+    "slashChord": {
+      "pattern": "[chord]/[bassDegree]",
+      "description": "Chord with alternate bass note, bass degree uses same system as chord degrees"
     }
   },
 

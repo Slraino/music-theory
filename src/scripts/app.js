@@ -5,7 +5,8 @@ const AppConfig = {
     DEFAULT_SFX_VOLUME: 50,
     VOLUME_FADE_STEP: 0.1,
     VOLUME_FADE_INTERVAL: 100,
-    YOUTUBE_BGM_FADE_IN_DURATION: 2000,
+    YOUTUBE_BGM_FADE_IN_DELAY: 2000,
+    YOUTUBE_BGM_FADE_IN_DURATION: 1000,
     YOUTUBE_FADE_INTERVAL: 500,
     TRACK_RETRY_DELAY: 2000,
     TRACK_END_DELAY: 500,
@@ -699,6 +700,9 @@ window.clearBackgroundPreview = () => {
     backgroundPreviewSession++;
     const clearSession = backgroundPreviewSession;
     
+    // Clear any pending fade timers
+    clearPreviewFadeTimers();
+    
     const overlay = document.getElementById('bgVideoOverlay');
     if (!overlay) return;
 
@@ -708,15 +712,11 @@ window.clearBackgroundPreview = () => {
     try {
         const iframe = overlay.querySelector('iframe');
         if (iframe && iframe.src && iframe.src !== 'about:blank') {
-            startYouTubePreviewFadeOut(iframe, 1000, () => {
-                if (shouldFinalizeBackgroundClear(overlay, clearSession)) {
-                    finalizeBackgroundPreviewClear(overlay);
-                }
-            });
-        } else {
-            if (shouldFinalizeBackgroundClear(overlay, clearSession)) {
-                finalizeBackgroundPreviewClear(overlay);
-            }
+            // Stop video immediately without fade
+            sendYouTubeCommand(iframe, 'stopVideo');
+        }
+        if (shouldFinalizeBackgroundClear(overlay, clearSession)) {
+            finalizeBackgroundPreviewClear(overlay);
         }
     } catch (e) {
         console.error('Error clearing background preview:', e);
@@ -772,26 +772,29 @@ function startYouTubePreviewFadeOut(iframe, durationMs = 1000, onComplete) {
     const steps = 20;
     const stepTime = Math.max(20, Math.floor(durationMs / steps));
     let currentStep = 0;
+    let completed = false;
+    
+    const finishFadeOut = () => {
+        if (completed) return; // Prevent double execution
+        completed = true;
+        clearPreviewFadeTimers();
+        sendYouTubeCommand(iframe, 'stopVideo');
+        if (typeof onComplete === 'function') {
+            onComplete();
+        }
+    };
     
     previewFadeInterval = setInterval(() => {
         currentStep += 1;
         const volume = Math.max(0, Math.round(100 - (currentStep / steps) * 100));
         sendYouTubeCommand(iframe, 'setVolume', [volume]);
         if (currentStep >= steps) {
-            clearPreviewFadeTimers();
-            sendYouTubeCommand(iframe, 'stopVideo');
-            if (typeof onComplete === 'function') {
-                onComplete();
-            }
+            finishFadeOut();
         }
     }, stepTime);
     
     previewFadeTimeout = setTimeout(() => {
-        clearPreviewFadeTimers();
-        sendYouTubeCommand(iframe, 'stopVideo');
-        if (typeof onComplete === 'function') {
-            onComplete();
-        }
+        finishFadeOut();
     }, durationMs + 100);
 }
 
@@ -848,22 +851,34 @@ function stopYouTubeVolumeControl() {
         musicFadeInInterval = null;
     }
     
-    // Restore music volume
-    if (soundEffects && soundEffects.audioElement && soundEffects.musicPlaying) {
-        const targetVol = soundEffects.musicVolume;
-        const duration = AppConfig.YOUTUBE_BGM_FADE_IN_DURATION;
-        const steps = Math.max(1, Math.round(duration / AppConfig.VOLUME_FADE_INTERVAL));
-        const stepSize = targetVol / steps;
+    // Wait 2 seconds, then check if no preview is playing before fading in BGM
+    setTimeout(() => {
+        // Check if a YouTube preview is currently active
+        const overlay = document.getElementById('bgVideoOverlay');
+        const isPreviewActive = overlay && overlay.classList.contains('is-active');
         
-        musicFadeInInterval = setInterval(() => {
-            if (soundEffects.audioElement.volume < targetVol) {
-                soundEffects.audioElement.volume = Math.min(targetVol, soundEffects.audioElement.volume + stepSize);
-            } else {
-                clearInterval(musicFadeInInterval);
-                musicFadeInInterval = null;
-            }
-        }, AppConfig.VOLUME_FADE_INTERVAL);
-    }
+        if (isPreviewActive) {
+            // Don't restore BGM if a preview is still playing
+            return;
+        }
+        
+        // Restore music volume with 1s fade-in
+        if (soundEffects && soundEffects.audioElement && soundEffects.musicPlaying) {
+            const targetVol = soundEffects.musicVolume;
+            const duration = AppConfig.YOUTUBE_BGM_FADE_IN_DURATION;
+            const steps = Math.max(1, Math.round(duration / AppConfig.VOLUME_FADE_INTERVAL));
+            const stepSize = targetVol / steps;
+            
+            musicFadeInInterval = setInterval(() => {
+                if (soundEffects.audioElement.volume < targetVol) {
+                    soundEffects.audioElement.volume = Math.min(targetVol, soundEffects.audioElement.volume + stepSize);
+                } else {
+                    clearInterval(musicFadeInInterval);
+                    musicFadeInInterval = null;
+                }
+            }, AppConfig.VOLUME_FADE_INTERVAL);
+        }
+    }, AppConfig.YOUTUBE_BGM_FADE_IN_DELAY);
 }
 
 /* ==================== SOUND EFFECTS ==================== */
@@ -1123,6 +1138,15 @@ class SoundEffects {
 
         // Music toggle
         if (musicToggleBtn) {
+            // Set initial button state
+            if (this.shouldPlayMusic) {
+                musicToggleBtn.classList.add('active');
+                musicToggleBtn.textContent = '🎵';
+            } else {
+                musicToggleBtn.classList.remove('active');
+                musicToggleBtn.textContent = '⏹';
+            }
+            
             musicToggleBtn.addEventListener('click', () => {
                 if (this.musicPlaying) {
                     this.stopBackgroundMusic();

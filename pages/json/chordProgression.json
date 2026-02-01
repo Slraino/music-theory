@@ -91,22 +91,22 @@
           { 
             "artist": "164",  "title": "天之弱",  "part": "Chorus",  "genre": "Jpop",  
             "youtubeId": "2-zPY0vrpjQ",  "clipStart": 69,
-            "chordVariation": [["6m"], ["4"], ["5"], ["1", "5/7"]]
+            "chordVariation": ["6m", "4", "5", ["1", "5/7"]]
           },
           { 
             "artist": "40mP",  "title": "からくりピエロ",  "part": "Chorus",  "genre": "Jpop",  
             "youtubeId": "OiQYP-y4Fxc",  "clipStart": 121,
-            "chordVariation": [["6m"], ["4"], ["5"], ["1", "5/7"]]
+            "chordVariation": ["6m", "4", "5", ["1", "5/7"]]
           },
             { 
               "artist": "fripSide",  "title": "only my railgun",  "part": "Chorus",  "genre": "Jpop",  
               "youtubeId": "ZhIxg6_Femo",  "clipStart": 62,
-              "chordVariation": [["6m"], ["4"], ["5"], ["1", "5/7"]]
+              "chordVariation": ["6m", "4", "5", ["1", "5/7"]]
             },
             { 
               "artist": "Umamusume",  "title": "GIRLS' LEGEND U",  "part": "Chorus",  "genre": "Jpop",  
               "youtubeId": "G7RmGsHxv-Q",  "clipStart": 75,
-              "chordVariation": [["6m"], ["4"], ["5"], ["1", "5/7"]]
+              "chordVariation": ["6m", "4", "5", ["1", "5/7"]]
             }
         ]
       },
@@ -397,7 +397,7 @@
         "music": [
           { 
             "artist": "結束バンド",  "title": "星座になれたら",  "part": "Chorus",  "genre": "Jpop",  
-            "youtubeId": "fJh5UeiULZs",  "clipStart": 54,
+            "youtubeId": "wSTbdqo-j74",  "clipStart": 69,
             "chordVariation": [["4M7"], ["4/5"], ["3m7"], ["6m7", "b6m7", "5m7", "1"]]
           }
         ]
@@ -413,7 +413,7 @@
         "chordsName": ["王道進行", "variation"],
         "theory": [],
         "music": [
-          { "artist": "ヨルシカ",  "title": "春泥棒",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "Sw1Flgub9s8",  "clipStart": 57 }
+          { "artist": "ヨルシカ",  "title": "春泥棒",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "Sw1Flgub9s8",  "clipStart": 47 }
         ]
       },
       {
