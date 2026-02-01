@@ -124,22 +124,22 @@ async function renderProgressions() {
                 if (prog.progressions && prog.progressions.length > 0) {
                     prog.progressions.forEach((progression) => {
                         // Build the chord progression with bars
-                        if (Array.isArray(progression.chords) && progression.chords.length > 0) {
+                        if (Array.isArray(progression.progression) && progression.progression.length > 0) {
                             // Generate progression ID for linking to progressionInfo
-                            const progressionId = chordsToProgressionId(progression.chords);
+                            const progressionId = chordsToProgressionId(progression.progression);
                             const encodedLine = encodeURIComponent(progressionId);
                             
                             // Check for multi-phrase structure (3-level array)
-                            const isMultiPhrase = progression.chords.length > 0 && 
-                                Array.isArray(progression.chords[0]) && 
-                                progression.chords[0].length > 0 && 
-                                Array.isArray(progression.chords[0][0]);
+                            const isMultiPhrase = progression.progression.length > 0 && 
+                                Array.isArray(progression.progression[0]) && 
+                                progression.progression[0].length > 0 && 
+                                Array.isArray(progression.progression[0][0]);
                             
                             if (isMultiPhrase) {
                                 // Multi-phrase: [[["1"], ["4"]], [["5"], ["6m"]]]
                                 let phraseGroupHTML = `<div class="phrase-group">`;
                                 
-                                progression.chords.forEach((phrase) => {
+                                progression.progression.forEach((phrase) => {
                                     phraseGroupHTML += `<div class="progression-grid" data-prog-index="${prog.origIndex}" data-line="${encodedLine}">`;
                                     
                                     phrase.forEach((barChords) => {
@@ -163,11 +163,11 @@ async function renderProgressions() {
                                 
                                 phraseGroupHTML += `</div>`;
                                 allContent += phraseGroupHTML;
-                            } else if (Array.isArray(progression.chords[0])) {
+                            } else if (Array.isArray(progression.progression[0])) {
                                 // Single phrase with bars: [["6m"], ["4"], ["5"], ["1"]]
                                 let gridHTML = `<div class="progression-grid" data-prog-index="${prog.origIndex}" data-line="${encodedLine}">`;
                                 
-                                progression.chords.forEach((barChords) => {
+                                progression.progression.forEach((barChords) => {
                                     const isMultiChord = Array.isArray(barChords) && barChords.length > 1;
                                     const multiClass = isMultiChord ? ' multi-chord' : '';
                                     gridHTML += `<div class="progression-bar${multiClass}">`;
@@ -189,7 +189,7 @@ async function renderProgressions() {
                                 // Simple array: ["1", "4", "5", "1"]
                                 let gridHTML = `<div class="progression-grid" data-prog-index="${prog.origIndex}" data-line="${encodedLine}">`;
                                 
-                                progression.chords.forEach((chord) => {
+                                progression.progression.forEach((chord) => {
                                     gridHTML += `<div class="progression-bar">`;
                                     gridHTML += `<span class="chord-item">${escapeHtml(chord)}</span>`;
                                     gridHTML += `</div>`;

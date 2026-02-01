@@ -87,7 +87,7 @@
     text-shadow: none;
 }
 
-/* Song-specific chord display (when a song with chordVariation is playing) */
+/* Song-specific chord display (when a song with progressionVariation is playing) */
 .phrase-container.song-specific-display {
     border: 1px dashed rgba(100, 200, 255, 0.4);
     border-radius: 0.5rem;

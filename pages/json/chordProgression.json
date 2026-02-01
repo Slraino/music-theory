@@ -3,7 +3,7 @@
     "note": "7",
     "progressions": [
       {
-        "chords": ["7o", "3m", "6m", "6m"],
+        "progression": ["7o", "3m", "6m", "6m"],
         "theory": [],
         "music": []
       }
@@ -13,7 +13,7 @@
     "note": "b7",
     "progressions": [
       {
-        "chords": ["b7", "b7", "b7m", "b37"],
+        "progression": ["b7", "b7", "b7m", "b37"],
         "music": []
       }
     ]
@@ -22,13 +22,13 @@
     "note": "6",
     "progressions": [
       {
-        "chords": ["6m7", "b6m7", "5m7", "#4ø7"],
+        "progression": ["6m7", "b6m7", "5m7", "#4ø7"],
         "progressionName": [],
         "theory": ["Chromatic Descending"],
         "music": []
       },
       {
-        "chords": ["6m", "b6+", "1/5", "#4ø7"],
+        "progression": ["6m", "b6+", "1/5", "#4ø7"],
         "progressionName":[],
         "theory": ["Line Chilche", "Chromatic Descending"],
         "music": [
@@ -36,28 +36,28 @@
         ]
       },
       {
-        "chords": ["6m", "6m", "b6m", "5m"],
+        "progression": ["6m", "6m", "b6m", "5m"],
         "theory": [],
         "music": [
           {
             "artist": "Eve",  "title": "廻廻奇譚",  "part": "Chorus",  "genre": "Jpop",  
             "youtubeId": "1tk1pqwrOys",  "clipStart": 48,
-            "chordVariation": [[["6m7"], ["6m7", "b6m7"], ["5m7"], ["1"]], [["4M7"], ["4M7"], ["3sus"], ["3"]]]
+            "progressionVariation": [[["6m7"], ["6m7", "b6m7"], ["5m7"], ["1"]], [["4M7"], ["4M7"], ["3sus"], ["3"]]]
           }
         ]
       },
       {
-        "chords": ["6m", "5", "4", "b7"],
+        "progression": ["6m", "5", "4", "b7"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["6m", "5", "4", "3m"],
+        "progression": ["6m", "5", "4", "3m"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["6m", "4", "5", "1"],
+        "progression": ["6m", "4", "5", "1"],
         "progressionName": ["小室進行"],
         "theory": [],
         "music": [
@@ -91,35 +91,34 @@
           { 
             "artist": "164",  "title": "天之弱",  "part": "Chorus",  "genre": "Jpop",  
             "youtubeId": "2-zPY0vrpjQ",  "clipStart": 69,
-            "chordVariation": ["6m", "4", "5", ["1", "5/7"]]
+            "progressionVariation": ["6m", "4", "5", ["1", "5/7"]]
           },
           { 
             "artist": "40mP",  "title": "からくりピエロ",  "part": "Chorus",  "genre": "Jpop",  
             "youtubeId": "OiQYP-y4Fxc",  "clipStart": 121,
-            "chordVariation": ["6m", "4", "5", ["1", "5/7"]]
+            "progressionVariation": ["6m", "4", "5", ["1", "5/7"]]
           },
             { 
               "artist": "fripSide",  "title": "only my railgun",  "part": "Chorus",  "genre": "Jpop",  
               "youtubeId": "ZhIxg6_Femo",  "clipStart": 62,
-              "chordVariation": ["6m", "4", "5", ["1", "5/7"]]
+              "progressionVariation": ["6m", "4", "5", ["1", "5/7"]]
             },
             { 
               "artist": "Umamusume",  "title": "GIRLS' LEGEND U",  "part": "Chorus",  "genre": "Jpop",  
               "youtubeId": "G7RmGsHxv-Q",  "clipStart": 75,
-              "chordVariation": ["6m", "4", "5", ["1", "5/7"]]
+              "progressionVariation": ["6m", "4", "5", ["1", "5/7"]]
             }
         ]
       },
       {
-        "chords": ["6m", "4", "5", "3"],
-        "progressionName": ["小室進行", "variation"],
+        "progression": ["6m", "4", "5", "3"],
         "theory": [],
         "music": [
           { "artist": "ヨルシカ",  "title": "雨とカプチーノ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "PWbRleMGagU",  "clipStart": 77 }
         ]
       },
       {
-        "chords": ["6m", "4", "1", "5"],
+        "progression": ["6m", "4", "1", "5"],
         "progressionName": ["Axis Progression"],
         "theory": [],
         "music": [
@@ -128,19 +127,19 @@
         ]
       },
       {
-        "chords": [["6m"], ["3m"], ["4"], ["7", "1"]],
+        "progression": ["6m", "3m", "4", ["7", "1"]],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["6m", "3m", "4", "5"],
+        "progression": ["6m", "3m", "4", "5"],
         "theory": [],
         "music": [
           { "artist": "ヨルシカ",  "title": "逃亡",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "LiStvz5SWMc",  "clipStart": 119 }
         ]
       },
       {
-        "chords": [["6m"], ["3m"], ["4"], ["5", "1"]],
+        "progression": [["6m"], ["3m"], ["4"], ["5", "1"]],
         "theory": [],
         "music": [
           { "artist": "GReeeeN",  "title": "キセキ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "DwTinTO0o9I",  "clipStart": 122 },
@@ -150,7 +149,7 @@
         ]
       },
       {
-        "chords": ["6m", "3m", "4", "1"],
+        "progression": ["6m", "3m", "4", "1"],
         "theory": [],
         "music": [
           { "artist": "ヨルシカ",  "title": "透明エレジー",  "part": "Verse",  "genre": "Jpop",  "youtubeId": "U2-K_eFGtJM",  "clipStart": 27 },
@@ -161,22 +160,22 @@
         ]
       },
       {
-        "chords": ["6m", "3m", "2m", "1"],
+        "progression": ["6m", "3m", "2m", "1"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["6m", "2m", "5sus", "5"],
+        "progression": ["6m", "2m", "5sus", "5"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["6m", "2m", "5", "#5"],
+        "progression": ["6m", "2m", "5", "#5"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["6m", "2m", "5", "1"],
+        "progression": ["6m", "2m", "5", "1"],
         "theory": [],
         "music": [
           { 
@@ -210,12 +209,12 @@
         ]
       },
       {
-        "chords": ["6m", "2m", "4", "1"],
+        "progression": ["6m", "2m", "4", "1"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["6m", "2m", "2m", "5"],
+        "progression": ["6m", "2m", "2m", "5"],
         "theory": [],
         "music": []
       }
@@ -225,7 +224,7 @@
     "note": "b6",
     "progressions": [
       {
-        "chords": ["b6", "b7", "1"],
+        "progression": ["b6", "b7", "1"],
         "progressionName": ["Mario Cadence"],
         "theory": [],
         "music": []
@@ -236,7 +235,7 @@
     "note": "5",
     "progressions": [
       {
-        "chords": ["5", "6m", "4", "1"],
+        "progression": ["5", "6m", "4", "1"],
         "progressionName": ["Axis Progression"],
         "theory": [],
         "music": []
@@ -247,24 +246,22 @@
     "note": "#4",
     "progressions": [
       {
-        "chords": ["#4o", "7o", "3m", "6m"],
-        "progressionName": ["王道進行", "variation"],
+        "progression": ["#4o", "7o", "3m", "6m"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["#4o", "4m/b6", "3ø7/b7", "6m"],
+        "progression": ["#4o", "4m/b6", "3ø7/b7", "6m"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["#4o", "4m/b6", "3m", "6m"],
-        "progressionName": ["王道進行", "variation"],
+        "progression": ["#4o", "4m/b6", "3m", "6m"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["#4o", "4m/b6", "3m", "b3"],
+        "progression": ["#4o", "4m/b6", "3m", "b3"],
         "theory": [],
         "music": []
       }
@@ -274,35 +271,34 @@
     "note": "4",
     "progressions": [
       {
-        "chords": ["4", "7o", "3m", "6m"],
-        "theory": ["王道進行", "variation"],
-        "music": []
-      },
-      {
-        "chords": ["4", "b7", "3m", "3m"],
+        "progression": ["4", "7o", "3m", "6m"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["4", "b7", "3m", "6m"],
-        "progressionName":["王道進行", "variation"],
+        "progression": ["4", "b7", "3m", "3m"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["4", "b7", "2m", "5"],
+        "progression": ["4", "b7", "3m", "6m"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["4", "b7", "1"],
+        "progression": ["4", "b7", "2m", "5"],
+        "theory": [],
+        "music": []
+      },
+      {
+        "progression": ["4", "b7", "1"],
         "progressionName":["Back Door Progression"],
         "theory": [],
         "music": []
       },
       {
-        "chords": [[["4"], ["5"], ["6m"], ["7o", "1"]]],
-        "progressionName": ["456進行", "variation"],
+        "progression": ["4", "5", "6m", ["7o", "1"]],
+        "progressionName": ["456進行"],
         "theory": [],
         "music": [
           { 
@@ -311,7 +307,7 @@
         ]
       },
       {
-        "chords": ["4", "5", "6m", "6m"],
+        "progression": ["4", "5", "6m", "6m"],
         "progressionName":["456進行"],
         "theory": [],
         "music": [
@@ -330,14 +326,14 @@
         ]
       },
       {
-        "chords": [["4"], ["5"], ["6m"], ["5"]],
-        "progressionName":["456進行", "variation"],
+        "progression": [["4"], ["5"], ["6m"], ["5"]],
+        "progressionName":["456進行"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["4", "5", "6m", "3m"],
-        "progressionName":["456進行", "variation"],
+        "progression": ["4", "5", "6m", "3m"],
+        "progressionName":["456進行"],
         "theory": [],
         "music": [
           { 
@@ -353,9 +349,8 @@
         ]
       },
       {
-        "chords": ["4", "5", "6m", "1"],
-        "progressionName":["456進行", "variation"],
-        "theory": [],
+        "progression": ["4", "5", "6m", "1"],
+        "theory": ["456進行"],
         "music": [
           { "artist": "ヨルシカ",  "title": "雨とカプチー",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "PWbRleMGagU",  "clipStart": 77 },
           { "artist": "YOASOBI",  "title": "アンコール",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "vcGbefQBvJ4",  "clipStart": 73 },
@@ -365,7 +360,7 @@
         ]
       },
       {
-        "chords": ["4", "5", "3m", "6m"],
+        "progression": ["4", "5", "3m", "6m"],
         "progressionName":["王道進行"],
         "theory": [],
         "music": [
@@ -376,100 +371,91 @@
           {
             "artist": "HoneyWorks", "title": "可愛くてごめん", "part": "Chorus", "genre": "Jpop",
             "youtubeId": "K4xLi8IF1FM", "clipStart": 42,
-            "chordVariation": [["4", "5", "3m", "6m"], ["4", "5", "1", "1"]]
+            "progressionVariation": [[["4"], ["5"], ["3m"], ["6m"]], [["4"], ["5"], ["1"], ["1"]]]
           },
           {
             "artist": "ヨルシカ",  "title": "言って。",  "part": "Chorus",  "genre": "Jpop",  
             "youtubeId": "F64yFFnZfkI",  "clipStart": 61,
-            "chordVariation": [[["4"], ["5"], ["3m", "3/#5"], ["6m"]]]
+            "progressionVariation": ["4", "5", ["3m", "3/#5"], "6m"]
           },
           { 
             "artist": "YOASOBI",  "title": "怪物",  "part": "Chorus",  "genre": "Jpop",  
             "youtubeId": "dy90tA3TT1c",  "clipStart": 36,
-            "chordVariation": [[["4"], ["5"], ["3m"], ["6m"]], [["4"], ["37", "37/#5"], ["6m"], ["5", "1"]]]
+            "progressionVariation": [[["4"], ["5"], ["3m"], ["6m"]], [["4"], ["37", "37/#5"], ["6m"], ["5", "1"]]]
           }
         ]
       },
       {
-        "chords": ["4", "4/5", "3m", "6m"],
-        "progressionName": ["王道進行", "variation"],
+        "progression": ["4", "4/5", "3m", "6m"],
         "theory": ["Chromatic Descending"],
         "music": [
           { 
             "artist": "結束バンド",  "title": "星座になれたら",  "part": "Chorus",  "genre": "Jpop",  
             "youtubeId": "wSTbdqo-j74",  "clipStart": 69,
-            "chordVariation": [["4M7"], ["4/5"], ["3m7"], ["6m7", "b6m7", "5m7", "1"]]
+            "progressionVariation": ["4M7", "4/5", "3m7", ["6m7", "b6m7", "5m7", "1"]]
           }
         ]
       },
       {
-        "chords": ["4", "5", "3", "6m"],
-        "progressionName": ["王道進行", "variation"],
-        "theory": [],
-        "music": []
-      },
-      {
-        "chords": [["4(9)"], ["5sus"], ["1/3", "5sus"], ["6m"]],
-        "chordsName": ["王道進行", "variation"],
+        "progression": [["4(9)"], ["5sus"], ["1/3", "5sus"], ["6m"]],
         "theory": [],
         "music": [
           { "artist": "ヨルシカ",  "title": "春泥棒",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "Sw1Flgub9s8",  "clipStart": 47 }
         ]
       },
       {
-        "chords": ["4", "5", "#5o", "6m"],
+        "progression": ["4", "5", "#5o", "6m"],
+        "theory": [],
+        "music": []
+      },
+      {
+        "progression": [["4"], ["5"], ["3m"], ["6m", "3m/5"]],
         "chordsName": ["王道進行", "variation"],
         "theory": [],
         "music": []
       },
       {
-        "chords": [["4"], ["5"], ["3m"], ["6m", "3m/5"]],
-        "chordsName": ["王道進行", "variation"],
+        "progression": ["4", "5", "1", "6m"],
+        "theory": []
+      },
+      {
+        "progression": ["4", "5", "1", "1"],
         "theory": [],
         "music": []
       },
       {
-        "chords": ["4", "5", "1", "6m"],
-        "theory": ["王道進行 variation"]
-      },
-      {
-        "chords": ["4", "5", "1", "1"],
-        "theory": ["王道進行 variation"],
-        "music": []
-      },
-      {
-        "chords": [[["4"], ["5"], ["1"], ["5"]], [["4"], ["5"], ["b6"], ["b7"]]],
-        "theory": ["王道進行 variation"],
+        "progression": [[["4"], ["5"], ["1"], ["5"]], [["4"], ["5"], ["b6"], ["b7"]]],
+        "theory": [],
         "music": [
           { "artist": "K-ON!",  "title": "Cagayake!GIRLS",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": [[["4M7"], ["4mM7"], ["3m7"], ["67"]], [["2m7"], ["57"], ["1M7"], ["#4ø7"]]],
+        "progression": [[["4M7"], ["4mM7"], ["3m7"], ["67"]], [["2m7"], ["57"], ["1M7"], ["#4ø7"]]],
         "theory": ["王道進行 variation"],
         "music": [
           { "artist": "藤井風",  "title": "きらり",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["4", "4m", "3m", "6m"],
+        "progression": ["4", "4m", "3m", "6m"],
+        "theory": [],
+        "music": []
+      },
+      {
+        "progression": ["4", "4m", "3m", "3o"],
         "thoery": ["王道進行 variation"],
         "music": []
       },
       {
-        "chords": ["4", "4m", "3m", "3o"],
-        "thoery": ["王道進行 variation"],
-        "music": []
-      },
-      {
-        "chords": ["4", "4m", "3m", "b3o"],
+        "progression": ["4", "4m", "3m", "b3o"],
         "thoery": ["王道進行 variation"],
         "music": [
           { "artist": "まふまふ",  "title": "女の子になりたい",  "part": "Intro",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": [["4"], ["37"], ["6m"], ["5m", "17"]],
+        "progression": [["4"], ["37"], ["6m"], ["5m", "17"]],
         "thoery": ["丸サ進行"],
         "music": [
           { "artist": "YOASOBI",  "title": "夜に駆ける",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
@@ -477,7 +463,7 @@
         ]
       },
       {
-        "chords": ["4", "3", "6m", "1"],
+        "progression": ["4", "3", "6m", "1"],
         "thoery": ["丸サ進行 variation"],
         "music": [
           { "artist": "Ado",  "title": "うっせぇわ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
@@ -485,79 +471,74 @@
         ]
       },
       {
-        "chords": ["4", "3m", "6m", "1"],
+        "progression": ["4", "3m", "6m", "1"],
         "thoery": ["丸サ進行 variation"],
         "music": [
           { "artist": "YOASOBI",  "title": "アイドル",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["4", "3m", "6m", "#4o"],
+        "progression": ["4", "3m", "6m", "#4o"],
         "thoery": ["丸サ進行 variation"],
         "music": []
       },
       {
-        "chords": ["4", "3m", "5", "6"],
+        "progression": ["4", "3m", "5", "6"],
         "music": [
           { "artist": "茅原実里",  "title": "優しい忘却",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["4", "3m", "b3", "5"],
+        "progression": ["4", "3m", "b3", "5"],
         "music": []
       },
       {
-        "chords": [["4"], ["1/3"], ["b3"], ["5sus", "5"]],
+        "progression": [["4"], ["1/3"], ["b3"], ["5sus", "5"]],
         "music": []
       },
       {
-        "chords": ["4", "3m", "2", "5"],
+        "progression": ["4", "3m", "2", "5"],
         "music": []
       },
       {
-        "chords": ["4", "3m", "2", "b2m"],
+        "progression": ["4", "3m", "2", "b2m"],
         "music": []
       },
       {
-        "chords": ["4", "3m", "2m", "1"],
+        "progression": ["4", "3m", "2m", "1"],
         "music": []
       },
       {
-        "chords": [["4"], ["1", "2"], ["4"], ["5"]],
+        "progression": [["4"], ["1", "2"], ["4"], ["5"]],
         "music": [
           { "artist": "back number",  "title": "クリスマスソング",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["4", "1", "4", "1"],
+        "progression": ["4", "1", "4", "1"],
         "music": [
           { "artist": "back number",  "title": "クリスマスソング",  "part": "Verse",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["4", "2m", "5", "1"],
+        "progression": ["4", "2m", "5", "1"],
         "music": []
       },
       {
-        "chords": ["4", "2", "5m", "1"],
+        "progression": ["4", "2", "5m", "1"],
         "music": []
       },
       {
-        "chords": ["4", "1", "6m", "5"],
+        "progression": ["4", "1", "6m", "5"],
         "music": []
       },
       {
-        "chords": ["4", "1", "5", "6m"],
+        "progression": ["4", "1", "5", "6m"],
         "thoery": ["Axis Progression"],
         "music": [
           { "artist": "米津玄師",  "title": "Lemon",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
           { "artist": "米津玄師",  "title": "アイネクライネ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          {
-            " artist": "ヨルシカ",
-            "title": " ただ君に晴れ",
-            "part": "Chorus",
-            "genre": "Jpop"
-          }
+          { "artist": "ヨルシカ", "title": " ただ君に晴れ", "part": "Chorus", "genre": "Jpop" }
         ]
       }
     ]
@@ -566,19 +547,19 @@
     "note": "3",
     "progressions": [
       {
-        "chords": ["3m", "5", "6m", "1"],
+        "progression": ["3m", "5", "6m", "1"],
         "music": []
       },
       {
-        "chords": ["3m", "4", "#5o", "6m"],
+        "progression": ["3m", "4", "#5o", "6m"],
         "music": []
       },
       {
-        "chords": ["3m", "4", "5", "6m"],
+        "progression": ["3m", "4", "5", "6m"],
         "music": []
       },
       {
-        "chords": ["3m", "4", "5", "1"],
+        "progression": ["3m", "4", "5", "1"],
         "music": []
       }
     ]
@@ -587,7 +568,7 @@
     "note": "b3",
     "progressions": [
       {
-        "chords": ["b3"],
+        "progression": ["b3"],
         "music": []
       }
     ]
@@ -596,57 +577,57 @@
     "note": "2",
     "progressions": [
       {
-        "chords": ["2", "5", "b7", "6m"],
+        "progression": ["2", "5", "b7", "6m"],
         "music": []
       },
       {
-        "chords": ["2", "5", "b7", "5"],
+        "progression": ["2", "5", "b7", "5"],
         "music": []
       },
       {
-        "chords": ["2", "5", "1"],
+        "progression": ["2", "5", "1"],
         "music": []
       },
       {
-        "chords": ["2", "5", "1", "6m"],
+        "progression": ["2", "5", "1", "6m"],
         "music": []
       },
       {
-        "chords": ["2", "5", "1", "4"],
+        "progression": ["2", "5", "1", "4"],
         "music": []
       },
       {
-        "chords": ["2m", "5", "1mM7"],
+        "progression": ["2m", "5", "1mM7"],
         "music": []
       },
       {
-        "chords": ["2m", "3m", "6m7", "6"],
+        "progression": ["2m", "3m", "6m7", "6"],
         "music": [
           { "artist": "米津玄師",  "title": "死神",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["2m7", "37", "6m7", "67"],
+        "progression": ["2m7", "37", "6m7", "67"],
         "music": [
           { "artist": "Eve",  "title": "擬劇論",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["2m", "3m", "4", "5"],
+        "progression": ["2m", "3m", "4", "5"],
         "music": []
       },
       {
-        "chords": ["2m", "3m", "4", "3m"],
+        "progression": ["2m", "3m", "4", "3m"],
         "music": []
       },
       {
-        "chords": ["2m", "2m", "5", "5"],
+        "progression": ["2m", "2m", "5", "5"],
         "music": [
           { "artist": "7!!",  "title": "Orange",  "part": "Chorus",  "genre": "Jpop",  "subgenre": "Pop Rock",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["2m", "17", "4", "5"],
+        "progression": ["2m", "17", "4", "5"],
         "music": []
       }
     ]
@@ -655,7 +636,7 @@
     "note": "b2",
     "progressions": [
       {
-        "chords": ["b2"],
+        "progression": ["b2"],
         "music": []
       }
     ]
@@ -664,180 +645,180 @@
     "note": "1",
     "progressions": [
       {
-        "chords": ["1", "7o", "6m", "b6"],
+        "progression": ["1", "7o", "6m", "b6"],
         "theory": ["Modal Interchange"],
         "music": []
       },
       {
-        "chords": [[["1"], ["5/7"], ["5m/b7"], ["4/6"]], [["4m/b6"], ["1/5"], ["2/#4"], ["5"]]],
+        "progression": [[["1"], ["5/7"], ["5m/b7"], ["4/6"]], [["4m/b6"], ["1/5"], ["2/#4"], ["5"]]],
         "theory": ["Chromatic Descending", "Secondary Dominant", "Modal Interchange"],
         "music": []
       },
       {
-        "chords": [[["1"], ["5/7"], ["6m"], ["3m/5"]], [["4"], ["1/3"], ["2m"], ["5"]]],
+        "progression": [[["1"], ["5/7"], ["6m"], ["3m/5"]], [["4"], ["1/3"], ["2m"], ["5"]]],
         "theory": ["Canon Progression"],
         "music": [
           { "artist": "GReeeeN",  "title": "キセキ",  "part": "Verse",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": [[["1"], ["7ø7", "3/#5"], ["6m"], ["5m", "17"]], [["4M7"], ["1/3"], ["2M7"], ["4/5", "4m/5"]]],
+        "progression": [[["1"], ["7ø7", "3/#5"], ["6m"], ["5m", "17"]], [["4M7"], ["1/3"], ["2M7"], ["4/5", "4m/5"]]],
         "music": [
           { "artist": "Official髭男dism",  "title": "Pretender",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["1", "b7", "6m", "4"],
+        "progression": ["1", "b7", "6m", "4"],
         "music": []
       },
       {
-        "chords": ["1", "b7", "b6", "5"],
+        "progression": ["1", "b7", "b6", "5"],
         "music": []
       },
       {
-        "chords": ["1", "b7", "4", "4m"],
+        "progression": ["1", "b7", "4", "4m"],
         "theory": ["Modal Interchange"],
         "music": []
       },
       {
-        "chords": ["1", "b7m", "1", "b7m"],
+        "progression": ["1", "b7m", "1", "b7m"],
         "music": []
       },
       {
-        "chords": ["1", "b6o", "6m", "b7"],
+        "progression": ["1", "b6o", "6m", "b7"],
         "music": []
       },
       {
-        "chords": ["1", "b6", "1", "b6"],
+        "progression": ["1", "b6", "1", "b6"],
         "music": []
       },
       {
-        "chords": ["1", "5", "6", "5"],
+        "progression": ["1", "5", "6", "5"],
         "music": []
       },
       {
-        "chords": ["1", "5", "6m", "4"],
+        "progression": ["1", "5", "6m", "4"],
         "theory": ["Axis Progression"],
         "music": []
       },
       {
-        "chords": ["1", "5", "6m", "27"],
+        "progression": ["1", "5", "6m", "27"],
         "music": []
       },
       {
-        "chords": ["1", "5", "6m", "3m"],
+        "progression": ["1", "5", "6m", "3m"],
         "theory": ["Modal Interchange"],
         "music": []
       },
       {
-        "chords": ["1", "5m", "4", "4m"],
+        "progression": ["1", "5m", "4", "4m"],
         "theory": ["Modal Interchange"],
         "music": []
       },
       {
-        "chords": ["1", "4", "6m", "5"],
+        "progression": ["1", "4", "6m", "5"],
         "theory": ["50s Progression"],
         "music": []
       },
       {
-        "chords": ["1", "4m", "6m", "5"],
+        "progression": ["1", "4m", "6m", "5"],
         "theory": ["50s Progression", "Modal Interchange"],
         "music": []
       },
       {
-        "chords": ["1", "4", "5", "6m"],
+        "progression": ["1", "4", "5", "6m"],
         "music": []
       },
       {
-        "chords": ["1", "4", "5", "1"],
+        "progression": ["1", "4", "5", "1"],
         "music": [
           { "artist": "茅原実里",  "title": "優しい忘却",  "part": "Verse",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": [["1", "5m", "17"], ["4"], ["5"], ["6m"]],
+        "progression": [["1", "5m", "17"], "4", "5", "6m"],
         "theory": ["Chromatic Descending", "Pedal Note", "Line Cliche"],
         "music": [
           { "artist": "Debussy",  "title": "Clair de Lune",  "part": "Bar59",  "genre": "Classical",  "subgenre": "Impressionism",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["1", "4", "1/3", "4"],
+        "progression": ["1", "4", "1/3", "4"],
         "music": [
           { "artist": "Debussy",  "title": "Clair de Lune",  "part": "Bar9",  "genre": "Classical",  "subgenre": "Impressionism",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["1", "4", "1", "4"],
+        "progression": ["1", "4", "1", "4"],
         "music": []
       },
       {
-        "chords": ["1", "47", "1", "47"],
+        "progression": ["1", "47", "1", "47"],
         "music": []
       },
       {
-        "chords": ["1", "4", "2m", "b2"],
+        "progression": ["1", "4", "2m", "b2"],
         "music": []
       },
       {
-        "chords": ["1", "3m", "6m", "5"],
+        "progression": ["1", "3m", "6m", "5"],
         "music": [
           { "artist": "SEKAI NO OWARI",  "title": "Silent",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["1", "37", "6m", "5"],
+        "progression": ["1", "37", "6m", "5"],
         "theory": ["Secondary Dominant"],
         "music": [
           { "artist": "7!!",  "title": "Orange",  "part": "Chorus",  "genre": "Jpop",  "subgenre": "Pop Rock",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["1", "3m", "2m", "5"],
+        "progression": ["1", "3m", "2m", "5"],
         "music": []
       },
       {
-        "chords": ["1M9", "b3M7(13)", "b2M7(13)", "7M9"],
+        "progression": ["1M9", "b3M7(13)", "b2M7(13)", "7M9"],
         "music": []
       },
       {
-        "chords": ["1", "27", "1", "27"],
+        "progression": ["1", "27", "1", "27"],
         "theory": ["Lydian"],
         "music": []
       },
       {
-        "chords": ["1", "2", "1", "2"],
+        "progression": ["1", "2", "1", "2"],
         "theory": ["Lydian"],
         "music": []
       },
       {
-        "chords": ["1", "b2dim", "2m", "5"],
+        "progression": ["1", "b2dim", "2m", "5"],
         "music": [
           { "artist": "Max",  "title": "It's you",  "part": "Chorus",  "genre": "Pop",  "subgenre": "RnB",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["1", "1", "3o", "6m"],
+        "progression": ["1", "1", "3o", "6m"],
         "music": [
           { "artist": "Aira Yuuki",  "title": "Violet Snow",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
         ]
       },
       {
-        "chords": ["1M7", "17", "1(6)", "1+"],
+        "progression": ["1M7", "17", "1(6)", "1+"],
         "theory": ["Chromatic Descending", "Pedal Note", "Line Cliche"],
         "music": []
       },
       {
-        "chords": ["1", "1+", "6m/1", "17"],
+        "progression": ["1", "1+", "6m/1", "17"],
         "theory": ["Chromatic Accenting", "Line Cliche"],
         "music": []
       },
       {
-        "chords": ["1(no3)", "1(6, no3)", "1(no3)", "1(6, no3)"],
+        "progression": ["1(no3)", "1(6, no3)", "1(no3)", "1(6, no3)"],
         "music": []
       },
       {
-        "chords": ["1", "4/1", "1", "4m/1"],
+        "progression": ["1", "4/1", "1", "4m/1"],
         "music": []
       }
     ]

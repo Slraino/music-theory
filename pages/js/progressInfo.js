@@ -331,8 +331,8 @@ function findSelectedProgression(chordProgressions, progressionId, groupIndex) {
     const tryFindInGroup = (group) => {
         if (!group || !Array.isArray(group.progressions)) return null;
         return group.progressions.find(prog => {
-            if (!prog || !prog.chords) return false;
-            const id = chordsToProgressionId(prog.chords);
+            if (!prog || !prog.progression) return false;
+            const id = chordsToProgressionId(prog.progression);
             return id === progressionId;
         }) || null;
     };
