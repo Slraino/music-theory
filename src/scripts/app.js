@@ -655,7 +655,7 @@ function buildBackgroundYoutubeUrl(videoId, clipStart = 0) {
 
 let backgroundPreviewAutoStopTimeout;
 
-window.setBackgroundPreview = (videoId, clipStart = 0) => {
+window.setBackgroundPreview = (videoId, clipStart = 0, duration = 15) => {
     if (window.videoPreviewEnabled === false) return;
     
     // Increment session to invalidate any pending requests
@@ -686,13 +686,13 @@ window.setBackgroundPreview = (videoId, clipStart = 0) => {
     overlay.classList.add('is-active');
     startYouTubeVolumeControl(iframe);
 
-    // Auto-stop preview after 15s with 1s fade out
+    // Auto-stop preview after specified duration
     if (backgroundPreviewAutoStopTimeout) {
         clearTimeout(backgroundPreviewAutoStopTimeout);
     }
     backgroundPreviewAutoStopTimeout = setTimeout(() => {
         window.clearBackgroundPreview();
-    }, 15000);
+    }, duration * 1000);
 };
 
 window.clearBackgroundPreview = () => {
@@ -769,33 +769,14 @@ function startYouTubePreviewFadeIn() {
 
 function startYouTubePreviewFadeOut(iframe, durationMs = 1000, onComplete) {
     clearPreviewFadeTimers();
-    const steps = 20;
-    const stepTime = Math.max(20, Math.floor(durationMs / steps));
-    let currentStep = 0;
-    let completed = false;
     
-    const finishFadeOut = () => {
-        if (completed) return; // Prevent double execution
-        completed = true;
-        clearPreviewFadeTimers();
-        sendYouTubeCommand(iframe, 'stopVideo');
-        if (typeof onComplete === 'function') {
-            onComplete();
-        }
-    };
+    // Immediately mute and stop video instead of fading
+    sendYouTubeCommand(iframe, 'mute');
+    sendYouTubeCommand(iframe, 'stopVideo');
     
-    previewFadeInterval = setInterval(() => {
-        currentStep += 1;
-        const volume = Math.max(0, Math.round(100 - (currentStep / steps) * 100));
-        sendYouTubeCommand(iframe, 'setVolume', [volume]);
-        if (currentStep >= steps) {
-            finishFadeOut();
-        }
-    }, stepTime);
-    
-    previewFadeTimeout = setTimeout(() => {
-        finishFadeOut();
-    }, durationMs + 100);
+    if (typeof onComplete === 'function') {
+        onComplete();
+    }
 }
 
 function shouldFinalizeBackgroundClear(overlay, clearSession) {

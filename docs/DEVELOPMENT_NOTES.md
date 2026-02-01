@@ -143,3 +143,92 @@ const settings = await MusicTheoryDB.loadSettings();
 | Page CSS | pages/css/*.css |
 | JSON data | pages/json/*.json |
 | Audio | assets/audio/ |
+
+## chordProgression.json Format
+
+### Basic Progression (1 phrase, 4 bars)
+```json
+{
+  "progression": ["4", "5", "3m", "6m"],
+  "music": []
+}
+```
+
+### Progression with Multi-chord Bar
+```json
+{
+  "progression": ["4", "5", ["3m", "6m"], "1"],
+  "music": []
+}
+```
+
+### Progression with 2 Phrases (8+ bars)
+Each phrase on its own line for readability:
+```json
+{
+  "progression": [
+    [["4"], ["5"], ["3m"], ["6m"]],
+    [["4"], ["5"], ["1"], ["1"]]
+  ],
+  "music": []
+}
+```
+
+### Progression with 3-4 Phrases
+```json
+{
+  "progression": [
+    [["1"], ["5/7"], ["6m"], ["3m/5"]],
+    [["4"], ["1/3"], ["2m"], ["5"]],
+    [["1"], ["5/7"], ["6m"], ["5m", "17"]],
+    [["4M7"], ["1/3"], ["2M7"], ["5"]]
+  ],
+  "music": []
+}
+```
+
+### progressionVariation Format
+
+For songs that use a variation of the base progression.
+
+**1 phrase variation** (single line):
+```json
+"progressionVariation": ["6m", "4", "5", ["1", "5/7"]]
+```
+
+**2 phrase variation** (2 lines):
+```json
+"progressionVariation": [
+  ["4", "5", "3m", "6m"],
+  ["4", "5", "1", "1"]
+]
+```
+
+**2 phrase with multi-chord bars** (2 lines):
+```json
+"progressionVariation": [
+  [["6m7"], ["6m7", "b6m7"], ["5m7"], ["1"]],
+  [["4M7"], ["4M7"], ["3sus"], ["3"]]
+]
+```
+
+**3-4 phrase variation** (3-4 lines):
+```json
+"progressionVariation": [
+  [["4"], ["5"], ["3m"], ["6m"]],
+  [["4"], ["37", "37/#5"], ["6m"], ["5", "1"]],
+  [["4"], ["5"], ["3m"], ["6m"]],
+  [["2m"], ["5"], ["1"], ["1"]]
+]
+```
+
+### Format Rules Summary
+
+| Scenario | Format |
+|----------|--------|
+| Simple 4-bar | `["1", "2", "3", "4"]` |
+| Multi-chord in bar | `["1", ["2", "3"], "4", "5"]` |
+| 2+ phrases | Each phrase is own array, each bar is array of chords |
+| progressionVariation | Same rules, formatted for readability |
+
+**Tip**: For multi-phrase progressions, always use the fully nested format where each bar is wrapped in `[]` for consistency.

@@ -105,6 +105,115 @@
     pointer-events: none;
 }
 
+/* Phrase placeholder - visible dotted outline for adding phrases */
+.phrase-container.phrase-placeholder {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    background: rgba(10, 10, 15, 0.4);
+    min-height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.phrase-container.phrase-placeholder:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(10, 10, 15, 0.6);
+}
+
+.phrase-placeholder-icon {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.2s;
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    pointer-events: auto;
+}
+
+.phrase-placeholder:hover .phrase-placeholder-icon {
+    color: var(--brand);
+}
+
+/* Phrase remove button - top left corner */
+.phrase-remove-btn {
+    position: absolute;
+    top: -0.7rem;
+    left: -0.7rem;
+    width: 1.4rem;
+    height: 1.4rem;
+    min-width: 1.4rem;
+    min-height: 1.4rem;
+    padding: 0;
+    border-radius: 50%;
+    border: none;
+    background: rgba(10, 10, 15, 0.85);
+    color: var(--brand);
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.4rem;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+    z-index: 10;
+}
+
+.phrase-container:hover .phrase-remove-btn {
+    opacity: 1;
+}
+
+.phrase-remove-btn:hover {
+    background: rgba(10, 10, 15, 0.95);
+    transform: scale(1.15);
+}
+
+/* Phrase navigation container */
+.phrase-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.phrase-nav-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.25rem;
+    background: rgba(10, 10, 15, 0.8);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.phrase-nav-icon:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+    background: rgba(255, 23, 68, 0.1);
+}
+
+.phrase-nav-icon.active {
+    border-color: var(--brand);
+    color: var(--brand);
+    background: rgba(255, 23, 68, 0.2);
+}
+
 .controls-row.phrase-reserved {
     visibility: hidden;
     pointer-events: none;
@@ -228,6 +337,7 @@
     align-items: stretch;
     flex-wrap: nowrap;
     width: 100%;
+    position: relative;
     background: rgba(10, 10, 15, 0.92);
     border: none;
     border-radius: 0.5rem;

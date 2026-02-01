@@ -75,6 +75,77 @@ let originalPhrases = null; // Store original phrases when showing song-specific
 let currentlyPlayingSong = null; // Track currently playing song for display
 let currentProgressionName = null; // Track current progression name for variation message
 let currentProgressionChords = null; // Track current base chords for header display
+let currentPhraseView = 0; // 0 = phrases 1-2, 1 = phrases 3-4
+let allCurrentPhrases = []; // Store all phrases (up to 4) for navigation
+
+function rebuildProgressionFromPhrases(phrases) {
+    currentBars = [];
+    currentParents = [];
+    isSubstituted = [];
+
+    phrases.forEach(phrase => {
+        phrase.forEach(bar => {
+            currentBars.push(bar);
+            const parents = bar.map(chord => getDiatonicParent(chord));
+            currentParents.push(parents);
+            isSubstituted.push(bar.map(chord => !isChordDiatonic(chord)));
+        });
+    });
+}
+
+// Rebuild allCurrentPhrases from currentBars
+function rebuildPhrasesFromBars() {
+    const barsPerPhrase = (allCurrentPhrases[0]?.length) || 4;
+    const numPhrases = Math.ceil(currentBars.length / barsPerPhrase);
+    allCurrentPhrases = [];
+    
+    for (let p = 0; p < numPhrases; p++) {
+        const phraseStart = p * barsPerPhrase;
+        const phraseEnd = phraseStart + barsPerPhrase;
+        const phrase = currentBars.slice(phraseStart, phraseEnd);
+        if (phrase.length > 0) {
+            allCurrentPhrases.push(phrase);
+        }
+    }
+}
+
+function createPlaceholderPhrase(barsPerPhrase, onAdd) {
+    const placeholderPhrase = document.createElement('div');
+    placeholderPhrase.className = 'phrase-container phrase-placeholder';
+
+    for (let i = 0; i < barsPerPhrase; i++) {
+        const barDiv = document.createElement('div');
+        barDiv.className = 'progression-bar';
+
+        const chordWrapper = document.createElement('div');
+        chordWrapper.className = 'chord-wrapper';
+
+        const chordDiv = document.createElement('div');
+        chordDiv.className = 'chord-item';
+        chordDiv.textContent = '\u00A0';
+
+        chordWrapper.appendChild(chordDiv);
+        barDiv.appendChild(chordWrapper);
+        placeholderPhrase.appendChild(barDiv);
+    }
+
+    const addIcon = document.createElement('div');
+    addIcon.className = 'phrase-placeholder-icon';
+    addIcon.innerHTML = '+';
+    addIcon.title = 'Click to add phrase';
+
+    placeholderPhrase.appendChild(addIcon);
+    
+    // Make entire placeholder clickable to add phrase
+    if (typeof onAdd === 'function') {
+        placeholderPhrase.onclick = (e) => {
+            onAdd();
+        };
+        placeholderPhrase.style.cursor = 'pointer';
+    }
+    
+    return placeholderPhrase;
+}
 
 // Helper: Mark progression as modified and stop preview
 function markProgressionModified() {
@@ -114,6 +185,9 @@ function showSongChords(song, progressionName) {
         // Convert progressionVariation to phrases format
         const songPhrases = normalizePhrases(song.progressionVariation);
         
+        console.log('showSongChords - progressionVariation:', JSON.stringify(song.progressionVariation));
+        console.log('showSongChords - normalized to', songPhrases.length, 'phrases:', JSON.stringify(songPhrases));
+        
         // Update the visual display only (not currentBars - that's the "real" progression)
         updateChordGridVisualOnly(songPhrases);
         
@@ -133,8 +207,13 @@ function restoreSongChords() {
     
     currentlyPlayingSong = null;
     
-    // Restore the visual display
-    updateChordGridVisualOnly(originalPhrases);
+    // Clear visual-only phrase state
+    visualOnlyPhrases = [];
+    visualOnlyPhraseView = 0;
+    
+    // Restore the visual display with full interactivity (not visual-only)
+    // Use currentBars which contains the original progression data
+    updateChordGrid([currentBars]);
     
     // Restore original progression name display
     restoreProgressionNameDisplay();
@@ -230,6 +309,53 @@ function getCurrentPhrases() {
     // Reconstruct phrases from currentBars
     // For simplicity, treat all bars as one phrase
     return [currentBars.map(bar => Array.isArray(bar) ? bar : [bar])];
+}
+
+// Map degree-only notation to diatonic chord quality
+// Uses systemTransfer.diatonicChords.qualities: 1->major, 2->m, 3->m, 4->major, 5->major, 6->m, 7->o
+function toDiatonicChord(degree) {
+    if (!degree || typeof degree !== 'string') return degree;
+    
+    // Check if it's a pure degree with optional accidentals (b2, #4, 1, 2, etc.)
+    // Must match: optional accidentals followed by a single digit 1-7 and nothing else
+    const match = degree.match(/^([b#]*)([1-7])$/);
+    if (!match) return degree; // Already has quality or is complex chord
+    
+    const accidental = match[1];
+    const degreeNum = match[2];
+    
+    // Get quality from systemTransfer or use fallback
+    const diatonicQualities = systemTransferData?.diatonicChords?.qualities || 
+        { '1': '', '2': 'm', '3': 'm', '4': '', '5': '', '6': 'm', '7': 'o' };
+    
+    const quality = diatonicQualities[degreeNum] || '';
+    return accidental + degreeNum + quality;
+}
+
+// Apply diatonic mapping to all chords in phrases
+function applyDiatonicMapping(phrases) {
+    if (!phrases || !Array.isArray(phrases)) return phrases;
+    
+    return phrases.map(phrase => 
+        phrase.map(bar => 
+            Array.isArray(bar) ? bar.map(chord => toDiatonicChord(chord)) : [toDiatonicChord(bar)]
+        )
+    );
+}
+
+// Split progression into phrases if it has 8+ bars (split into groups of 4)
+function splitIntoPhrases(bars) {
+    if (!bars || bars.length <= 4) {
+        return [bars];
+    }
+    
+    // Split into chunks of 4
+    const phrases = [];
+    for (let i = 0; i < bars.length; i += 4) {
+        phrases.push(bars.slice(i, i + 4));
+    }
+    
+    return phrases;
 }
 
 // Check if a single chord is diatonic in major key
@@ -393,12 +519,40 @@ function isChordDiatonic(chord) {
 }
 
 // Visual-only update of chord grid (doesn't affect currentBars)
+// Used for song-specific progressionVariation display
 function updateChordGridVisualOnly(phrases) {
     const display = document.getElementById('progressionDisplay');
     if (!display) return;
 
     display.innerHTML = '';
+    
+    // Store all phrases for navigation (but don't affect currentBars)
+    const allPhrases = phrases || [];
+    
+    // Store in a temporary variable for visual-only navigation
+    visualOnlyPhrases = allPhrases;
+    visualOnlyPhraseView = 0; // Reset to first view
+    
+    // Determine which phrases to show (first 2 phrases of current view)
+    const startIdx = 0;
+    const viewPhrases = allPhrases.slice(startIdx, startIdx + 2);
+    
+    renderVisualOnlyPhrases(display, viewPhrases);
+    
+    // Show phrase navigation if 3+ phrases
+    if (allPhrases.length > 2) {
+        renderVisualOnlyPhraseNavigation(display, allPhrases.length);
+    }
+}
 
+// Temporary storage for visual-only phrase display (progressionVariation)
+let visualOnlyPhrases = [];
+let visualOnlyPhraseView = 0;
+
+// Render phrases for visual-only display
+function renderVisualOnlyPhrases(display, phrases) {
+    display.innerHTML = '';
+    
     const displayPhrases = (phrases || []).map(phrase => ({ bars: phrase }));
 
     displayPhrases.forEach(phraseData => {
@@ -407,14 +561,22 @@ function updateChordGridVisualOnly(phrases) {
         phraseContainer.classList.add('song-specific-display'); // Mark as visual-only
 
         phraseData.bars.forEach(bar => {
+            // Ensure bar is always an array
+            const barArray = Array.isArray(bar) ? bar : [bar];
+            
             const barDiv = document.createElement('div');
             barDiv.className = 'progression-bar';
-            if (bar.length > 1) barDiv.classList.add('multi-chord');
+            // Count non-empty chords for multi-chord styling
+            const nonEmptyChords = barArray.filter(c => c && c !== '');
+            if (nonEmptyChords.length > 1) barDiv.classList.add('multi-chord');
             
             // Disable interactions for song-specific display
             barDiv.style.pointerEvents = 'none';
 
-            bar.forEach(degree => {
+            barArray.forEach(degree => {
+                // Skip empty chords (but bar still renders)
+                if (!degree || degree === '') return;
+                
                 const chordWrapper = document.createElement('div');
                 chordWrapper.className = 'chord-wrapper';
 
@@ -437,29 +599,72 @@ function updateChordGridVisualOnly(phrases) {
         display.appendChild(phraseContainer);
     });
     
-    // Always reserve space for 2 phrases to prevent layout shift
+    // Show phrase placeholder if less than 2 phrases shown
     if (displayPhrases.length < 2) {
         const barsPerPhrase = (displayPhrases[0] && displayPhrases[0].bars && displayPhrases[0].bars.length) || 4;
-        const reservedPhrase = document.createElement('div');
-        reservedPhrase.className = 'phrase-container phrase-reserved song-specific-display';
-        
-        for (let i = 0; i < barsPerPhrase; i++) {
-            const barDiv = document.createElement('div');
-            barDiv.className = 'progression-bar';
-            
-            const chordWrapper = document.createElement('div');
-            chordWrapper.className = 'chord-wrapper';
-            
-            const chordDiv = document.createElement('div');
-            chordDiv.className = 'chord-item';
-            chordDiv.textContent = '\u00A0';
-            
-            chordWrapper.appendChild(chordDiv);
-            barDiv.appendChild(chordWrapper);
-            reservedPhrase.appendChild(barDiv);
-        }
-        
-        display.appendChild(reservedPhrase);
+        const placeholderPhrase = createPlaceholderPhrase(barsPerPhrase, null);
+        placeholderPhrase.classList.add('song-specific-display');
+        placeholderPhrase.style.pointerEvents = 'none';
+        placeholderPhrase.style.opacity = '0.5';
+        display.appendChild(placeholderPhrase);
+    }
+}
+
+// Render phrase navigation for visual-only display (progressionVariation songs)
+function renderVisualOnlyPhraseNavigation(container, totalPhrases) {
+    // Remove existing navigation
+    const existingNav = container.parentElement?.querySelector('.phrase-navigation');
+    if (existingNav) existingNav.remove();
+    
+    const nav = document.createElement('div');
+    nav.className = 'phrase-navigation';
+    
+    // Icon 1: Shows phrases 1-2
+    const icon1 = document.createElement('div');
+    icon1.className = 'phrase-nav-icon' + (visualOnlyPhraseView === 0 ? ' active' : '');
+    icon1.textContent = '1';
+    icon1.title = 'View phrases 1-2';
+    icon1.onmouseenter = () => switchVisualOnlyPhraseView(0);
+    icon1.onclick = () => switchVisualOnlyPhraseView(0);
+    
+    // Icon 2: Shows phrases 3-4
+    const icon2 = document.createElement('div');
+    icon2.className = 'phrase-nav-icon' + (visualOnlyPhraseView === 1 ? ' active' : '');
+    icon2.textContent = '2';
+    icon2.title = 'View phrases 3-4';
+    icon2.onmouseenter = () => switchVisualOnlyPhraseView(1);
+    icon2.onclick = () => switchVisualOnlyPhraseView(1);
+    
+    nav.appendChild(icon1);
+    nav.appendChild(icon2);
+    
+    // Insert after the progression display
+    container.parentElement?.insertBefore(nav, container.nextSibling);
+}
+
+// Switch visual-only phrase view
+function switchVisualOnlyPhraseView(viewIndex) {
+    if (visualOnlyPhraseView === viewIndex) return;
+    if (visualOnlyPhrases.length <= 2 && viewIndex > 0) return;
+    
+    visualOnlyPhraseView = viewIndex;
+    
+    const display = document.getElementById('progressionDisplay');
+    if (!display) return;
+    
+    // Get the phrases for this view
+    const startIdx = viewIndex * 2;
+    const viewPhrases = visualOnlyPhrases.slice(startIdx, startIdx + 2);
+    
+    // Re-render phrases
+    renderVisualOnlyPhrases(display, viewPhrases);
+    
+    // Update navigation icons active state
+    const navIcons = display.parentElement?.querySelectorAll('.phrase-nav-icon');
+    if (navIcons) {
+        navIcons.forEach((icon, i) => {
+            icon.classList.toggle('active', i === viewIndex);
+        });
     }
 }
 
@@ -476,22 +681,60 @@ function normalizePhrases(chords) {
             return chords;
         }
         
-        // Check if inner arrays contain only strings (bars format, not phrases)
-        // e.g., [["4M7"], ["4/5"], ["3m7"], ["6m7", "b6m7"]] - 1 phrase with 4 bars
+        // Check if inner arrays contain only strings
         const allInnerAreStringArrays = chords.every(item => 
             Array.isArray(item) && item.every(el => typeof el === 'string')
         );
         
         if (allInnerAreStringArrays) {
+            // Distinguish between bars format and phrases format by inner array length
+            // Bars format: [["4M7"], ["4/5"], ["3m7"]] - each inner array is 1-2 elements (multi-chord bar)
+            // Phrases format: [["4","5","1","5"],["4","5","b6","b7"]] - each inner array is 3-4+ elements (phrase)
+            
+            // Calculate average inner array length
+            const avgLength = chords.reduce((sum, item) => sum + item.length, 0) / chords.length;
+            
+            // If average length is >= 3, treat as phrases format (each inner array is a phrase with multiple bars)
+            // Bars rarely have more than 2 chords, phrases typically have 4 bars
+            const likelyPhrasesFormat = avgLength >= 3;
+            
+            if (likelyPhrasesFormat) {
+                // It's progressionVariation format: [["4", "5", "3m", "6m"], ["4", "5", "1", "1"]]
+                // Each inner array is a phrase, each string is a single-chord bar
+                // Handle comma-separated chords like "4M7, 4mM7" -> ["4M7", "4mM7"]
+                return chords.map(phrase => {
+                    if (Array.isArray(phrase)) {
+                        return phrase.map(chord => {
+                            if (Array.isArray(chord)) return chord;
+                            // Split comma-separated chords into multi-chord bar
+                            if (typeof chord === 'string' && chord.includes(',')) {
+                                return chord.split(',').map(c => c.trim()).filter(c => c);
+                            }
+                            return [chord];
+                        });
+                    }
+                    return [[phrase]];
+                });
+            }
+            
             // This is bars format - wrap in single phrase
+            // e.g., [["4M7"], ["4/5"], ["3m7"], ["6m7", "b6m7"]] - 1 phrase with 4 bars
             return [chords];
         }
         
-        // It's progressionVariation format: [["4", "5", "3m", "6m"], ["4", "5", "1", "1"]]
-        // Each inner array is a phrase, each string is a single-chord bar
+        // It's progressionVariation format with mixed content
+        // Each inner array is a phrase, each element is a bar (string or array)
+        // Handle comma-separated chords
         return chords.map(phrase => {
             if (Array.isArray(phrase)) {
-                return phrase.map(chord => Array.isArray(chord) ? chord : [chord]);
+                return phrase.map(chord => {
+                    if (Array.isArray(chord)) return chord;
+                    // Split comma-separated chords into multi-chord bar
+                    if (typeof chord === 'string' && chord.includes(',')) {
+                        return chord.split(',').map(c => c.trim()).filter(c => c);
+                    }
+                    return [chord];
+                });
             }
             return [[phrase]];
         });
@@ -499,8 +742,15 @@ function normalizePhrases(chords) {
     
     // Simple/mixed array of chords: ["6m", "4", "5", ["1", "5/7"]]
     // Some elements are strings (single chord bar), some are arrays (multi-chord bar)
-    // Convert to single phrase with proper bar format
-    return [chords.map(c => Array.isArray(c) ? c : [c])];
+    // Handle comma-separated chords
+    return [chords.map(c => {
+        if (Array.isArray(c)) return c;
+        // Split comma-separated chords into multi-chord bar
+        if (typeof c === 'string' && c.includes(',')) {
+            return c.split(',').map(ch => ch.trim()).filter(ch => ch);
+        }
+        return [c];
+    })];
 }
 
 const KEYS = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
@@ -744,14 +994,56 @@ async function initChordGenerator() {
                             Array.isArray(prog.progression[0][0]);
                         
                         if (isPhrasedProgression) {
-                            // Multi-phrase format: [[["1"], ["4"]], [[["5"], ["6m"]]]]
-                            // Already in phrase format
-                            allProgressions.push({ phrases: prog.progression, music: prog.music || [], progressionName: prog.progressionName || null });
+                            // Multi-phrase format: [[['1'], ['4']], [[['5'], ['6m']]]]
+                            // Already in phrase format - apply diatonic mapping
+                            const mappedPhrases = applyDiatonicMapping(prog.progression);
+                            allProgressions.push({ 
+                                rawPhrases: prog.progression,
+                                phrases: mappedPhrases, 
+                                music: prog.music || [], 
+                                progressionName: prog.progressionName || null 
+                            });
                         } else {
                             // Single phrase format
-                            // Could be: ["1", "4", "5"] or [["1", "5m"], ["4"], ["5"]]
-                            const bars = prog.progression.map(bar => Array.isArray(bar) ? bar : [bar]);
-                            allProgressions.push({ phrases: [bars], music: prog.music || [], progressionName: prog.progressionName || null });
+                            // Could be: ['1', '4', '5'] or [['1', '5m'], ['4'], ['5']]
+                            let bars = prog.progression.map(bar => {
+                                if (Array.isArray(bar)) {
+                                    // Filter out empty strings from multi-chord bars
+                                    const filtered = bar.filter(c => c && c.trim());
+                                    return filtered.length > 0 ? filtered : ['']; // Keep empty bar as single empty chord
+                                } else if (bar && bar.trim()) {
+                                    return [bar];
+                                } else {
+                                    return ['']; // Empty bar - keep as empty chord placeholder
+                                }
+                            }); // Don't filter out empty bars - they should render as empty
+                            
+                            // Debug: log progressions with 8+ bars
+                            if (bars.length >= 8) {
+                                console.log('8+ bar progression found:', bars.length, 'bars -', prog.progression.slice(0, 4).join(', '));
+                            }
+                            
+                            // Store raw bars for header display
+                            const rawBars = JSON.parse(JSON.stringify(bars));
+                            
+                            // Split into phrases if 8+ bars
+                            const phrases = splitIntoPhrases(bars);
+                            const rawPhrases = splitIntoPhrases(rawBars);
+                            
+                            // Debug: verify phrase split
+                            if (bars.length >= 8) {
+                                console.log('  Split into', phrases.length, 'phrases');
+                            }
+                            
+                            // Apply diatonic mapping to phrases for comparison
+                            const mappedPhrases = applyDiatonicMapping(phrases);
+                            
+                            allProgressions.push({ 
+                                rawPhrases: rawPhrases,
+                                phrases: mappedPhrases, 
+                                music: prog.music || [], 
+                                progressionName: prog.progressionName || null 
+                            });
                         }
                     }
                 });
@@ -955,7 +1247,7 @@ function refreshChords() {
     }
 
     let randomIndex;
-    const maxHistory = 10;
+    const maxHistory = 15;
     const recentSet = new Set(recentProgressionIndices);
     
     // If history is larger than available progressions, trim it
@@ -988,15 +1280,34 @@ function refreshChords() {
     }
     const randomProgression = allProgressions[randomIndex];
     
+    // Debug: log what we're loading
+    console.log('refreshChords - loading progression:', randomIndex);
+    console.log('  Raw phrases structure:', JSON.stringify(randomProgression.phrases).substring(0, 200));
+    
     // Reset modification flag when loading a new progression
     isProgressionModified = false;
+    
+    // Reset phrase view to first pair
+    currentPhraseView = 0;
+    
+    // Phrases are already diatonic-mapped when loaded, use directly
+    const displayPhrases = randomProgression.phrases;
+    
+    // Debug: verify phrase structure
+    console.log('  displayPhrases count:', displayPhrases.length);
+    displayPhrases.forEach((p, i) => {
+        console.log('    Phrase', i + 1, ':', p.length, 'bars');
+    });
+    
+    // Store all phrases for navigation (up to 4 phrases)
+    allCurrentPhrases = displayPhrases.map(phrase => phrase.map(bar => [...bar]));
     
     // Flatten phrases into bars and keep track of phrase structure
     currentBars = [];
     currentParents = [];
     isSubstituted = [];
     
-    randomProgression.phrases.forEach(phrase => {
+    displayPhrases.forEach(phrase => {
         phrase.forEach(bar => {
             currentBars.push(bar);
             const parents = bar.map(chord => getDiatonicParent(chord));
@@ -1008,14 +1319,18 @@ function refreshChords() {
     
     // Store current progression info for variation messages
     currentProgressionName = randomProgression.progressionName;
-    currentProgressionChords = randomProgression.phrases;
+    currentProgressionChords = displayPhrases;
     
-    // Update chord header with base progression chords
-    updateChordHeader(randomProgression.phrases);
+    // Update chord header with RAW progression chords (degree-only, no diatonic mapping)
+    updateChordHeader(randomProgression.rawPhrases || randomProgression.phrases);
     
-    updateChordGrid(randomProgression.phrases);
+    // Get first 2 phrases for initial display
+    const viewPhrases = displayPhrases.slice(0, 2);
+    
+    // Update grid with diatonic-mapped chords (first 2 phrases)
+    updateChordGrid(viewPhrases);
     renderGeneratorMusic(randomProgression.music || [], randomProgression.progressionName);
-    updateProgressionNameDisplay(randomProgression.progressionName, randomProgression.phrases);
+    updateProgressionNameDisplay(randomProgression.progressionName, displayPhrases);
 }
 
 // Check if a chord progression is fully diatonic
@@ -1025,12 +1340,8 @@ function isProgressionDiatonic(phrases) {
     // Flatten all chords from phrases
     const allChords = phrases.flat(Infinity).filter(c => c && typeof c === 'string');
     
-    // Diatonic degrees (without alterations)
-    const diatonicDegrees = ['1', '2', '3', '4', '5', '6', '7'];
-    
-    // Expected qualities for diatonic chords in major key
-    // 1=major, 2=minor, 3=minor, 4=major, 5=major, 6=minor, 7=diminished
-    const diatonicQualities = {
+    // Get allowed qualities from systemTransfer or use fallback
+    const diatonicQualities = systemTransferData?.diatonicChords?.allowedQualities || {
         '1': ['', 'M7', 'M9', '6', '(6)', '(no3)', '(6, no3)', '+', 'sus', 'sus4', 'sus2', '7', '(9)'],
         '2': ['m', 'm7', 'm9', 'ø', 'ø7'],
         '3': ['m', 'm7', 'm9', 'sus', 'sus4'],
@@ -1092,7 +1403,8 @@ function isProgressionDiatonic(phrases) {
     return true;
 }
 
-// Update the page title (h1) to show base chords like "4 - 5 - 3m - 6m"
+// Update the page title (h1) to show base degrees like "4 - 5 - 3 - 6"
+// Only shows the first phrase's degrees (numbers only, no quality)
 function updateChordHeader(phrases) {
     const pageTitle = document.getElementById('pageTitle');
     if (!pageTitle) return;
@@ -1102,18 +1414,28 @@ function updateChordHeader(phrases) {
         return;
     }
     
-    // Flatten phrases to get first chord from each bar
-    const baseChords = [];
-    phrases.forEach(phrase => {
-        phrase.forEach(bar => {
-            if (Array.isArray(bar) && bar.length > 0) {
-                // Get just the first chord of each bar for the header
-                baseChords.push(bar[0]);
+    // Only use FIRST phrase for header (the base progression)
+    const firstPhrase = phrases[0];
+    if (!firstPhrase || !Array.isArray(firstPhrase)) {
+        pageTitle.textContent = 'Chord Generator';
+        return;
+    }
+    
+    // Get degree number only from each bar in the first phrase
+    const baseDegrees = [];
+    firstPhrase.forEach(bar => {
+        if (Array.isArray(bar) && bar.length > 0) {
+            // Get just the first chord of each bar, extract degree number only
+            const chord = bar[0];
+            // Extract just the degree number (e.g., "4m" -> "4", "b6" -> "b6", "3m7" -> "3")
+            const match = chord.match(/^([b#]*)([1-7])/);
+            if (match) {
+                baseDegrees.push(match[1] + match[2]); // accidental + degree number
             }
-        });
+        }
     });
     
-    const headerText = baseChords.join(' - ');
+    const headerText = baseDegrees.join(' - ');
     pageTitle.textContent = headerText;
 }
 
@@ -1171,9 +1493,10 @@ function updateProgressionNameDisplay(progressionName, phrases, forceVariation =
 
 // Check if current progression matches any in the database and show music examples
 function checkAndShowMusicExamples() {
-    // Always keep header in sync with current bars (including manual edits)
-    if (currentBars && currentBars.length > 0) {
-        updateChordHeader([currentBars]);
+    // Always keep header in sync with first phrase (including manual edits)
+    // Use allCurrentPhrases so we only show the first phrase's chords in header
+    if (allCurrentPhrases && allCurrentPhrases.length > 0) {
+        updateChordHeader(allCurrentPhrases);
     }
     
     if (!allProgressions || allProgressions.length === 0) {
@@ -1182,7 +1505,7 @@ function checkAndShowMusicExamples() {
     }
 
     // Flatten currentBars into a single array for comparison
-    const currentChords = currentBars.flat(Infinity).filter(c => c && typeof c === 'string');
+    const currentChords = currentBars.flat(Infinity).filter(c => c && typeof c === 'string' && c.trim());
     
     // Search through all progressions for a match
     let matchedMusic = [];
@@ -1196,7 +1519,7 @@ function checkAndShowMusicExamples() {
         
         if (prog.phrases && Array.isArray(prog.phrases)) {
             // Flatten all phrases into a single chord array
-            progChords = prog.phrases.flat(Infinity).filter(c => c && typeof c === 'string');
+            progChords = prog.phrases.flat(Infinity).filter(c => c && typeof c === 'string' && c.trim());
         }
         
         // Compare chord arrays
@@ -1218,7 +1541,10 @@ function checkAndShowMusicExamples() {
         updateProgressionNameDisplay(matchedProgressionName, matchedPhrases);
         renderGeneratorMusic(matchedMusic, matchedProgressionName);
     } else {
-        // No match: clear labels and music list
+        // No match: clear labels, music list, and stop auto-play
+        currentMusicList = [];  // Clear immediately before render
+        autoPlayQueue = [];     // Clear auto-play queue
+        autoPlayQueueKey = '';  // Reset queue key
         renderGeneratorMusic([]);
         updateProgressionNameDisplay([], []);
 
@@ -1228,6 +1554,7 @@ function checkAndShowMusicExamples() {
         }
         if (window.generatorMusicTimeout) {
             clearTimeout(window.generatorMusicTimeout);
+            window.generatorMusicTimeout = null;
         }
     }
 }
@@ -1459,7 +1786,26 @@ function autoPlayRandomMusic() {
         if (!randomSong) return;
         
         const clipStart = randomSong.clipStart || 0;
-        const clipDuration = 15;
+        
+        // Determine clip duration based on number of phrases
+        // Use song's progressionVariation phrase count if available, otherwise use base progression
+        // 1 phrase = 15s, 2 phrases = 25s, 3+ phrases = 35s
+        let phraseCount = allCurrentPhrases.length;
+        
+        // If song has progressionVariation, count its phrases instead
+        if (randomSong.progressionVariation) {
+            const songPhrases = normalizePhrases(randomSong.progressionVariation);
+            phraseCount = songPhrases.length;
+        }
+        
+        let clipDuration = 15;
+        if (phraseCount === 2) {
+            clipDuration = 25;
+        } else if (phraseCount > 2) {
+            clipDuration = 35;
+        }
+        
+        console.log('autoPlayRandomMusic - phraseCount:', phraseCount, 'clipDuration:', clipDuration + 's');
         
         // Show song-specific chords if available
         if (randomSong.progressionVariation) {
@@ -1470,7 +1816,8 @@ function autoPlayRandomMusic() {
         }
         
         if (typeof window.setBackgroundPreview === 'function') {
-            window.setBackgroundPreview(randomSong.youtubeId, clipStart);
+            // Pass duration to setBackgroundPreview so it knows when to auto-stop
+            window.setBackgroundPreview(randomSong.youtubeId, clipStart, clipDuration);
             
             // Schedule next random music after clip duration
             if (window.generatorMusicTimeout) {
@@ -1532,8 +1879,8 @@ function getDiatonicParent(chord) {
         }
     }
     
-    // Fallback: hardcoded mapping for common chromatic alterations
-    const diatonicMap = {
+    // Fallback: use chromaticParents from systemTransfer or hardcoded defaults
+    const chromaticParents = systemTransferData?.diatonicChords?.chromaticParents || {
         'b2': '2m', '#1': '2m',
         'b3': '3m', '#2': '3m',
         '#4': '4', 'b5': '5',
@@ -1541,7 +1888,7 @@ function getDiatonicParent(chord) {
         'b7': '7o', '#6': '7o'
     };
     
-    const parent = diatonicMap[degree];
+    const parent = chromaticParents[degree];
     if (parent) {
         // Return parent with same quality if possible
         const quality = baseChord.slice(degree.length);
@@ -1628,12 +1975,36 @@ function updateChordGrid(phrases) {
     const display = document.getElementById('progressionDisplay');
     if (!display) return;
 
+    // Debug: log what's being rendered
+    console.log('updateChordGrid - phrases count:', phrases.length);
+    phrases.forEach((p, i) => console.log('  Phrase', i + 1, '- bars:', p.length, '-', p.map(b => b.join(',')).join(' | ')));
+
     display.innerHTML = '';
     let barGlobalIndex = 0;
 
-    phrases.forEach(phrase => {
+    phrases.forEach((phrase, phraseIndex) => {
         const phraseContainer = document.createElement('div');
         phraseContainer.className = 'phrase-container';
+
+        const globalPhraseIndex = currentPhraseView * 2 + phraseIndex;
+        if (globalPhraseIndex >= 1) {
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'phrase-remove-btn';
+            removeBtn.type = 'button';
+            removeBtn.title = 'Remove phrase';
+            removeBtn.innerHTML = '×';
+            removeBtn.onmousedown = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            };
+            removeBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                removePhrase(globalPhraseIndex);
+            };
+            phraseContainer.appendChild(removeBtn);
+        }
 
         phrase.forEach(bar => {
             const barIndex = barGlobalIndex++;
@@ -1689,6 +2060,11 @@ function updateChordGrid(phrases) {
             };
 
             bar.forEach((degree, chordIndex) => {
+                // Skip rendering for empty chord placeholders (but bar is still shown)
+                if (!degree || degree === '') {
+                    return; // Empty bar - don't add chord, just show empty bar
+                }
+                
                 const chordWrapper = document.createElement('div');
                 chordWrapper.className = 'chord-wrapper';
 
@@ -1747,31 +2123,235 @@ function updateChordGrid(phrases) {
         display.appendChild(phraseContainer);
     });
 
-    // Always reserve space for a second phrase row to prevent layout shift
-    // when hovering songs with 2 phrases
+    // Always show phrase 2 slot - either with content or as placeholder
     if (phrases.length < 2) {
         const barsPerPhrase = (phrases[0] && phrases[0].length) || 4;
-        const reservedPhrase = document.createElement('div');
-        reservedPhrase.className = 'phrase-container phrase-reserved';
-        
-        for (let i = 0; i < barsPerPhrase; i++) {
+        const placeholderPhrase = createPlaceholderPhrase(barsPerPhrase, () => addNewPhrase());
+        display.appendChild(placeholderPhrase);
+    }
+    
+    // Add phrase navigation if there are more than 2 phrases available
+    renderPhraseNavigation(display);
+}
+
+// Render phrase navigation icons (1, 2) for viewing different phrase pairs
+function renderPhraseNavigation(container) {
+    // Remove existing navigation
+    const existingNav = container.parentElement?.querySelector('.phrase-navigation');
+    if (existingNav) existingNav.remove();
+    
+    // Only show navigation if there are 3+ phrases total
+    if (allCurrentPhrases.length <= 2) return;
+    
+    const nav = document.createElement('div');
+    nav.className = 'phrase-navigation';
+    
+    // Icon 1: Shows phrases 1-2
+    const icon1 = document.createElement('div');
+    icon1.className = 'phrase-nav-icon' + (currentPhraseView === 0 ? ' active' : '');
+    icon1.textContent = '1';
+    icon1.title = 'View phrases 1-2';
+    icon1.onmouseenter = () => switchPhraseView(0);
+    icon1.onclick = () => switchPhraseView(0);
+    
+    // Icon 2: Shows phrases 3-4
+    const icon2 = document.createElement('div');
+    icon2.className = 'phrase-nav-icon' + (currentPhraseView === 1 ? ' active' : '');
+    icon2.textContent = '2';
+    icon2.title = 'View phrases 3-4';
+    icon2.onmouseenter = () => switchPhraseView(1);
+    icon2.onclick = () => switchPhraseView(1);
+    
+    nav.appendChild(icon1);
+    nav.appendChild(icon2);
+    
+    // Insert after the progression display
+    container.parentElement?.insertBefore(nav, container.nextSibling);
+}
+
+// Switch between phrase views (0 = phrases 1-2, 1 = phrases 3-4)
+function switchPhraseView(viewIndex) {
+    if (currentPhraseView === viewIndex) return;
+    if (allCurrentPhrases.length <= 2 && viewIndex > 0) return;
+    
+    currentPhraseView = viewIndex;
+    
+    // Get the phrases for this view
+    const startIdx = viewIndex * 2;
+    const viewPhrases = allCurrentPhrases.slice(startIdx, startIdx + 2);
+    
+    // Re-render with new view (but don't update allCurrentPhrases)
+    updateChordGridWithView(viewPhrases);
+}
+
+// Update chord grid for a specific view (without changing allCurrentPhrases)
+function updateChordGridWithView(phrases) {
+    const display = document.getElementById('progressionDisplay');
+    if (!display) return;
+
+    display.innerHTML = '';
+    
+    // Calculate bar offset based on current view
+    const barOffset = currentPhraseView * 2 * ((allCurrentPhrases[0]?.length) || 4);
+    let barLocalIndex = 0;
+
+    phrases.forEach((phrase, phraseIndex) => {
+        const phraseContainer = document.createElement('div');
+        phraseContainer.className = 'phrase-container';
+
+        const globalPhraseIndex = currentPhraseView * 2 + phraseIndex;
+        if (globalPhraseIndex >= 1) {
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'phrase-remove-btn';
+            removeBtn.type = 'button';
+            removeBtn.title = 'Remove phrase';
+            removeBtn.innerHTML = '×';
+            removeBtn.onmousedown = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            };
+            removeBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                removePhrase(globalPhraseIndex);
+            };
+            phraseContainer.appendChild(removeBtn);
+        }
+
+        phrase.forEach(bar => {
+            const barIndex = barOffset + barLocalIndex++;
             const barDiv = document.createElement('div');
             barDiv.className = 'progression-bar';
+            barDiv.dataset.barIndex = barIndex;
+            if (bar.length > 1) barDiv.classList.add('multi-chord');
+
+            // Track mouse position for insert location
+            let insertPosition = bar.length;
+            let cachedChordWrappers = null;
             
-            const chordWrapper = document.createElement('div');
-            chordWrapper.className = 'chord-wrapper';
+            barDiv.onmousemove = (e) => {
+                if (isSubstituteMode) return;
+                const mouseX = e.clientX;
+                if (!cachedChordWrappers) {
+                    cachedChordWrappers = barDiv.querySelectorAll('.chord-wrapper');
+                }
+                insertPosition = cachedChordWrappers.length;
+                for (let i = 0; i < cachedChordWrappers.length; i++) {
+                    const chordRect = cachedChordWrappers[i].getBoundingClientRect();
+                    const chordCenter = chordRect.left + chordRect.width / 2;
+                    if (mouseX < chordCenter) {
+                        insertPosition = i;
+                        break;
+                    }
+                }
+                showAddIndicator(e.clientX, e.clientY);
+            };
             
-            const chordDiv = document.createElement('div');
-            chordDiv.className = 'chord-item';
-            chordDiv.textContent = '\u00A0'; // Non-breaking space for height
-            
-            chordWrapper.appendChild(chordDiv);
-            barDiv.appendChild(chordWrapper);
-            reservedPhrase.appendChild(barDiv);
-        }
-        
-        display.appendChild(reservedPhrase);
+            barDiv.onmouseleave = () => hideAddIndicator();
+            barDiv.onclick = (e) => {
+                if (e.target === barDiv || e.target.classList.contains('progression-bar')) {
+                    addChordToBar(barIndex, insertPosition);
+                }
+            };
+            barDiv.oncontextmenu = (e) => e.preventDefault();
+
+            bar.forEach((degree, chordIndex) => {
+                const chordWrapper = document.createElement('div');
+                chordWrapper.className = 'chord-wrapper';
+
+                const chordDiv = document.createElement('div');
+                chordDiv.className = 'chord-item';
+                if (isSubstituted[barIndex] && isSubstituted[barIndex][chordIndex]) {
+                    chordDiv.classList.add('substituted');
+                }
+                const displayText = showDegrees ? degree : chordGenerator.degreeToNote(selectedKey, degree);
+                chordDiv.textContent = displayText;
+                chordDiv.title = 'Click: remove/substitute | Right-click: change chord';
+                
+                chordDiv.onmouseenter = () => {
+                    if (!isSubstituteMode) {
+                        const rect = chordDiv.getBoundingClientRect();
+                        showRemoveIndicator(rect.right + 8, rect.top + rect.height / 2);
+                    }
+                };
+                chordDiv.onmousemove = (e) => {
+                    if (!isSubstituteMode) showRemoveIndicator(e.clientX, e.clientY);
+                };
+                chordDiv.onmouseleave = () => hideAddIndicator();
+                chordDiv.onclick = (e) => {
+                    e.stopPropagation();
+                    if (isSubstituteMode) {
+                        replaceWithSubstitute(barIndex, chordIndex, degree);
+                    } else {
+                        removeChordFromBar(barIndex, chordIndex);
+                    }
+                };
+                chordDiv.oncontextmenu = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showChordSelector(chordWrapper, barIndex, chordIndex, degree);
+                };
+
+                chordWrapper.appendChild(chordDiv);
+                barDiv.appendChild(chordWrapper);
+            });
+
+            phraseContainer.appendChild(barDiv);
+        });
+
+        display.appendChild(phraseContainer);
+    });
+
+    // Show placeholder for second phrase slot if needed
+    if (phrases.length < 2) {
+        const barsPerPhrase = (phrases[0] && phrases[0].length) || 4;
+        const placeholderPhrase = createPlaceholderPhrase(barsPerPhrase, () => addNewPhrase());
+        display.appendChild(placeholderPhrase);
     }
+    
+    renderPhraseNavigation(display);
+}
+
+// Add a new phrase to the progression
+function addNewPhrase() {
+    if (allCurrentPhrases.length >= 4) return;
+
+    const barsPerPhrase = (allCurrentPhrases[0] && allCurrentPhrases[0].length) ? allCurrentPhrases[0].length : 4;
+    
+    // Create new phrase with default chords
+    const newPhrase = [];
+    for (let i = 0; i < barsPerPhrase; i++) {
+        newPhrase.push(['1']);
+    }
+    
+    allCurrentPhrases.push(newPhrase);
+    markProgressionModified();
+
+    rebuildProgressionFromPhrases(allCurrentPhrases);
+
+    // Update display
+    const viewPhrases = allCurrentPhrases.slice(currentPhraseView * 2, currentPhraseView * 2 + 2);
+    updateChordGridWithView(viewPhrases);
+    checkAndShowMusicExamples();
+}
+
+function removePhrase(phraseIndex) {
+    if (phraseIndex <= 0) return; // never remove first phrase
+    if (phraseIndex >= allCurrentPhrases.length) return;
+
+    allCurrentPhrases.splice(phraseIndex, 1);
+    markProgressionModified();
+
+    if (currentPhraseView * 2 >= allCurrentPhrases.length) {
+        currentPhraseView = 0;
+    }
+
+    rebuildProgressionFromPhrases(allCurrentPhrases);
+
+    const viewPhrases = allCurrentPhrases.slice(currentPhraseView * 2, currentPhraseView * 2 + 2);
+    updateChordGridWithView(viewPhrases);
+    checkAndShowMusicExamples();
 }
 
 // Add a new chord to a bar
@@ -1793,9 +2373,10 @@ function addChordToBar(barIndex, insertPosition = null) {
         isSubstituted[barIndex].splice(insertPosition, 0, false);
     }
     
-    // Rebuild display
-    const phrases = [currentBars];
-    updateChordGrid(phrases);
+    // Rebuild phrases from bars and display current view
+    rebuildPhrasesFromBars();
+    const viewPhrases = allCurrentPhrases.slice(currentPhraseView * 2, currentPhraseView * 2 + 2);
+    updateChordGridWithView(viewPhrases);
     checkAndShowMusicExamples();
 }
 
@@ -1810,9 +2391,10 @@ function removeChordFromBar(barIndex, chordIndex) {
     currentParents[barIndex].splice(chordIndex, 1);
     isSubstituted[barIndex].splice(chordIndex, 1);
     
-    // Rebuild display
-    const phrases = [currentBars];
-    updateChordGrid(phrases);
+    // Rebuild phrases from bars and display current view
+    rebuildPhrasesFromBars();
+    const viewPhrases = allCurrentPhrases.slice(currentPhraseView * 2, currentPhraseView * 2 + 2);
+    updateChordGridWithView(viewPhrases);
     checkAndShowMusicExamples();
 }
 

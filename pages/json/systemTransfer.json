@@ -126,6 +126,35 @@
 
   "parsingOrder": ["degree", "triads", "sixths", "sevenths", "accidentals", "suspended", "extended", "omitted", "slashed"],
 
+  "diatonicChords": {
+    "description": "Diatonic chord qualities in major key - used for degree-only notation conversion",
+    "qualities": {
+      "1": "",
+      "2": "m",
+      "3": "m", 
+      "4": "",
+      "5": "",
+      "6": "m",
+      "7": "o"
+    },
+    "allowedQualities": {
+      "1": ["", "M7", "M9", "6", "(6)", "(no3)", "(6, no3)", "+", "sus", "sus4", "sus2", "7", "(9)"],
+      "2": ["m", "m7", "m9", "ø", "ø7"],
+      "3": ["m", "m7", "m9", "sus", "sus4"],
+      "4": ["", "M7", "M9", "(9)", "sus"],
+      "5": ["", "7", "9", "sus", "sus4", "m7"],
+      "6": ["m", "m7", "m9", "", "7"],
+      "7": ["o", "ø", "ø7", "o7", "m7"]
+    },
+    "chromaticParents": {
+      "b2": "2m", "#1": "2m",
+      "b3": "3m", "#2": "3m",
+      "#4": "4", "b5": "5",
+      "b6": "6m", "#5": "6m",
+      "b7": "7o", "#6": "7o"
+    }
+  },
+
   "chordSubstitutions": {
     "substitutions": {
       "1": { "function": ["3m", "6m"], "modal": ["1m"], "tritone": [] },
