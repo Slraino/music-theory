@@ -67,8 +67,246 @@ let systemTransferData = null;
 let currentBars = [];
 let currentParents = [];
 let lastProgressionIndex = -1;
+let recentProgressionIndices = [];
 let isSubstituted = [];
+let isProgressionModified = false; // Track if user has manually modified the progression
 let bpm = 200;
+let originalPhrases = null; // Store original phrases when showing song-specific chords
+let currentlyPlayingSong = null; // Track currently playing song for display
+let currentProgressionName = null; // Track current progression name for variation message
+let currentProgressionChords = null; // Track current base chords for header display
+
+// Helper: Mark progression as modified and stop preview
+function markProgressionModified() {
+    isProgressionModified = true;
+    
+    // Restore original chords if song-specific display was showing
+    originalPhrases = null;
+    currentlyPlayingSong = null;
+    
+    // Immediately stop any playing preview
+    if (typeof window.clearBackgroundPreview === 'function') {
+        window.clearBackgroundPreview();
+    }
+    
+    // Clear auto-play timeout
+    if (window.generatorMusicTimeout) {
+        clearTimeout(window.generatorMusicTimeout);
+        window.generatorMusicTimeout = null;
+    }
+    
+    // Clear music list
+    currentMusicList = [];
+}
+
+// Show song-specific chord progression (for songs with chordVariation)
+function showSongChords(song, progressionName) {
+    try {
+        if (!song || !song.chordVariation) return false;
+        
+        // Store original phrases if not already stored
+        if (!originalPhrases) {
+            originalPhrases = getCurrentPhrases();
+        }
+        
+        currentlyPlayingSong = song;
+        
+        // Convert chordVariation to phrases format
+        // chordVariation is expected to be array of bars, e.g., [["4", "5", "3m", "6m"], ["4", "5", "1", "1"]]
+        const songPhrases = normalizePhrases(song.chordVariation);
+        
+        // Update the visual display only (not currentBars - that's the "real" progression)
+        updateChordGridVisualOnly(songPhrases);
+        
+        // Show variation message in tooltip, keep progression name visible
+        showVariationMessage(progressionName, songPhrases);
+        
+        console.log('Showing song-specific chords for:', song.title, song.chordVariation);
+        return true;
+    } catch (error) {
+        console.error('Error in showSongChords:', error);
+        return false;
+    }
+}
+
+// Restore original chord progression display
+function restoreSongChords() {
+    if (!originalPhrases) return;
+    
+    currentlyPlayingSong = null;
+    
+    // Restore the visual display
+    updateChordGridVisualOnly(originalPhrases);
+    
+    // Restore original progression name display
+    restoreProgressionNameDisplay();
+    
+    console.log('Restored original chords');
+    originalPhrases = null;
+}
+
+// Show variation message when a chordVariation song is playing
+function showVariationMessage(progressionName, songPhrases) {
+    const container = document.getElementById('progressionNameDisplay');
+    if (!container) return;
+
+    // Keep the progression name visible, but apply variation styling if non-diatonic
+    updateProgressionNameDisplay(progressionName || [], songPhrases || []);
+
+    const mainName = progressionName && Array.isArray(progressionName)
+        ? progressionName.filter(name => name.toLowerCase() !== 'variation').join(' ')
+        : '';
+
+    const message = mainName
+        ? `This is a variation of ${mainName}`
+        : 'This is a chord variation';
+
+    attachVariationTooltipToProgressionDisplay(message);
+}
+
+// Restore the original progression name display
+function restoreProgressionNameDisplay() {
+    if (currentProgressionName && currentProgressionChords) {
+        updateProgressionNameDisplay(currentProgressionName, [currentProgressionChords]);
+    }
+    detachVariationTooltipFromProgressionDisplay();
+}
+
+function attachVariationTooltipToProgressionDisplay(message) {
+    const display = document.getElementById('progressionDisplay');
+    if (!display) return;
+
+    display.dataset.variationTooltip = message;
+    if (display.dataset.variationTooltipBound === 'true') return;
+    display.dataset.variationTooltipBound = 'true';
+
+    let tooltip = null;
+
+    const handleMouseEnter = () => {
+        const text = display.dataset.variationTooltip;
+        if (!text) return;
+        if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.className = 'progression-variation-tooltip';
+            document.body.appendChild(tooltip);
+        }
+        tooltip.textContent = text;
+        const rect = display.getBoundingClientRect();
+        tooltip.style.left = rect.left + 'px';
+        tooltip.style.top = (rect.top - 36) + 'px';
+        tooltip.style.display = 'block';
+    };
+
+    const handleMouseLeave = () => {
+        if (tooltip) {
+            tooltip.style.display = 'none';
+        }
+    };
+
+    display._variationTooltipHandlers = { handleMouseEnter, handleMouseLeave };
+    display.addEventListener('mouseenter', handleMouseEnter);
+    display.addEventListener('mouseleave', handleMouseLeave);
+}
+
+function detachVariationTooltipFromProgressionDisplay() {
+    const display = document.getElementById('progressionDisplay');
+    if (!display) return;
+
+    if (display._variationTooltipHandlers) {
+        const { handleMouseEnter, handleMouseLeave } = display._variationTooltipHandlers;
+        display.removeEventListener('mouseenter', handleMouseEnter);
+        display.removeEventListener('mouseleave', handleMouseLeave);
+        display._variationTooltipHandlers = null;
+    }
+    delete display.dataset.variationTooltip;
+    delete display.dataset.variationTooltipBound;
+}
+
+// Get current phrases from currentBars
+function getCurrentPhrases() {
+    // Reconstruct phrases from currentBars
+    // For simplicity, treat all bars as one phrase
+    return [currentBars.map(bar => Array.isArray(bar) ? bar : [bar])];
+}
+
+// Visual-only update of chord grid (doesn't affect currentBars)
+function updateChordGridVisualOnly(phrases) {
+    const display = document.getElementById('progressionDisplay');
+    if (!display) return;
+
+    display.innerHTML = '';
+
+    const displayPhrases = (phrases || []).map(phrase => ({ bars: phrase, isPlaceholder: false }));
+    const barsPerPhrase = (phrases && phrases[0] && phrases[0].length) || currentBars.length || 4;
+
+    if (displayPhrases.length < 2) {
+        const placeholderBars = Array.from({ length: barsPerPhrase }, () => ['']);
+        displayPhrases.push({ bars: placeholderBars, isPlaceholder: true });
+    }
+
+    displayPhrases.forEach(phraseData => {
+        const phraseContainer = document.createElement('div');
+        phraseContainer.className = 'phrase-container';
+        phraseContainer.classList.add('song-specific-display'); // Mark as visual-only
+        if (phraseData.isPlaceholder) {
+            phraseContainer.classList.add('phrase-placeholder');
+        }
+
+        phraseData.bars.forEach(bar => {
+            const barDiv = document.createElement('div');
+            barDiv.className = 'progression-bar';
+            if (bar.length > 1) barDiv.classList.add('multi-chord');
+            
+            // Disable interactions for song-specific display
+            barDiv.style.pointerEvents = 'none';
+
+            bar.forEach(degree => {
+                const chordWrapper = document.createElement('div');
+                chordWrapper.className = 'chord-wrapper';
+
+                const chordDiv = document.createElement('div');
+                chordDiv.className = 'chord-item';
+                const displayText = showDegrees ? degree : chordGenerator.degreeToNote(selectedKey, degree);
+                chordDiv.textContent = displayText;
+
+                chordWrapper.appendChild(chordDiv);
+                barDiv.appendChild(chordWrapper);
+            });
+
+            phraseContainer.appendChild(barDiv);
+        });
+
+        display.appendChild(phraseContainer);
+    });
+}
+
+// Normalize chord data to phrases format
+// phrases = [[bar, bar, bar], [bar, bar, bar]] where bar = [chord, chord, ...]
+function normalizePhrases(chords) {
+    if (!chords || !Array.isArray(chords)) return [[[1]]];
+    
+    // Check if first element is an array
+    if (chords.length > 0 && Array.isArray(chords[0])) {
+        // Check if first element of first element is also an array (fully nested phrases format)
+        if (chords[0].length > 0 && Array.isArray(chords[0][0])) {
+            // Already in phrases format: [[["4"], ["5"]], [["3m"], ["6m"]]]
+            return chords;
+        }
+        
+        // It's chordVariation format: [["4", "5", "3m", "6m"], ["4", "5", "1", "1"]]
+        // Each inner array is a phrase, each string is a single-chord bar
+        return chords.map(phrase => {
+            if (Array.isArray(phrase)) {
+                return phrase.map(chord => Array.isArray(chord) ? chord : [chord]);
+            }
+            return [[phrase]];
+        });
+    }
+    
+    // Simple array of chords: ["4", "5", "3m", "6m"]
+    // Convert to single phrase with single-chord bars
+    return [chords.map(c => [c])];
+}
 
 const KEYS = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
@@ -313,12 +551,12 @@ async function initChordGenerator() {
                         if (isPhrasedProgression) {
                             // Multi-phrase format: [[["1"], ["4"]], [[["5"], ["6m"]]]]
                             // Already in phrase format
-                            allProgressions.push({ phrases: prog.chords, music: prog.music || [] });
+                            allProgressions.push({ phrases: prog.chords, music: prog.music || [], progressionName: prog.progressionName || null });
                         } else {
                             // Single phrase format
                             // Could be: ["1", "4", "5"] or [["1", "5m"], ["4"], ["5"]]
                             const bars = prog.chords.map(bar => Array.isArray(bar) ? bar : [bar]);
-                            allProgressions.push({ phrases: [bars], music: prog.music || [] });
+                            allProgressions.push({ phrases: [bars], music: prog.music || [], progressionName: prog.progressionName || null });
                         }
                     }
                 });
@@ -351,7 +589,7 @@ function renderChordGeneratorPage() {
 
     container.innerHTML = `
         <div class="key-selector">
-            <div class="left-spacer"></div>
+            <div class="left-spacer" id="progressionNameDisplay"></div>
             <button class="refresh-btn refresh-btn" onclick="refreshChords()">🔄 Refresh</button>
             <div class="controls-right">
                 <button class="toggle-btn" onclick="playProgression()" style="background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);">
@@ -475,20 +713,51 @@ window.setupPreviewButtonTooltip = function() {
 function refreshChords() {
     if (allProgressions.length === 0) return;
 
+    // Stop any playing preview and clear auto-play timeout on refresh
+    if (typeof window.clearBackgroundPreview === 'function') {
+        window.clearBackgroundPreview();
+    }
+    if (window.generatorMusicTimeout) {
+        clearTimeout(window.generatorMusicTimeout);
+        window.generatorMusicTimeout = null;
+    }
+
     let randomIndex;
+    const maxHistory = 10;
+    const recentSet = new Set(recentProgressionIndices);
     
-    // If there's only one progression, use it
-    if (allProgressions.length === 1) {
+    // If history is larger than available progressions, trim it
+    if (recentProgressionIndices.length > maxHistory) {
+        recentProgressionIndices = recentProgressionIndices.slice(-maxHistory);
+    }
+    
+    if (allProgressions.length <= 1) {
         randomIndex = 0;
     } else {
-        // Pick a random progression that's different from the last one
+        // Try to pick a progression not in recent history
+        let attempts = 0;
         do {
             randomIndex = Math.floor(Math.random() * allProgressions.length);
-        } while (randomIndex === lastProgressionIndex);
+            attempts += 1;
+        } while (recentSet.has(randomIndex) && attempts < 50);
+        
+        // Fallback: if all are in history, allow any except immediate last
+        if (recentSet.has(randomIndex) && allProgressions.length > 1) {
+            do {
+                randomIndex = Math.floor(Math.random() * allProgressions.length);
+            } while (randomIndex === lastProgressionIndex);
+        }
     }
     
     lastProgressionIndex = randomIndex;
+    recentProgressionIndices.push(randomIndex);
+    if (recentProgressionIndices.length > maxHistory) {
+        recentProgressionIndices = recentProgressionIndices.slice(-maxHistory);
+    }
     const randomProgression = allProgressions[randomIndex];
+    
+    // Reset modification flag when loading a new progression
+    isProgressionModified = false;
     
     // Flatten phrases into bars and keep track of phrase structure
     currentBars = [];
@@ -505,12 +774,180 @@ function refreshChords() {
         });
     });
     
+    // Store current progression info for variation messages
+    currentProgressionName = randomProgression.progressionName;
+    currentProgressionChords = randomProgression.phrases;
+    
+    // Update chord header with base progression chords
+    updateChordHeader(randomProgression.phrases);
+    
     updateChordGrid(randomProgression.phrases);
-    renderGeneratorMusic(randomProgression.music || []);
+    renderGeneratorMusic(randomProgression.music || [], randomProgression.progressionName);
+    updateProgressionNameDisplay(randomProgression.progressionName, randomProgression.phrases);
+}
+
+// Check if a chord progression is fully diatonic
+function isProgressionDiatonic(phrases) {
+    if (!phrases || !Array.isArray(phrases)) return true;
+    
+    // Flatten all chords from phrases
+    const allChords = phrases.flat(Infinity).filter(c => c && typeof c === 'string');
+    
+    // Diatonic degrees (without alterations)
+    const diatonicDegrees = ['1', '2', '3', '4', '5', '6', '7'];
+    
+    // Expected qualities for diatonic chords in major key
+    // 1=major, 2=minor, 3=minor, 4=major, 5=major, 6=minor, 7=diminished
+    const diatonicQualities = {
+        '1': ['', 'M7', 'M9', '6', '(6)', '(no3)', '(6, no3)', '+', 'sus', 'sus4', 'sus2', '7', '(9)'],
+        '2': ['m', 'm7', 'm9', 'ø', 'ø7'],
+        '3': ['m', 'm7', 'm9', 'sus', 'sus4'],
+        '4': ['', 'M7', 'M9', '(9)', 'sus'],
+        '5': ['', '7', '9', 'sus', 'sus4', 'm7'],
+        '6': ['m', 'm7', 'm9', '', '7'],
+        '7': ['o', 'ø', 'ø7', 'o7', 'm7']
+    };
+    
+    for (const chord of allChords) {
+        // Handle slash chords - take only the part before the slash for main analysis
+        const baseChord = chord.split('/')[0];
+        
+        // Extract degree and quality
+        const degreeMatch = baseChord.match(/^([b#]?[1-7])/);
+        if (!degreeMatch) continue;
+        
+        const degree = degreeMatch[1];
+        const quality = baseChord.slice(degree.length);
+        
+        // Check if degree has chromatic alteration (b or #)
+        if (degree.startsWith('b') || degree.startsWith('#')) {
+            return false; // Non-diatonic due to chromatic alteration
+        }
+        
+        // Check if quality is diatonic for this degree
+        const allowedQualities = diatonicQualities[degree];
+        if (allowedQualities) {
+            // For degree 4, check if it's minor (4m, 4m7, etc.) - that's non-diatonic
+            if (degree === '4' && quality.startsWith('m')) {
+                return false;
+            }
+            // For degree 5, 5m is diatonic (Mixolydian borrowing common), but let's be strict
+            if (degree === '5' && quality.startsWith('m') && !quality.startsWith('m7')) {
+                // 5m without 7 is non-diatonic modal interchange
+                return false;
+            }
+            // For degree 2, if it's major (2, 27) it's non-diatonic (secondary dominant)
+            if (degree === '2' && !quality.startsWith('m') && !quality.startsWith('ø')) {
+                return false;
+            }
+            // For degree 3, if it's major (3, 37) it's non-diatonic (secondary dominant)
+            if (degree === '3' && !quality.startsWith('m') && !quality.startsWith('sus') && quality !== '') {
+                // 37, 3 alone with extensions that imply major
+                if (quality.match(/^7|^9|^M/)) {
+                    return false;
+                }
+            }
+            if (degree === '3' && quality === '') {
+                return false; // 3 major is non-diatonic
+            }
+            // For degree 6, if it's major (6, 67) it could be non-diatonic
+            if (degree === '6' && !quality.startsWith('m') && quality !== '' && quality !== '7') {
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
+
+// Update the page title (h1) to show base chords like "4 - 5 - 3m - 6m"
+function updateChordHeader(phrases) {
+    const pageTitle = document.getElementById('pageTitle');
+    if (!pageTitle) return;
+    
+    if (!phrases || !Array.isArray(phrases) || phrases.length === 0) {
+        pageTitle.textContent = 'Chord Generator';
+        return;
+    }
+    
+    // Flatten phrases to get first chord from each bar
+    const baseChords = [];
+    phrases.forEach(phrase => {
+        phrase.forEach(bar => {
+            if (Array.isArray(bar) && bar.length > 0) {
+                // Get just the first chord of each bar for the header
+                baseChords.push(bar[0]);
+            }
+        });
+    });
+    
+    const headerText = baseChords.join(' - ');
+    pageTitle.textContent = headerText;
+}
+
+// Update the progression name display
+function updateProgressionNameDisplay(progressionName, phrases) {
+    const container = document.getElementById('progressionNameDisplay');
+    if (!container) return;
+    
+    if (!progressionName || !Array.isArray(progressionName) || progressionName.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    // Check if the progression is diatonic based on actual chords
+    const isDiatonic = isProgressionDiatonic(phrases);
+    // Check if "variation" is explicitly in the progressionName array
+    const hasVariationLabel = progressionName.some(name => name.toLowerCase() === 'variation');
+    const mainName = progressionName.filter(name => name.toLowerCase() !== 'variation').join(' ');
+    const displayName = mainName || progressionName.join(' ');
+    
+    // Show as variation (salmon) if either: has "variation" label OR is non-diatonic
+    const isVariation = hasVariationLabel || !isDiatonic;
+    
+    if (isVariation) {
+        container.innerHTML = `<span class="progression-name-tag variation" data-tooltip="This is a variation of ${escapeHtml(displayName)}">${escapeHtml(displayName)}</span>`;
+    } else {
+        container.innerHTML = `<span class="progression-name-tag">${escapeHtml(displayName)}</span>`;
+    }
+    
+    // Setup hover tooltip for variation progressions
+    if (isVariation) {
+        const tag = container.querySelector('.progression-name-tag.variation');
+        if (tag) {
+            let tooltip = null;
+            
+            tag.addEventListener('mouseenter', function(e) {
+                const tooltipText = tag.dataset.tooltip;
+                if (!tooltip) {
+                    tooltip = document.createElement('div');
+                    tooltip.className = 'progression-variation-tooltip';
+                    tooltip.textContent = tooltipText;
+                    document.body.appendChild(tooltip);
+                }
+                
+                const rect = tag.getBoundingClientRect();
+                tooltip.style.left = rect.left + 'px';
+                tooltip.style.top = (rect.bottom + 8) + 'px';
+                tooltip.style.display = 'block';
+            });
+            
+            tag.addEventListener('mouseleave', function() {
+                if (tooltip) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+    }
 }
 
 // Check if current progression matches any in the database and show music examples
 function checkAndShowMusicExamples() {
+    // Always keep header in sync with current bars (including manual edits)
+    if (currentBars && currentBars.length > 0) {
+        updateChordHeader([currentBars]);
+    }
+    
     if (!allProgressions || allProgressions.length === 0) {
         renderGeneratorMusic([]);
         return;
@@ -521,6 +958,8 @@ function checkAndShowMusicExamples() {
     
     // Search through all progressions for a match
     let matchedMusic = [];
+    let matchedProgressionName = null;
+    let matchedPhrases = null;
     
     // allProgressions has been transformed to { phrases: [...], music: [...] }
     for (const prog of allProgressions) {
@@ -537,28 +976,60 @@ function checkAndShowMusicExamples() {
             const isMatch = progChords.every((chord, idx) => chord === currentChords[idx]);
             
             if (isMatch) {
-                if (prog.music && prog.music.length > 0) {
-                    matchedMusic = prog.music;
-                    break;
-                }
+                matchedMusic = prog.music || [];
+                matchedProgressionName = prog.progressionName || [];
+                matchedPhrases = prog.phrases || [];
+                break;
             }
         }
     }
-    
-    renderGeneratorMusic(matchedMusic);
+
+    if (matchedProgressionName && matchedPhrases) {
+        currentProgressionName = matchedProgressionName;
+        currentProgressionChords = matchedPhrases;
+        updateProgressionNameDisplay(matchedProgressionName, matchedPhrases);
+        renderGeneratorMusic(matchedMusic, matchedProgressionName);
+    } else {
+        // No match: clear labels and music list
+        renderGeneratorMusic([]);
+        updateProgressionNameDisplay([], []);
+
+        // Stop any playing preview and clear auto-play timeout
+        if (typeof window.clearBackgroundPreview === 'function') {
+            window.clearBackgroundPreview();
+        }
+        if (window.generatorMusicTimeout) {
+            clearTimeout(window.generatorMusicTimeout);
+        }
+    }
 }
 
-function renderGeneratorMusic(musicList) {
+// Store current music list globally for auto-play
+let currentMusicList = [];
+let currentMusicProgressionName = null; // Store progression name for variation messages
+let autoPlayQueue = [];
+let autoPlayQueueKey = '';
+
+function renderGeneratorMusic(musicList, progressionName) {
     const container = document.getElementById('generatorMusic');
     if (!container) return;
 
+    // Store progression name for chordVariation messages
+    currentMusicProgressionName = progressionName;
+
     if (!Array.isArray(musicList) || musicList.length === 0) {
         container.innerHTML = '<p class="detail-line" style="color: #888;">No music examples yet.</p>';
+        currentMusicList = [];
         return;
     }
 
+    // Store the music list for auto-play
+    currentMusicList = musicList.filter(song => song && song.youtubeId);
+    autoPlayQueueKey = buildMusicListKey(currentMusicList);
+    autoPlayQueue = buildShuffledQueue(currentMusicList.length);
+
     const artistMap = new Map();
-    musicList.forEach(song => {
+    musicList.forEach((song, songIndex) => {
         if (!song) return;
         let artistDisplay = '';
         if (Array.isArray(song.artist)) {
@@ -570,11 +1041,12 @@ function renderGeneratorMusic(musicList) {
         const part = song.part ? song.part.trim() : '';
         const youtubeId = song.youtubeId ? song.youtubeId.trim() : '';
         const clipStart = song.clipStart ? parseInt(song.clipStart) : 0;
+        const hasChordVariation = song.chordVariation ? 'true' : 'false';
         if (!artistDisplay && !title) return;
         const key = artistDisplay || 'Unknown Artist';
         if (!artistMap.has(key)) artistMap.set(key, []);
         if (title) {
-            artistMap.get(key).push({ title, part, youtubeId, clipStart });
+            artistMap.get(key).push({ title, part, youtubeId, clipStart, songIndex, hasChordVariation });
         }
     });
 
@@ -589,12 +1061,11 @@ function renderGeneratorMusic(musicList) {
         const titleLinks = [];
         
         titles.forEach(item => {
-            const titleWithPart = item.part ? `${item.title} (${item.part})` : item.title;
-            const key = `${titleWithPart}::${item.youtubeId || ''}`;
+            const key = `${item.title}::${item.youtubeId || ''}`;
             if (seen.has(key)) return;
             seen.add(key);
 
-            const safeTitle = escapeHtml(titleWithPart);
+            const safeTitle = escapeHtml(item.title);
             if (!item.youtubeId) {
                 titleLinks.push(safeTitle);
                 return;
@@ -603,8 +1074,8 @@ function renderGeneratorMusic(musicList) {
             const iframeUrl = buildYoutubeEmbedUrl(item.youtubeId, item.clipStart || 0, false);
             const tooltipId = `tooltip-${Math.random().toString(36).substr(2, 9)}`;
             
-            // Create link with separate tooltip in document
-            titleLinks.push(`<a class="music-link" data-tooltip="${tooltipId}" data-video-id="${item.youtubeId}" data-start="${item.clipStart || 0}">${safeTitle}</a>`);
+            // Create link with separate tooltip in document (include songIndex for chordVariation lookup)
+            titleLinks.push(`<a class="music-link" data-tooltip="${tooltipId}" data-video-id="${item.youtubeId}" data-start="${item.clipStart || 0}" data-song-index="${item.songIndex}" data-has-chord-variation="${item.hasChordVariation}">${safeTitle}</a>`);
             html += `<div class="music-tooltip" id="${tooltipId}" style="display: none;">
                 <iframe width="560" height="315" src="${escapeHtml(iframeUrl)}" 
                     title="${safeTitle}" frameborder="0" 
@@ -621,6 +1092,9 @@ function renderGeneratorMusic(musicList) {
 
     container.innerHTML = html;
     setupGeneratorMusicHoverHandlers(container);
+    
+    // Auto-start a random music preview
+    autoPlayRandomMusic();
 }
 
 function setupGeneratorMusicHoverHandlers(container) {
@@ -671,6 +1145,22 @@ function setupGeneratorMusicHoverHandlers(container) {
 
         const videoId = link.dataset.videoId;
         const clipStart = link.dataset.start || '0';
+        const songIndex = parseInt(link.dataset.songIndex);
+        const hasChordVariation = link.dataset.hasChordVariation === 'true';
+
+        // Stop auto-play when manually hovering
+        if (window.generatorMusicTimeout) {
+            clearTimeout(window.generatorMusicTimeout);
+        }
+
+        // Show song-specific chords if available (with safety check)
+        if (hasChordVariation && !isNaN(songIndex) && currentMusicList && currentMusicList[songIndex]) {
+            try {
+                showSongChords(currentMusicList[songIndex], currentMusicProgressionName);
+            } catch (error) {
+                console.error('Error showing song chords:', error);
+            }
+        }
 
         if (typeof window.setBackgroundPreview === 'function') {
             window.setBackgroundPreview(videoId, clipStart);
@@ -679,15 +1169,28 @@ function setupGeneratorMusicHoverHandlers(container) {
     };
 
     const handleMouseOut = (event) => {
+        const link = event.target.closest('.music-link');
+        // Only handle if we're actually leaving a music link
+        if (!link) return;
+        
         // Hide tooltip on mouseout
         if (disabledTooltip) {
             disabledTooltip.style.display = 'none';
         }
         
+        // Only clear and resume if preview is enabled
+        if (window.generatorPreviewEnabled !== true) return;
+        
         // Clear video preview when not hovering
         if (typeof window.clearBackgroundPreview === 'function') {
             window.clearBackgroundPreview();
         }
+        
+        // Restore original chords if a song-specific display was shown
+        restoreSongChords();
+        
+        // Resume auto-play after hover ends
+        setTimeout(() => autoPlayRandomMusic(), 1000);
     };
 
     container.addEventListener('mouseover', handleMouseOver);
@@ -700,6 +1203,68 @@ function buildYoutubeEmbedUrl(videoId, clipStart = 0, autoplay = false) {
     if (!videoId) return '';
     const autoplayParam = autoplay ? '1' : '0';
     return `https://www.youtube.com/embed/${videoId}?start=${clipStart}&autoplay=${autoplayParam}`;
+}
+
+// Auto-play a random music from the current list
+function autoPlayRandomMusic() {
+    if (!currentMusicList || currentMusicList.length === 0) return;
+    if (window.generatorPreviewEnabled !== true) return;
+    
+    try {
+        const currentKey = buildMusicListKey(currentMusicList);
+        if (currentKey !== autoPlayQueueKey) {
+            autoPlayQueueKey = currentKey;
+            autoPlayQueue = buildShuffledQueue(currentMusicList.length);
+        }
+        if (autoPlayQueue.length === 0) {
+            autoPlayQueue = buildShuffledQueue(currentMusicList.length);
+        }
+        const nextIndex = autoPlayQueue.shift();
+        const randomSong = currentMusicList[nextIndex];
+        if (!randomSong) return;
+        
+        const clipStart = randomSong.clipStart || 0;
+        const clipDuration = 15;
+        
+        console.log('Auto-playing:', randomSong.title, 'from', currentMusicList.length, 'songs, duration:', clipDuration);
+        
+        // Show song-specific chords if available
+        if (randomSong.chordVariation) {
+            showSongChords(randomSong, currentMusicProgressionName);
+        } else {
+            // Restore original chords if previous song had custom chords
+            restoreSongChords();
+        }
+        
+        if (typeof window.setBackgroundPreview === 'function') {
+            window.setBackgroundPreview(randomSong.youtubeId, clipStart);
+            
+            // Schedule next random music after clip duration
+            if (window.generatorMusicTimeout) {
+                clearTimeout(window.generatorMusicTimeout);
+            }
+            window.generatorMusicTimeout = setTimeout(() => {
+                autoPlayRandomMusic();
+            }, clipDuration * 1000);
+        }
+    } catch (error) {
+        console.error('Error in autoPlayRandomMusic:', error);
+    }
+}
+
+function buildMusicListKey(list) {
+    return (list || [])
+        .map(song => `${song.youtubeId || ''}:${song.clipStart || 0}`)
+        .join('|');
+}
+
+function buildShuffledQueue(length) {
+    const indices = Array.from({ length }, (_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return indices;
 }
 
 function cleanupGeneratorMusicHoverHandlers(container) {
@@ -959,11 +1524,45 @@ function updateChordGrid(phrases) {
         display.appendChild(phraseContainer);
         display.appendChild(controlsRow);
     });
+
+    // Always reserve space for a second phrase row to prevent layout shift
+    // when hovering songs with 2 phrases
+    if (phrases.length < 2) {
+        const barsPerPhrase = (phrases[0] && phrases[0].length) || 4;
+        const reservedPhrase = document.createElement('div');
+        reservedPhrase.className = 'phrase-container phrase-reserved';
+        
+        for (let i = 0; i < barsPerPhrase; i++) {
+            const barDiv = document.createElement('div');
+            barDiv.className = 'progression-bar';
+            
+            const chordWrapper = document.createElement('div');
+            chordWrapper.className = 'chord-wrapper';
+            
+            const chordDiv = document.createElement('div');
+            chordDiv.className = 'chord-item';
+            chordDiv.textContent = '\u00A0'; // Non-breaking space for height
+            
+            chordWrapper.appendChild(chordDiv);
+            barDiv.appendChild(chordWrapper);
+            reservedPhrase.appendChild(barDiv);
+        }
+        
+        display.appendChild(reservedPhrase);
+        
+        // Empty controls row for reserved phrase
+        const reservedControls = document.createElement('div');
+        reservedControls.className = 'controls-row phrase-reserved';
+        display.appendChild(reservedControls);
+    }
 }
 
 // Add a new chord to a bar
 function addChordToBar(barIndex, insertPosition = null) {
     if (!currentBars[barIndex]) return;
+    
+    // Mark as modified and stop preview
+    markProgressionModified();
     
     // If no position specified, add to end
     if (insertPosition === null || insertPosition >= currentBars[barIndex].length) {
@@ -986,6 +1585,9 @@ function addChordToBar(barIndex, insertPosition = null) {
 // Remove a chord from a bar
 function removeChordFromBar(barIndex, chordIndex) {
     if (!currentBars[barIndex] || currentBars[barIndex].length <= 1) return;
+    
+    // Mark as modified and stop preview
+    markProgressionModified();
     
     currentBars[barIndex].splice(chordIndex, 1);
     currentParents[barIndex].splice(chordIndex, 1);
@@ -1114,6 +1716,9 @@ function showChordTypes(typeList, chordTypes, barIndex, chordIndex) {
         btn.textContent = displayText;
         btn.className = 'type-btn';
         btn.onclick = () => {
+            // Mark as modified and stop preview
+            markProgressionModified();
+            
             currentBars[barIndex][chordIndex] = degree;
             // Update parent if user manually selects a new diatonic chord
             const newParent = getDiatonicParent(degree);
@@ -1162,6 +1767,10 @@ function replaceWithSubstitute(barIndex, chordIndex, currentDegree) {
     
     // Pick random substitution
     const newDegree = allSubs[Math.floor(Math.random() * allSubs.length)];
+    
+    // Mark as modified and stop preview
+    markProgressionModified();
+    
     currentBars[barIndex][chordIndex] = newDegree;
     
     // Mark as substituted if different from parent, otherwise mark as parent
@@ -1648,6 +2257,17 @@ function calculateVoiceMovement(voicing1, voicing2) {
 // ==================== CLEANUP ====================
 // Cleanup function to be called when leaving the page
 function cleanupChordGenerator() {
+    // Clear any pending music auto-play timeout
+    if (window.generatorMusicTimeout) {
+        clearTimeout(window.generatorMusicTimeout);
+        window.generatorMusicTimeout = null;
+    }
+    
+    // Clear background preview
+    if (typeof window.clearBackgroundPreview === 'function') {
+        window.clearBackgroundPreview();
+    }
+    
     // Remove indicator element
     if (addIndicator) {
         addIndicator.remove();

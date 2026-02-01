@@ -5,6 +5,7 @@ const AppConfig = {
     DEFAULT_SFX_VOLUME: 50,
     VOLUME_FADE_STEP: 0.1,
     VOLUME_FADE_INTERVAL: 100,
+    YOUTUBE_BGM_FADE_IN_DURATION: 2000,
     YOUTUBE_FADE_INTERVAL: 500,
     TRACK_RETRY_DELAY: 2000,
     TRACK_END_DELAY: 500,
@@ -629,6 +630,9 @@ document.addEventListener('DOMContentLoaded', () => {
     router.init();
 });
 
+// Session ID to track which preview request is current - prevents race conditions
+let backgroundPreviewSession = 0;
+
 function ensureBackgroundVideoOverlay() {
     let overlay = document.getElementById('bgVideoOverlay');
     if (!overlay) {
@@ -644,39 +648,175 @@ function ensureBackgroundVideoOverlay() {
 function buildBackgroundYoutubeUrl(videoId, clipStart = 0) {
     if (!videoId) return '';
     const start = clipStart || 0;
-    return `https://www.youtube.com/embed/${videoId}?start=${start}&autoplay=1&mute=0&controls=1&modestbranding=1&playsinline=1&rel=0&disablekb=0&fs=1`;
+    const origin = window.location?.origin ? `&origin=${encodeURIComponent(window.location.origin)}` : '';
+    return `https://www.youtube.com/embed/${videoId}?start=${start}&autoplay=1&mute=0&controls=1&modestbranding=1&playsinline=1&rel=0&disablekb=0&fs=1&enablejsapi=1${origin}`;
 }
+
+let backgroundPreviewAutoStopTimeout;
 
 window.setBackgroundPreview = (videoId, clipStart = 0) => {
     if (window.videoPreviewEnabled === false) return;
     
+    // Increment session to invalidate any pending requests
+    backgroundPreviewSession++;
+    const currentSession = backgroundPreviewSession;
+
+    // Cancel any pending fade-out from previous preview
+    clearPreviewFadeTimers();
+    
     const overlay = ensureBackgroundVideoOverlay();
-    const iframe = overlay.querySelector('iframe');
     const url = buildBackgroundYoutubeUrl(videoId, clipStart);
     if (!url) return;
-    if (iframe.src !== url) {
-        iframe.src = url;
+    
+    // Replace iframe entirely to cancel any pending loads
+    const oldIframe = overlay.querySelector('iframe');
+    if (oldIframe) {
+        oldIframe.remove();
     }
+    
+    const iframe = document.createElement('iframe');
+    iframe.title = 'Background Preview';
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+    iframe.allowFullscreen = true;
+    iframe.dataset.session = currentSession;
+    iframe.src = url;
+    overlay.appendChild(iframe);
+    
     overlay.classList.add('is-active');
     startYouTubeVolumeControl(iframe);
+
+    // Auto-stop preview after 15s with 1s fade out
+    if (backgroundPreviewAutoStopTimeout) {
+        clearTimeout(backgroundPreviewAutoStopTimeout);
+    }
+    backgroundPreviewAutoStopTimeout = setTimeout(() => {
+        window.clearBackgroundPreview();
+    }, 15000);
 };
 
 window.clearBackgroundPreview = () => {
+    // Increment session to invalidate any pending requests
+    backgroundPreviewSession++;
+    const clearSession = backgroundPreviewSession;
+    
     const overlay = document.getElementById('bgVideoOverlay');
     if (!overlay) return;
+
+    // Hide overlay immediately to avoid lingering preview screen
+    overlay.classList.remove('is-active');
     
     try {
         const iframe = overlay.querySelector('iframe');
-        if (iframe) {
-            iframe.src = '';
+        if (iframe && iframe.src && iframe.src !== 'about:blank') {
+            startYouTubePreviewFadeOut(iframe, 1000, () => {
+                if (shouldFinalizeBackgroundClear(overlay, clearSession)) {
+                    finalizeBackgroundPreviewClear(overlay);
+                }
+            });
+        } else {
+            if (shouldFinalizeBackgroundClear(overlay, clearSession)) {
+                finalizeBackgroundPreviewClear(overlay);
+            }
         }
-        overlay.classList.remove('is-active');
     } catch (e) {
         console.error('Error clearing background preview:', e);
+        if (shouldFinalizeBackgroundClear(overlay, clearSession)) {
+            finalizeBackgroundPreviewClear(overlay);
+        }
     }
     
     stopYouTubeVolumeControl();
+
+    if (backgroundPreviewAutoStopTimeout) {
+        clearTimeout(backgroundPreviewAutoStopTimeout);
+        backgroundPreviewAutoStopTimeout = null;
+    }
 };
+
+let previewFadeInterval;
+let previewFadeTimeout;
+let playerReadyDelay = 1500; // Wait for YouTube player to initialize
+
+function sendYouTubeCommand(iframe, func, args = []) {
+    if (!iframe || !iframe.contentWindow) return false;
+    try {
+        iframe.contentWindow.postMessage(JSON.stringify({
+            event: 'command',
+            func,
+            args
+        }), '*');
+        return true;
+    } catch (e) {
+        // Ignore postMessage errors
+        return false;
+    }
+}
+
+function clearPreviewFadeTimers() {
+    if (previewFadeInterval) {
+        clearInterval(previewFadeInterval);
+        previewFadeInterval = null;
+    }
+    if (previewFadeTimeout) {
+        clearTimeout(previewFadeTimeout);
+        previewFadeTimeout = null;
+    }
+}
+
+function startYouTubePreviewFadeIn() {
+    // Intentionally disabled to avoid preview delay
+}
+
+function startYouTubePreviewFadeOut(iframe, durationMs = 1000, onComplete) {
+    clearPreviewFadeTimers();
+    const steps = 20;
+    const stepTime = Math.max(20, Math.floor(durationMs / steps));
+    let currentStep = 0;
+    
+    previewFadeInterval = setInterval(() => {
+        currentStep += 1;
+        const volume = Math.max(0, Math.round(100 - (currentStep / steps) * 100));
+        sendYouTubeCommand(iframe, 'setVolume', [volume]);
+        if (currentStep >= steps) {
+            clearPreviewFadeTimers();
+            sendYouTubeCommand(iframe, 'stopVideo');
+            if (typeof onComplete === 'function') {
+                onComplete();
+            }
+        }
+    }, stepTime);
+    
+    previewFadeTimeout = setTimeout(() => {
+        clearPreviewFadeTimers();
+        sendYouTubeCommand(iframe, 'stopVideo');
+        if (typeof onComplete === 'function') {
+            onComplete();
+        }
+    }, durationMs + 100);
+}
+
+function shouldFinalizeBackgroundClear(overlay, clearSession) {
+    if (!overlay) return false;
+    const iframe = overlay.querySelector('iframe');
+    if (!iframe) return true;
+    const iframeSession = parseInt(iframe.dataset.session, 10);
+    return iframeSession === clearSession;
+}
+
+function finalizeBackgroundPreviewClear(overlay) {
+    // Remove iframe entirely to cancel any pending loads
+    const iframe = overlay.querySelector('iframe');
+    if (iframe) {
+        iframe.remove();
+    }
+    // Recreate empty iframe for next use
+    const newIframe = document.createElement('iframe');
+    newIframe.title = 'Background Preview';
+    newIframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+    newIframe.allowFullscreen = true;
+    overlay.appendChild(newIframe);
+    overlay.classList.remove('is-active');
+}
 
 let youTubeVolumeCheckInterval;
 let musicFadeInInterval; // Track fadeIn interval to prevent stacking
@@ -711,10 +851,13 @@ function stopYouTubeVolumeControl() {
     // Restore music volume
     if (soundEffects && soundEffects.audioElement && soundEffects.musicPlaying) {
         const targetVol = soundEffects.musicVolume;
+        const duration = AppConfig.YOUTUBE_BGM_FADE_IN_DURATION;
+        const steps = Math.max(1, Math.round(duration / AppConfig.VOLUME_FADE_INTERVAL));
+        const stepSize = targetVol / steps;
         
         musicFadeInInterval = setInterval(() => {
             if (soundEffects.audioElement.volume < targetVol) {
-                soundEffects.audioElement.volume = Math.min(targetVol, soundEffects.audioElement.volume + AppConfig.VOLUME_FADE_STEP);
+                soundEffects.audioElement.volume = Math.min(targetVol, soundEffects.audioElement.volume + stepSize);
             } else {
                 clearInterval(musicFadeInInterval);
                 musicFadeInInterval = null;

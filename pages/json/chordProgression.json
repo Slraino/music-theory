@@ -23,20 +23,28 @@
     "progressions": [
       {
         "chords": ["6m7", "b6m7", "5m7", "#4ø7"],
+        "progressionName": [],
         "theory": ["Chromatic Descending"],
         "music": []
       },
       {
         "chords": ["6m", "b6+", "1/5", "#4ø7"],
+        "progressionName":[],
         "theory": ["Line Chilche", "Chromatic Descending"],
         "music": [
-          { "artist": "μ's",  "title": "Snow Halation",  "part": "Pre-chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { "artist": "μ's",  "title": "Snow Halation",  "part": "Pre-chorus",  "genre": "Jpop",  "youtubeId": "vJ3jNTH2QL0",  "clipStart": 183 }
         ]
       },
       {
-        "chords": ["6m", "5", "4", "3m"],
+        "chords": ["6m", "6m", "b6m", "5m"],
         "theory": [],
-        "music": []
+        "music": [
+          {
+            "artist": "Eve",  "title": "廻廻奇譚",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "1tk1pqwrOys",  "clipStart": 48,
+            "chordVariation": [[["6m7"], ["6m7", "b6m7"], ["5m7"], ["1"]], [["4M7"], ["4M7"], ["3sus"], ["3"]]]
+          }
+        ]
       },
       {
         "chords": ["6m", "5", "4", "b7"],
@@ -44,49 +52,79 @@
         "music": []
       },
       {
-        "chords": [[["6m7"], ["6m7", "b6m7"], ["5m7"], ["1"]], [["4M7"], ["4M7"], ["3sus"], ["3"]]],
+        "chords": ["6m", "5", "4", "3m"],
         "theory": [],
-        "music": [
-          { "artist": "Eve",  "title": "廻廻奇譚",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
-        ]
+        "music": []
       },
       {
         "chords": ["6m", "4", "5", "1"],
-        "theory": ["小室進行"],
+        "progressionName": ["小室進行"],
+        "theory": [],
         "music": [
-          { "artist": "Joe Hisaishi",  "title": "Summer",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "l0GN40EL1VU",  "clipStart": 102 },
-          { "artist": "黒うさP",  "title": "千本桜",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "shs0rAiwsGQ",  "clipStart": 57 },
-          { "artist": "cosMo",  "title": "初音ミクの消失",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "VWVtIg5cdDU",  "clipStart": 107 },
-          { "artist": "しゃろう",  "title": "You and Me",  "part": "Chorus",  "genre": "Bgm",  "youtubeId": "WtRHih2nZxk",  "clipStart": 12 },
-          { "artist": "さユり",  "title": "花の塔",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "Rwzy6Qt8gq8",  "clipStart": 37 },
-          { "artist": "Ado",  "title": "ギラギラ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "sOiMD45QGLs",  "clipStart": 86 },
-          { "artist": "ナノウ",  "title": "ハロ／ハワユ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "-M4sAQYi6r4",  "clipStart": 116 }
-        ]
-      },
-      {
-        "chords": [["6m"], ["4"], ["5"], ["1", "5/7"]],
-        "theory": ["小室進行 variation"],
-        "music": [
-          { "artist": "164",  "title": "天之弱",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "40mP",  "title": "壊れたピエロ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "dai",  "title": "You",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "fripSide",  "title": "only my railgun",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "Umamusume",  "title": "GIRLS' LEGEND U",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { 
+            "artist": "Joe Hisaishi",  "title": "Summer",  "part": "Chorus",  "genre": "Modern",  
+            "youtubeId": "l0GN40EL1VU",  "clipStart": 102},
+          { 
+            "artist": "黒うさP",  "title": "千本桜",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "shs0rAiwsGQ",  "clipStart": 57},
+          { 
+            "artist": "cosMo",  "title": "初音ミクの消失",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "VWVtIg5cdDU",  "clipStart": 107 
+          },
+          { 
+            "artist": "しゃろう",  "title": "You and Me",  "part": "Chorus",  "genre": "Bgm",  
+            "youtubeId": "WtRHih2nZxk",  "clipStart": 12 },
+          { 
+            "artist": "さユり",  "title": "花の塔",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "Rwzy6Qt8gq8",  "clipStart": 37 },
+          { 
+            "artist": "Ado",  "title": "ギラギラ",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "sOiMD45QGLs",  "clipStart": 86},
+          { 
+            "artist": "ナノウ",  "title": "ハロ／ハワユ",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "URG6YnTPcac",  "clipStart": 116
+          },
+          { 
+            "artist": "dai",  "title": "You",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "i0397crkBlg",  "clipStart": 91
+          },
+          { 
+            "artist": "164",  "title": "天之弱",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "2-zPY0vrpjQ",  "clipStart": 69,
+            "chordVariation": [["6m"], ["4"], ["5"], ["1", "5/7"]]
+          },
+          { 
+            "artist": "40mP",  "title": "からくりピエロ",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "OiQYP-y4Fxc",  "clipStart": 121,
+            "chordVariation": [["6m"], ["4"], ["5"], ["1", "5/7"]]
+          },
+            { 
+              "artist": "fripSide",  "title": "only my railgun",  "part": "Chorus",  "genre": "Jpop",  
+              "youtubeId": "ZhIxg6_Femo",  "clipStart": 62,
+              "chordVariation": [["6m"], ["4"], ["5"], ["1", "5/7"]]
+            },
+            { 
+              "artist": "Umamusume",  "title": "GIRLS' LEGEND U",  "part": "Chorus",  "genre": "Jpop",  
+              "youtubeId": "G7RmGsHxv-Q",  "clipStart": 75,
+              "chordVariation": [["6m"], ["4"], ["5"], ["1", "5/7"]]
+            }
         ]
       },
       {
         "chords": ["6m", "4", "5", "3"],
-        "theory": ["小室進行 variation"],
+        "progressionName": ["小室進行", "variation"],
+        "theory": [],
         "music": [
-          { "artist": "ヨルシカ",  "title": "雨とカプチーノ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { "artist": "ヨルシカ",  "title": "雨とカプチーノ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "PWbRleMGagU",  "clipStart": 77 }
         ]
       },
       {
         "chords": ["6m", "4", "1", "5"],
-        "theory": ["Axis Progression"],
+        "progressionName": ["Axis Progression"],
+        "theory": [],
         "music": [
-          { "artist": "ONE OK ROCK",  "title": "The Beginning",  "part": "Verse",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "RADWIMPS",  "title": "前前前世",  "part": "Verse",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { "artist": "ONE OK ROCK",  "title": "The Beginning",  "part": "Verse",  "genre": "Jpop",  "youtubeId": "Hh9yZWeTmVM",  "clipStart": 51 },
+          { "artist": "RADWIMPS",  "title": "前前前世",  "part": "Verse",  "genre": "Jpop",  "youtubeId": "PDSkFeMVNFs",  "clipStart": 21 }
         ]
       },
       {
@@ -98,28 +136,28 @@
         "chords": ["6m", "3m", "4", "5"],
         "theory": [],
         "music": [
-          { "artist": "ヨルシカ",  "title": "逃亡",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { "artist": "ヨルシカ",  "title": "逃亡",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "LiStvz5SWMc",  "clipStart": 119 }
         ]
       },
       {
         "chords": [["6m"], ["3m"], ["4"], ["5", "1"]],
         "theory": [],
         "music": [
-          { "artist": "GReeeeN",  "title": "キセキ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "ヨルシカ",  "title": "夜明けと蛍",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "fripSide",  "title": "LEVEL5-judgelight-",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "傘村トータ",  "title": "あなたの夜が明けるまで",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { "artist": "GReeeeN",  "title": "キセキ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "DwTinTO0o9I",  "clipStart": 122 },
+          { "artist": "ヨルシカ",  "title": "夜明けと蛍",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "nDbNRb9gOr4",  "clipStart": 98 },
+          { "artist": "fripSide",  "title": "LEVEL5-judgelight-",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "FGGsY2CIaSk",  "clipStart": 70 },
+          { "artist": "傘村トータ",  "title": "あなたの夜が明けるまで",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "xfR0iTh8PSI",  "clipStart": 56 }
         ]
       },
       {
         "chords": ["6m", "3m", "4", "1"],
         "theory": [],
         "music": [
-          { "artist": "ヨルシカ",  "title": "透明エレジー",  "part": "Verse",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "YOASOBI",  "title": "ハルカ",  "part": "Verse",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "さユり",  "title": "birthday song",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "Aimer",  "title": "蝶々結び",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "TRUE",  "title": "Sincerely",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { "artist": "ヨルシカ",  "title": "透明エレジー",  "part": "Verse",  "genre": "Jpop",  "youtubeId": "U2-K_eFGtJM",  "clipStart": 27 },
+          { "artist": "YOASOBI",  "title": "ハルカ",  "part": "Pre-chorus",  "genre": "Jpop",  "youtubeId": "vd3IlOjSUGQ",  "clipStart": 33 },
+          { "artist": "さユり",  "title": "birthday song",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "sIkkq4m2feA",  "clipStart": 45 },
+          { "artist": "Aimer",  "title": "蝶々結び",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "Du_5wIB26-M",  "clipStart": 57 },
+          { "artist": "TRUE",  "title": "Sincerely",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "uwph0dv9E6U",  "clipStart": 59 }
         ]
       },
       {
@@ -141,13 +179,34 @@
         "chords": ["6m", "2m", "5", "1"],
         "theory": [],
         "music": [
-          { "artist": "Frank Sinatra",  "title": "Fly me to the moon",  "part": "Chorus",  "genre": "pop",  "subgenre": "Jazz",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "高橋洋子",  "title": "残酷な天使のテーゼ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "蝶々P",  "title": "心拍数♯0822",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "米津玄師",  "title": "感電",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "ヨルシカ",  "title": "ブレーメン",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "fripSide",  "title": "final phase",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "M2U",  "title": "Wicked Fate",  "part": "0:59",  "genre": "Electronic",  "youtubeId": "",  "clipStart": 0 }
+          { 
+            "artist": "Frank Sinatra",  "title": "Fly me to the moon",  "part": "Chorus",  "genre": "pop",  "subgenre": "Jazz",  
+            "youtubeId": "JYuyWrkwpok",  "clipStart": 104 
+          },
+          { 
+            "artist": "高橋洋子",  "title": "残酷な天使のテーゼ",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "o6wtDPVkKqI",  "clipStart": 68 
+          },
+          { 
+            "artist": "蝶々P",  "title": "心拍数♯0822",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "g6hGN-WNig0",  "clipStart": 247 
+          },
+          { 
+            "artist": "米津玄師",  "title": "感電",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "UFQEttrn6CQ",  "clipStart": 213
+          },
+          { 
+            "artist": "ヨルシカ",  "title": "ブレーメン",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "oy6MDr6I6rM",  "clipStart": 73
+          },
+          { 
+            "artist": "fripSide",  "title": "final phase",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "gQ91NaeO2To",  "clipStart": 59
+          },
+          { 
+            "artist": "M2U",  "title": "Wicked Fate",  "part": "0:59",  "genre": "Electronic",  
+            "youtubeId": "p2fxxXqSPB0",  "clipStart": 62
+          }
         ]
       },
       {
@@ -167,10 +226,9 @@
     "progressions": [
       {
         "chords": ["b6", "b7", "1"],
-        "theory": ["Mario Cadence"],
-        "music": [
-          { "artist": "K-ON!",  "title": "Cagayake!GIRLS ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
-        ]
+        "progressionName": ["Mario Cadence"],
+        "theory": [],
+        "music": []
       }
     ]
   },
@@ -179,7 +237,8 @@
     "progressions": [
       {
         "chords": ["5", "6m", "4", "1"],
-        "theory": ["Axis Progression"],
+        "progressionName": ["Axis Progression"],
+        "theory": [],
         "music": []
       }
     ]
@@ -189,7 +248,8 @@
     "progressions": [
       {
         "chords": ["#4o", "7o", "3m", "6m"],
-        "theory": ["王道進行 variation"],
+        "progressionName": ["王道進行", "variation"],
+        "theory": [],
         "music": []
       },
       {
@@ -199,7 +259,8 @@
       },
       {
         "chords": ["#4o", "4m/b6", "3m", "6m"],
-        "theory": ["王道進行 variation"],
+        "progressionName": ["王道進行", "variation"],
+        "theory": [],
         "music": []
       },
       {
@@ -214,7 +275,7 @@
     "progressions": [
       {
         "chords": ["4", "7o", "3m", "6m"],
-        "theory": ["王道進行 variation"],
+        "theory": ["王道進行", "variation"],
         "music": []
       },
       {
@@ -224,7 +285,8 @@
       },
       {
         "chords": ["4", "b7", "3m", "6m"],
-        "theory": ["王道進行 variation"],
+        "progressionName":["王道進行", "variation"],
+        "theory": [],
         "music": []
       },
       {
@@ -234,103 +296,136 @@
       },
       {
         "chords": ["4", "b7", "1"],
-        "theory": ["Back Door Progression"],
+        "progressionName":["Back Door Progression"],
+        "theory": [],
         "music": []
       },
       {
         "chords": [[["4"], ["5"], ["6m"], ["7o", "1"]]],
+        "progressionName": ["456進行", "variation"],
         "theory": [],
         "music": [
-          { "artist": "上田麗奈",  "title": "リテラチュア",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { 
+            "artist": "上田麗奈",  "title": "リテラチュア",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "ufLKDNlLrAQ",  "clipStart": 48}
         ]
       },
       {
         "chords": ["4", "5", "6m", "6m"],
+        "progressionName":["456進行"],
         "theory": [],
         "music": [
-          { "artist": "坂本龍一",  "title": "Merry Christmas Mr. Lawrence",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "Lia",  "title": "鳥の詩",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "nomico",  "title": "Bad Apple!!",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { 
+            "artist": "坂本龍一",  "title": "Merry Christmas Mr. Lawrence",  "part": "Chorus",  "genre": "Modern",  
+            "youtubeId": "ELJf83TelA0",  "clipStart": 242
+          },
+          { 
+            "artist": "Lia",  "title": "鳥の詩",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "7mZlRSAUSsU",  "clipStart": 113
+          },
+          { 
+          "artist": "nomico",  "title": "Bad Apple!!",  "part": "Chorus",  "genre": "Jpop",  
+          "youtubeId": "FtutLA63Cp8",  "clipStart": 57
+          }
         ]
       },
       {
-        "chords": [["4"], ["5"], ["6m"], ["5", "1"]],
+        "chords": [["4"], ["5"], ["6m"], ["5"]],
+        "progressionName":["456進行", "variation"],
         "theory": [],
-        "music": [
-          { "artist": "フレデリック",  "title": "オドループ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
-        ]
+        "music": []
       },
       {
         "chords": ["4", "5", "6m", "3m"],
+        "progressionName":["456進行", "variation"],
         "theory": [],
         "music": [
-          { "artist": "LiSA",  "title": "紅蓮華",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "ZUTOMAYO",  "title": "眩しいDNAだけ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "ChouCho",  "title": "カワルミライ",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { 
+            "artist": "LiSA",  "title": "紅蓮華",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "x1FV6IrjZCY",  "clipStart": 60
+          },
+          { 
+            "artist": "ZUTOMAYO",  "title": "眩しいDNAだけ",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "VJy8qZ77bpE",  "clipStart": 122 },
+          { 
+            "artist": "ChouCho",  "title": "カワルミライ",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "Un9UiVL6Dms",  "clipStart": 52}
         ]
       },
       {
         "chords": ["4", "5", "6m", "1"],
+        "progressionName":["456進行", "variation"],
         "theory": [],
         "music": [
-          { "artist": "ヨルシカ",  "title": "雨とカプチー",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "YOASOBI",  "title": "アンコール",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "蝶々P",  "title": "心做し",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "Aimer",  "title": "Ref:rain",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "カンザキイオリ",  "title": "命に嫌われている。",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { "artist": "ヨルシカ",  "title": "雨とカプチー",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "PWbRleMGagU",  "clipStart": 77 },
+          { "artist": "YOASOBI",  "title": "アンコール",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "vcGbefQBvJ4",  "clipStart": 73 },
+          { "artist": "蝶々P",  "title": "心做し",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "3SkNrZnoK5w",  "clipStart": 80 },
+          { "artist": "Aimer",  "title": "Ref:rain",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "mvkbCZfwWzA",  "clipStart": 66 },
+          { "artist": "カンザキイオリ",  "title": "命に嫌われている。",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "0HYm60Mjm0k",  "clipStart": 58 }
         ]
       },
       {
         "chords": ["4", "5", "3m", "6m"],
-        "theory": ["王道進行"],
+        "progressionName":["王道進行"],
+        "theory": [],
         "music": [
-          { "artist": ["DAOKO","米津玄師"],  "title": "打上花火",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "KEMU VOXX",  "title": "六兆年と一夜物語",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "花澤香菜",  "title": "戀愛循環",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 },
-          { "artist": "HoneyWorks",  "title": "可愛くてごめん",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { "artist": ["DAOKO","米津玄師"],  "title": "打上花火",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "-tKVN2mAKRI",  "clipStart": 63 },
+          { "artist": "KEMU VOXX",  "title": "六兆年と一夜物語",  "part": "Chorus",  "genre": "Jpop",  
+          "youtubeId": "Om3MTou2kPg",  "clipStart": 55 },
+          { "artist": "花澤香菜",  "title": "戀愛循環",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "F8xpmTmdf6o",  "clipStart": 73 },
+          {
+            "artist": "HoneyWorks", "title": "可愛くてごめん", "part": "Chorus", "genre": "Jpop",
+            "youtubeId": "K4xLi8IF1FM", "clipStart": 42,
+            "chordVariation": [["4", "5", "3m", "6m"], ["4", "5", "1", "1"]]
+          },
+          {
+            "artist": "ヨルシカ",  "title": "言って。",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "F64yFFnZfkI",  "clipStart": 61,
+            "chordVariation": [[["4"], ["5"], ["3m", "3/#5"], ["6m"]]]
+          },
+          { 
+            "artist": "YOASOBI",  "title": "怪物",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "dy90tA3TT1c",  "clipStart": 36,
+            "chordVariation": [[["4"], ["5"], ["3m"], ["6m"]], [["4"], ["37", "37/#5"], ["6m"], ["5", "1"]]]
+          }
         ]
       },
       {
-        "chords": [["4M7"], ["4/5"], ["3m7"], ["6m7", "b6m7", "5m7", "1"]],
-        "theory": ["王道進行 variation", "Chromatic Descending"],
+        "chords": ["4", "4/5", "3m", "6m"],
+        "progressionName": ["王道進行", "variation"],
+        "theory": ["Chromatic Descending"],
         "music": [
-          { "artist": "結束バンド",  "title": "星座になれたら",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { 
+            "artist": "結束バンド",  "title": "星座になれたら",  "part": "Chorus",  "genre": "Jpop",  
+            "youtubeId": "fJh5UeiULZs",  "clipStart": 54,
+            "chordVariation": [["4M7"], ["4/5"], ["3m7"], ["6m7", "b6m7", "5m7", "1"]]
+          }
         ]
       },
       {
         "chords": ["4", "5", "3", "6m"],
-        "theory": ["王道進行 variation"],
+        "progressionName": ["王道進行", "variation"],
+        "theory": [],
         "music": []
       },
       {
-        "chords": [["4"], ["5"], ["3m", "3/#5"], ["6m"]],
-        "theory": ["王道進行 variation"],
-        "music": [
-          { "artist": "ヨルシカ",  "title": "言って。",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
-        ]
-      },
-      {
         "chords": [["4(9)"], ["5sus"], ["1/3", "5sus"], ["6m"]],
-        "theory": ["王道進行 variation"],
+        "chordsName": ["王道進行", "variation"],
+        "theory": [],
         "music": [
-          { "artist": "ヨルシカ",  "title": "春泥棒",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
-        ]
-      },
-      {
-        "chords": [[["4"], ["5"], ["3m"], ["6m"]], [["4"], ["37", "37/#5"], ["6m"], ["5", "1"]]],
-        "theory": ["王道進行 variation"],
-        "music": [
-          { "artist": "YOASOBI",  "title": "怪物",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
+          { "artist": "ヨルシカ",  "title": "春泥棒",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "Sw1Flgub9s8",  "clipStart": 57 }
         ]
       },
       {
         "chords": ["4", "5", "#5o", "6m"],
-        "theory": ["王道進行 variation"],
+        "chordsName": ["王道進行", "variation"],
+        "theory": [],
         "music": []
       },
       {
         "chords": [["4"], ["5"], ["3m"], ["6m", "3m/5"]],
-        "theory": ["王道進行 variation"],
+        "chordsName": ["王道進行", "variation"],
+        "theory": [],
         "music": []
       },
       {
@@ -340,9 +435,7 @@
       {
         "chords": ["4", "5", "1", "1"],
         "theory": ["王道進行 variation"],
-        "music": [
-          { "artist": "HoneyWorks",  "title": "可愛くてごめん",  "part": "Chorus",  "genre": "Jpop",  "youtubeId": "",  "clipStart": 0 }
-        ]
+        "music": []
       },
       {
         "chords": [[["4"], ["5"], ["1"], ["5"]], [["4"], ["5"], ["b6"], ["b7"]]],
