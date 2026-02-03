@@ -24,13 +24,21 @@
       {
         "progression": ["6", "b6", "5", "#4"],
         "progressionName":[],
-        "theory": ["Line Chilche", "Chromatic Descending"],
         "music": [
           { "artist": "μ's",  "title": "Snow Halation", "genre": "Jpop", 
             "youtubeId": "vJ3jNTH2QL0",  "clipStart": 183, 
             "progressionVariation": [
               ["6m7", "b6+7", "1/5", "#4ø7"]
-            ]
+            ],
+            "theory": ["Line Chilche", "Chromatic Descending"]
+          },
+          { "artist": "KANA-BOON",  "title": "シルエット", "genre": "Jpop", 
+            "youtubeId": "dlFA0Zq1k2A",  "clipStart": 44, 
+            "progressionVariation": [
+              ["6m", "b6+", "1/5", "#4ø7"],
+              ["4M6", "", "5M6", "57"]
+            ],
+            "theory": ["Line Chilche", "Chromatic Descending"]
           }
         ]
       },
@@ -55,7 +63,11 @@
       {
         "progression": ["6", "5", "4", "3"],
         "progressionName": [],
-        "music": []
+        "music": [
+          { "artist": "ヨルシカ",  "title": "Hisagi Haru",  "genre": "Jpop",  
+            "youtubeId": "F3cXxqgbx9Y",  "clipStart": 0
+          }
+        ]
       },
       {
         "progression": ["6", "5", "4", "1"],
@@ -120,6 +132,15 @@
             "youtubeId": "G7RmGsHxv-Q",  "clipStart": 75,
             "progressionVariation": [
               ["6m", "4", "5", ["1", "5/7"]]
+            ]
+          },
+          { "artist": "King Gnu",  "title": "白日",  "genre": "Jpop",  
+            "youtubeId": "ony539T074w",  "clipStart": 69,
+            "progressionVariation": [
+              ["6m", "4", "5", "1"],
+              ["37", "4M7", "27", "37"],
+              ["6m", "4", "5", "1"],
+              ["37", "4M7", "27/#4", "37"]
             ]
           }
         ]
@@ -223,36 +244,78 @@
         "music": []
       },
       {
+        "progression": ["6", "2", "5", "3"],
+        "progressionName": [],
+        "music": [
+          { "artist": "ヨルシカ",  "title": "Robber And Bouquet", "genre": "Jpop",  
+            "youtubeId": "qi1x1qgXbO8",  "clipStart": 36,
+            "progressionVariation": [
+              ["6m7 ", "2m7", "57", "37(#5)"],
+              ["4", "1", "7o", ["37", "#4ø7", "#5o"]],
+              ["6m7 ", "2m7", "57", "1"],
+              ["6m7", "3m7", ["4", "5"], "1"]
+            ]
+          }
+        ]
+      },
+      {
         "progression": ["6", "2", "5", "1"],
         "progressionName": [],
         "music": [
-          { 
-            "artist": "Frank Sinatra",  "title": "Fly me to the moon", "genre": "pop",  "subgenre": "Jazz",  
+          { "artist": "Frank Sinatra",  "title": "Fly me to the moon", "genre": "pop",  "subgenre": "Jazz",  
             "youtubeId": "JYuyWrkwpok",  "clipStart": 104 
           },
-          { 
-            "artist": "高橋洋子",  "title": "残酷な天使のテーゼ", "genre": "Jpop",  
+          { "artist": "高橋洋子",  "title": "残酷な天使のテーゼ", "genre": "Jpop",  
             "youtubeId": "o6wtDPVkKqI",  "clipStart": 68 
           },
-          { 
-            "artist": "蝶々P",  "title": "心拍数♯0822", "genre": "Jpop",  
+          { "artist": "蝶々P",  "title": "心拍数♯0822", "genre": "Jpop",  
             "youtubeId": "g6hGN-WNig0",  "clipStart": 247 
           },
-          { 
-            "artist": "米津玄師",  "title": "感電", "genre": "Jpop",  
+          { "artist": "米津玄師",  "title": "感電", "genre": "Jpop",  
             "youtubeId": "UFQEttrn6CQ",  "clipStart": 213
           },
-          { 
-            "artist": "ヨルシカ",  "title": "ブレーメン", "genre": "Jpop",  
+          { "artist": "ヨルシカ",  "title": "ブレーメン", "genre": "Jpop",  
             "youtubeId": "oy6MDr6I6rM",  "clipStart": 73
           },
-          { 
-            "artist": "fripSide",  "title": "final phase", "genre": "Jpop",  
+          { "artist": "fripSide",  "title": "final phase", "genre": "Jpop",  
             "youtubeId": "gQ91NaeO2To",  "clipStart": 59
           },
-          { 
-            "artist": "M2U",  "title": "Wicked Fate", "genre": "Electronic",  
+          { "artist": "M2U",  "title": "Wicked Fate", "genre": "Electronic",  
             "youtubeId": "p2fxxXqSPB0",  "clipStart": 62
+          },
+          { "artist": "ヨルシカ",  "title": "火星人", "genre": "Jpop",
+            "youtubeId": "OLRbIc8KZ_8",  "clipStart": 48,
+            "progressionVariation": [
+              ["6m7 ", "29", "4M7/5", "1M7"],
+              ["6m7", "29", "4M7/5", "1M7"],
+              ["6m7 ", "29", "4M7/5", "1M7"],
+              ["6m7", "37/#5", "57(b13)", "1M7"]
+            ]
+          },
+          { "artist": "ヨルシカ",  "title": "Rubato", "genre": "Jpop",
+            "youtubeId": "3J5uLk1DJV0",  "clipStart": 48,
+            "progressionVariation": [
+              ["6m7 ", "29", "57(13)", "1"],
+              ["6m7", "29", "57(13)", "1"],
+              ["6m7 ", "29", "57(13)", "1"],
+              ["2m9", "3m7", "4M7", "57"]
+            ]
+          },
+          { "artist": "ヨルシカ",  "title": "ブレーメン", "genre": "Jpop",
+            "youtubeId": "oy6MDr6I6rM",  "clipStart": 73,
+            "progressionVariation": [
+              ["6m7 ", "29", "57", ["1M7", "5/7"]],
+              ["6m7", "29", ["57(13)", "57(b13)"], "1"]
+            ]
+          },
+          { "artist": "ヨルシカ",  "title": "Hisagi Haru",  "genre": "Jpop",  
+            "youtubeId": "F3cXxqgbx9Y",  "clipStart": 40,
+            "progressionVariation": [
+              ["6m7 ", "2m7", "57", ["1", "#1o"]],
+              ["4M7", "1/3", "37(#5, b9)", "37(b9, #9)"],
+              ["4(9) ", "1/3", "37", "6m7"],
+              [["2m7", "57"], ["1M6", "1/3"], "4M9", "5"]
+            ]
           }
         ]
       },
@@ -365,6 +428,15 @@
           },
           { "artist": "nomico", "title": "Bad Apple!!", "genre": "Jpop",  
             "youtubeId": "FtutLA63Cp8", "clipStart": 57
+          },
+          { "artist": ["米津玄師", "宇多田ヒカル"], "title": "Jane Doe", "genre": "Jpop",  
+            "youtubeId": "sPLqsLsooJY", "clipStart": 60,
+            "progressionVariation": [
+              ["4M7", "57", "6m", ""],
+              ["4M7", "57", "37", "6m7"],
+              ["1/3", "4M7", "37/#5", "6m7"],
+              ["4M7", "5", "6m7", ""]
+            ]
           }
         ]
       },
@@ -388,7 +460,11 @@
           },
           { "artist": "Kizuna AI",  "title": "AIAIAI", "genre": "Jpop", "subgenre": "",
             "youtubeId": "S8dmq5YIUoc",  "clipStart": 78,
-            "progressionVariation": [[["4", "5"], ["6m", "3m"], ["2m7","5"], ["1"]], [["4", "5"], ["6m", "1"], ["2m","5"], ["1"]]],
+            "progressionVariation": [
+              ["4", "5", "6m", "3m"],
+              ["2m7","5", "1", ""], 
+              ["4", "5", "6m", "1"],
+              ["2m","5", "1", ""]],
             "progressionName": ["2-5-1 Progression"]
           }
         ]
@@ -517,13 +593,34 @@
               ["2m7", "57", "1M7", "#4ø7"]
             ],
             "theory": ["Modal Interchange", "Secondary Dominant", "Tritone Substitution"]
+          },
+          {
+            "artist": "ヨルシカ", "title": "Play Sick", "genre": "Jpop", 
+            "youtubeId": "2-jDq07rNs0",  "clipStart": 46,
+            "progressionVariation": [
+              ["4M9", "4Mm7(69)", "1M7/3", "6m7"],
+              ["2m7", "57(13)", ["1M7", "2m"], ["3m", "4m"]],
+              ["4M9", "4Mm7(69)", "1M7/3", "6m7"],
+              ["2m7", "57(13)", ["1M7", "1M7/2"], ["1M7/3", "1M7/4"]]
+            ],
+            "theory": ["Line Chilche", "Secondary Dominant"]
           }
         ]
       },
       {
-        "progression": ["4", "4m", "3m", "3o"],
+        "progression": ["4", "4", "3", "3"],
         "progressionName": [],
-        "music": []
+        "music": [
+          { "artist": "Tia", "title": "Heart realize", "genre": "Jpop",
+            "youtubeId": "mYF3b0m8bXw",  "clipStart": 71,
+            "progressionVariation": [
+              ["4M9", "5/4", "1(9)/3", ""],
+              ["2m7", "#5o", ["6m7", "5/7", "1", "2m7", "1/3"]],
+              ["4M9", "5/4", ["6m7", "b6+"], ["1/5", "#4ø7"]],
+              ["2m7", "1(9)/3", "4m7", ["b6", "b7"]]
+            ],
+            "theory": ["Modal Interchange"]}
+        ]
       },
       {
         "progression": ["4", "4", "3", "b3"],
@@ -655,7 +752,7 @@
         "music": [
           { 
             "artist": "sumimi", "title": "Sweet Escape", "genre": "Jpop",  
-            "youtubeId": "Cku-87VYG8g&t", "clipStart": 109,
+            "youtubeId": "Q5B3rlqFqF0", "clipStart": 23,
             "progressionVariation": [
               ["1/4", "2m7", "3m7", ["6m7", "5m7"]],
               ["1/4", "2m7", "3m7", "6m7"], 
@@ -683,6 +780,26 @@
           },
           { "artist": "ヨルシカ", "title": "ただ君に晴れ", "genre": "Jpop",
             "youtubeId": "-VKIqrvVOpo",  "clipStart": 56
+          },
+          { "artist": "ヨルシカ", "title": "チノカテ", "genre": "Jpop",
+            "youtubeId": "Fq55MMfHoJg",  "clipStart": 36,
+            "progressionVariation": [
+              ["4(9)", "1", ["4/5", "37/#5"], "6m7"],
+              ["4(9)", "1", ["4/5", "37/#5"], "6m7"],
+              ["4(9)", "1", ["4/5", "37/#5"], "6m7"],
+              ["4(9)", "5sus", "1", "5sus"]
+            ],
+            "theory": ["Secondary Dominant"]
+          },
+          { "artist": "優里", "title": "ドライフラワー", "genre": "Jpop",
+            "youtubeId": "kzZ6KXDM1RI",  "clipStart": 159,
+            "progressionVariation": [
+              ["4(9)", "1", ["5", "37"], "6m7"],
+              ["4(9)", "1", ["5", "37"], "6m7"],
+              ["4(9)", "1", "37", "6m7"],
+              ["2m7", "", "4m", "5"]
+            ],
+            "theory": ["Modal Interchange", "Secondary Dominant"]
           }
         ]
       },
@@ -718,8 +835,17 @@
         "music": []
       },
       {
-        "progression": ["3m", "4", "5", "6m"],
-        "music": []
+        "progression": ["3", "4", "5", "#5"],
+        "progressionName": [],
+        "music": [
+          { "artist": "KANA-BOON",  "title": "シルエット", "genre": "Jpop",  
+            "youtubeId": "dlFA0Zq1k2A",  "clipStart": 54,
+            "progressionVariation": [
+              ["1/3", "4", "5", "#5o"],
+              ["6m", "1/3", "4", "5"]
+            ]
+          }
+        ]
       },
       {
         "progression": ["3m", "4", "5", "1"],
@@ -787,12 +913,22 @@
         "music": []
       },
       {
-        "progression": ["2m", "5", "1mM7"],
+        "progression": ["2", "4", "6", "3"],
         "progressionName": [],
-        "music": []
+        "music": [
+          { "artist": ["米津玄师", "宇多田ヒカル"], "title": "JANE DOE", "genre": "Jpop",  
+            "youtubeId": "sPLqsLsooJY",  "clipStart": 103,
+            "progressionVariation": [
+              ["2m9", "4m6(#11)", "6m7", "37(b9)/#5"],
+              ["2m9", "4m6(#11)", "6m7", "37(b9)/#5"],
+              ["2m9", "57", "1M7", "4M7"],
+              ["7ø7", "37(b9, b13)", "6m7", "67"]
+            ]
+          }
+        ]
       },
       {
-        "progression": ["2", "3", "6", ""],
+        "progression": ["2", "3", "6", "6"],
         "progressionName": [],
         "music": [
           { "artist": "米津玄師", "title": "死神", "genre": "Jpop", 
@@ -817,6 +953,24 @@
       },
       {
         "progression": ["2m", "3m", "4", "3m"],
+        "progressionName": [],
+        "music": []
+      },
+      {
+        "progression": ["2m", "b3", "3", "4"],
+        "progressionName": [],
+        "music": [
+          { "artist": "ヨルシカ", "title": "チノカテ", "genre": "Jpop",
+            "youtubeId": "Fq55MMfHoJg",  "clipStart": 23,
+            "progressionVariation": [
+              ["2m7", "b3o7", "3m7", "4(9)"],
+              ["4(9)", "", "4/5", ""]
+            ]
+          }
+        ]
+      },
+      {
+        "progression": ["2m", "2m", "5", "1"],
         "progressionName": [],
         "music": []
       },
@@ -969,12 +1123,7 @@
         "music": []
       },
       {
-        "progression": ["1", "4", "6m", "5"],
-        "progressionName": ["50s Progression"],
-        "music": []
-      },
-      {
-        "progression": ["1", "4m", "6m", "5"],
+        "progression": ["1", "4", "6", "5"],
         "progressionName": ["50s Progression"],
         "music": []
       },
@@ -1006,10 +1155,6 @@
         ]
       },
       {
-        "progression": ["1", "4", "1", "4"],
-        "music": []
-      },
-      {
         "progression": ["1", "47", "1", "47"],
         "music": []
       },
@@ -1032,7 +1177,7 @@
             "youtubeId": "nf-L5R8U-Q0",  "clipStart": 102,
             "progressionVariation": [
               ["1", "37", "6m", "5"],
-              ["4", "3m", "2m", "5"]
+              [["4", "5"], ["3m", "6m"], "2m", "5"]
             ],
             "theory": ["Secondary Dominant"]
           },
@@ -1096,11 +1241,18 @@
         "progression": ["1", "1", "1", "1"],
         "progressionName": [],
         "music": [
-          {  
-            "artist": "鹿乃",  "title": "漫ろ雨",  "part": "Verse",  "genre": "Jpop",  
+          {  "artist": "鹿乃", "title": "漫ろ雨", "genre": "Jpop",  
             "youtubeId": "RXPgR6-dZ9M",  "clipStart": 16, 
             "progressionVariation": [
               ["1M7", "17", "1M6", "1+"]
+            ],
+            "theory": ["Pedal Note", "Chromatic Descending", "Line Cliche"]
+          },
+          { "artist": "菅野洋子",  "title": "サイレントでなんかいられない", "genre": "Jpop",  
+            "youtubeId": "EguFJlC-ivw", "clipStart": 0, 
+            "progressionVariation": [
+              ["1", "1M7", "17", "1M6"],
+              [["2m", "3m", "4", "5"], ["2m", "3m", "4", "5"], ["2m", "3m", "4", "5"], ["2m", "3m", "4", "5"]]
             ],
             "theory": ["Pedal Note", "Chromatic Descending", "Line Cliche"]
           }
