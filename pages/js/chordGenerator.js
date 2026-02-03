@@ -68,6 +68,8 @@ let currentBars = [];
 let currentParents = [];
 let lastProgressionIndex = -1;
 let recentProgressionIndices = [];
+let progressionPickCounts = new Map(); // Track pick count for weighted random
+let progressionGeneration = 0; // Track refresh generation to prevent stale auto-play
 let isSubstituted = [];
 let isProgressionModified = false; // Track if user has manually modified the progression
 let isSubstituteMode = false; // Track if substitute mode is active
@@ -1237,6 +1239,16 @@ window.setupPreviewButtonTooltip = function() {
 function refreshChords() {
     if (allProgressions.length === 0) return;
 
+    // Increment generation to invalidate any pending auto-play from previous progression
+    progressionGeneration++;
+
+    // Restore original chords if a song variation was being displayed
+    if (originalPhrases) {
+        restoreSongChords();
+    }
+    originalPhrases = null;
+    currentlyPlayingSong = null;
+
     // Stop any playing preview and clear auto-play timeout on refresh
     if (typeof window.clearBackgroundPreview === 'function') {
         window.clearBackgroundPreview();
@@ -1247,37 +1259,53 @@ function refreshChords() {
     }
 
     let randomIndex;
-    const maxHistory = 15;
-    const recentSet = new Set(recentProgressionIndices);
-    
-    // If history is larger than available progressions, trim it
-    if (recentProgressionIndices.length > maxHistory) {
-        recentProgressionIndices = recentProgressionIndices.slice(-maxHistory);
-    }
-    
+    // Weighted random selection - progressions picked more often have lower chance
     if (allProgressions.length <= 1) {
         randomIndex = 0;
     } else {
-        // Try to pick a progression not in recent history
-        let attempts = 0;
-        do {
-            randomIndex = Math.floor(Math.random() * allProgressions.length);
-            attempts += 1;
-        } while (recentSet.has(randomIndex) && attempts < 50);
+        // Calculate weights for each progression (inverse of pick count)
+        const weights = [];
+        let totalWeight = 0;
         
-        // Fallback: if all are in history, allow any except immediate last
-        if (recentSet.has(randomIndex) && allProgressions.length > 1) {
-            do {
-                randomIndex = Math.floor(Math.random() * allProgressions.length);
-            } while (randomIndex === lastProgressionIndex);
+        for (let i = 0; i < allProgressions.length; i++) {
+            const pickCount = progressionPickCounts.get(i) || 0;
+            // Weight formula: 1 / (pickCount + 1) - higher picks = lower weight
+            // Add penalty if this was the last picked progression
+            let weight = 1 / (pickCount + 1);
+            if (i === lastProgressionIndex) {
+                weight *= 0.1; // 90% reduction for immediate repeat
+            }
+            weights.push(weight);
+            totalWeight += weight;
+        }
+        
+        // Weighted random selection
+        let random = Math.random() * totalWeight;
+        randomIndex = 0;
+        for (let i = 0; i < weights.length; i++) {
+            random -= weights[i];
+            if (random <= 0) {
+                randomIndex = i;
+                break;
+            }
+        }
+    }
+    
+    // Update pick count for this progression
+    const currentCount = progressionPickCounts.get(randomIndex) || 0;
+    progressionPickCounts.set(randomIndex, currentCount + 1);
+    
+    // Reset counts periodically to prevent permanent bias (when all have been picked at least once)
+    const minPicks = Math.min(...Array.from({ length: allProgressions.length }, (_, i) => progressionPickCounts.get(i) || 0));
+    if (minPicks >= 1) {
+        // Reduce all counts by the minimum to normalize
+        for (let i = 0; i < allProgressions.length; i++) {
+            const count = progressionPickCounts.get(i) || 0;
+            progressionPickCounts.set(i, count - minPicks);
         }
     }
     
     lastProgressionIndex = randomIndex;
-    recentProgressionIndices.push(randomIndex);
-    if (recentProgressionIndices.length > maxHistory) {
-        recentProgressionIndices = recentProgressionIndices.slice(-maxHistory);
-    }
     const randomProgression = allProgressions[randomIndex];
     
     // Debug: log what we're loading
@@ -1772,6 +1800,9 @@ function autoPlayRandomMusic() {
     // Don't auto-play if user is manually hovering over a song
     if (window.isManuallyHovering) return;
     
+    // Capture current generation at start of this call
+    const myGeneration = progressionGeneration;
+    
     try {
         const currentKey = buildMusicListKey(currentMusicList);
         if (currentKey !== autoPlayQueueKey) {
@@ -1807,6 +1838,12 @@ function autoPlayRandomMusic() {
         
         console.log('autoPlayRandomMusic - phraseCount:', phraseCount, 'clipDuration:', clipDuration + 's');
         
+        // Check if progression changed since we started (stale callback)
+        if (myGeneration !== progressionGeneration) {
+            console.log('autoPlayRandomMusic - stale callback, generation mismatch');
+            return;
+        }
+        
         // Show song-specific chords if available
         if (randomSong.progressionVariation) {
             showSongChords(randomSong, currentMusicProgressionName);
@@ -1823,8 +1860,12 @@ function autoPlayRandomMusic() {
             if (window.generatorMusicTimeout) {
                 clearTimeout(window.generatorMusicTimeout);
             }
+            const scheduledGeneration = progressionGeneration;
             window.generatorMusicTimeout = setTimeout(() => {
-                autoPlayRandomMusic();
+                // Only auto-play if still on the same progression
+                if (scheduledGeneration === progressionGeneration) {
+                    autoPlayRandomMusic();
+                }
             }, clipDuration * 1000);
         }
     } catch (error) {

@@ -86,7 +86,7 @@
         "progression": ["6", "4", "5", "1"],
         "progressionName": ["小室進行"],
         "music": [
-          { "artist": "Joe Hisaishi",  "title": "Summer",  "genre": "Modern",  
+          { "artist": "久石讓",  "title": "Summer",  "genre": "Modern",  
             "youtubeId": "l0GN40EL1VU",  "clipStart": 102 
           },
           { "artist": "黒うさP",  "title": "千本桜",  "genre": "Jpop",  
@@ -573,16 +573,6 @@
         "progression": ["4", "4", "3", "6"],
         "progressionName": [],
         "music": [
-          { "artist": "sumimi", "title": "Sweet Escape", "genre": "Jpop",  
-            "youtubeId": "Q5B3rlqFqF0", "clipStart": 7,
-            "progressionVariation": [
-              ["1/4", "", "3m7", "6m7"], 
-              ["2m7", "57sus", "3m7", "67"], 
-              ["1/4", "2m7", "3m7", "6m7"], 
-              ["1/4", "2m7", "3m7", "6"]
-            ],
-            "theory": ["Picardy Third"] 
-          },
           { 
             "artist": "藤井風",  "title": "きらり", "genre": "Jpop",  
             "youtubeId": "TcLLpZBWsck",  "clipStart": 66,
@@ -612,7 +602,7 @@
         "progressionName": [],
         "music": [
           { "artist": "Tia", "title": "Heart realize", "genre": "Jpop",
-            "youtubeId": "mYF3b0m8bXw",  "clipStart": 71,
+            "youtubeId": "K-HmPIFinBQ",  "clipStart": 71,
             "progressionVariation": [
               ["4M9", "5/4", "1(9)/3", ""],
               ["2m7", "#5o", ["6m7", "5/7", "1", "2m7", "1/3"]],
@@ -917,7 +907,7 @@
         "progressionName": [],
         "music": [
           { "artist": ["米津玄师", "宇多田ヒカル"], "title": "JANE DOE", "genre": "Jpop",  
-            "youtubeId": "sPLqsLsooJY",  "clipStart": 103,
+            "youtubeId": "sPLqsLsooJY",  "clipStart": 93,
             "progressionVariation": [
               ["2m9", "4m6(#11)", "6m7", "37(b9)/#5"],
               ["2m9", "4m6(#11)", "6m7", "37(b9)/#5"],
