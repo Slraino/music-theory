@@ -248,7 +248,7 @@
         "progressionName": [],
         "music": [
           { "artist": "ヨルシカ",  "title": "Robber And Bouquet", "genre": "Jpop",  
-            "youtubeId": "qi1x1qgXbO8",  "clipStart": 36,
+            "youtubeId": "qi1x1qgXbO8",  "clipStart": 33,
             "progressionVariation": [
               ["6m7 ", "2m7", "57", "37(#5)"],
               ["4", "1", "7o", ["37", "#4ø7", "#5o"]],
@@ -1141,6 +1141,14 @@
               ["6m", "2/#4", "4/5", "5"]
             ],
             "theory": ["Modal Interchange"]
+          },
+          { "artist": "Andy Zhan",  "title": "romance no.3", "genre": "Modern", 
+            "youtubeId": "DbQsK211Jto",  "clipStart": 0,
+            "progressionVariation": [
+              ["1", ["4m6", "37(b9)"], "6m9", ["3/5", "1"]],
+              ["4(9)", ["5(9)/4", "1"], "Em7", ["5sus(b9)", "5+6"]]
+            ],
+            "theory": ["Modal Interchange", "Secondary Dominant"]
           }
         ]
       },
@@ -1170,15 +1178,6 @@
               [["4", "5"], ["3m", "6m"], "2m", "5"]
             ],
             "theory": ["Secondary Dominant"]
-          },
-          {
-            "artist": "Andy Zhan",  "title": "romance no.3", "genre": "Modern", 
-            "youtubeId": "DbQsK211Jto",  "clipStart": 0,
-            "progressionVariation": [
-              ["1", ["4m6", "37(b9)"], "6m9", ["3/5", "1"]],
-              ["4(9)", ["5(9)/4", "1"], "Em7", ["5sus(b9)", "5+6"]]
-            ],
-            "theory": ["Modal Interchange", "Secondary Dominant"]
           }
         ]
       },

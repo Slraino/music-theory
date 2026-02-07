@@ -7,22 +7,30 @@
     <meta name="theme-color" content="crimson">
     <meta name="description" content="Fantasia music theory tools: chord generator, chord progressions, and theory explorer.">
     <title>Fantasia</title>
-    <link rel="stylesheet" href="./src/styles/app.css?v=1.2">
-    <link rel="stylesheet" href="./pages/css/chordGenerator.css?v=1.3">
-    <link rel="stylesheet" href="./pages/css/chordProgression.css?v=1.2">
-    <link rel="stylesheet" href="./pages/css/musicTheory.css?v=1.2">
-    <link rel="stylesheet" href="./pages/css/progressionInfo.css?v=1.2">
+    <link rel="stylesheet" href="./src/styles/app.css?v=3.0">
+    <link rel="stylesheet" href="./pages/css/chordGenerator.css?v=1.6">
+    <link rel="stylesheet" href="./pages/css/chordProgression.css?v=1.4">
+    <link rel="stylesheet" href="./pages/css/musicTheory.css?v=1.4">
+    <link rel="stylesheet" href="./pages/css/progressionInfo.css?v=1.4">
+    <link rel="stylesheet" href="./pages/css/pomodoro.css?v=1.2">
+    <link rel="stylesheet" href="./pages/css/profile.css?v=1.1">
+    <link rel="stylesheet" href="./pages/css/chat.css?v=1.1">
 </head>
 <body>
     <div class="container">
+        <!-- Top Bar (appears on hover) -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <button id="chatBtn" class="chat-btn" title="Chat Room">💬</button>
+            </div>
+            <div class="top-bar-right">
+                <button id="settingsBtn" class="settings-btn" title="Settings">⚙️</button>
+                <div id="authContainer"></div>
+            </div>
+        </div>
+        
         <!-- Floating Title -->
         <div class="floating-title">✧ Fantasia ✧</div>
-        
-        <!-- Floating Copyright -->
-        <div class="floating-copyright">&copy; 2026 Fantasia &middot; Aino ❤️</div>
-        
-        <!-- Settings Button (outside header so it's always visible) -->
-        <button id="settingsBtn" class="settings-btn" title="Settings">⚙️</button>
         
         <!-- Settings Panel (outside header so it's always accessible) -->
         <div id="settingsPanel" class="settings-panel">
@@ -46,34 +54,42 @@
         </div>
         
         <!-- Default Header -->
-        <header>
-            <h1 id="pageTitle">Fantasia</h1>
+        <header id="pageTitle">Fantasia
             <button id="backBtn" class="back-btn" style="display: none;">←</button>
         </header>
 
         <main id="mainContent">
             <!-- HOME PAGE -->
-            <section id="homePage" class="page-section">
-                <section class="content-area" style="text-align: center; margin-bottom: 40px;">
-                    <p style="font-size: 1.2em; color: #e0e0e0; max-width: 600px; margin: 0 auto;">
-                        Explore music theory, generate chords, and discover progressions
-                    </p>
-                </section>
+            <section id="homePage" class="page-section" style="display: flex; align-items: center; justify-content: center; flex: 1;">
+                <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
+                    <!-- Tools Section -->
+                    <div class="nav-category">
+                        <h1 style="text-align: center; color: var(--theme); margin-bottom: 2.5rem; font-size: 1.5em;">Tools</h1>
+                        <div class="nav-boxes-container" style="display: flex; flex-direction: row; gap: 1rem;">
+                            <a href="chord-generator.html" class="section-box-card">
+                                <div class="section-box-icon">🎹</div>
+                                <div class="section-box-title">Chord Generator</div>
+                            </a>
+                            <a href="pomodoro.html" class="section-box-card">
+                                <div class="section-box-icon">🍅</div>
+                                <div class="section-box-title">Pomodoro</div>
+                            </a>
+                        </div>
+                    </div>
 
-                <div class="nav-category">
-                    <div class="nav-boxes-container">
-                        <a href="chord-generator.html" class="nav-box-card">
-                            <div class="nav-box-icon">🎹</div>
-                            <div class="nav-box-title">Chord Generator</div>
-                        </a>
-                        <a href="chord-progression.html" class="nav-box-card">
-                            <div class="nav-box-icon">🎼</div>
-                            <div class="nav-box-title">Chord Progression</div>
-                        </a>
-                        <a href="music-theory.html" class="nav-box-card">
-                            <div class="nav-box-icon">📚</div>
-                            <div class="nav-box-title">Music Theory</div>
-                        </a>
+                    <!-- Data Section -->
+                    <div class="nav-category">
+                        <h1 style="text-align: center; color: var(--theme); margin-bottom: 2.5rem; font-size: 1.5em;">Data</h1>
+                        <div class="nav-boxes-container" style="display: flex; flex-direction: row; gap: 1rem;">
+                            <a href="chord-progression.html" class="section-box-card">
+                                <div class="section-box-icon">🎼</div>
+                                <div class="section-box-title">Chord Progression</div>
+                            </a>
+                            <a href="music-theory.html" class="section-box-card">
+                                <div class="section-box-icon">📚</div>
+                                <div class="section-box-title">Music Theory</div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -157,27 +173,118 @@
                     <!-- Generator content will be loaded here -->
                 </div>
             </section>
+
+            <!-- POMODORO PAGE -->
+            <section id="pomodoroPage" class="page-section" style="display: none;">
+                <div class="pomodoro-container">
+                    <!-- Left Panel - Missions -->
+                    <div class="panel missions-panel" id="missions-panel">
+                        <h2>Missions</h2>
+                        <div class="cards-container" id="missions-container" data-zone="missions">
+                            <div class="add-card-section">
+                                <button class="add-mission-btn-icon" id="add-mission-btn-icon">+</button>
+                                <input type="text" id="new-mission-input" placeholder="Enter new mission...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Panel - Pomodoro Timer -->
+                    <div class="panel pomodoro-panel" id="pomodoro-panel">
+                        <div class="drop-zone" id="pomodoro-zone" data-zone="pomodoro">
+                            <p class="drop-hint">Drag a mission here to start</p>
+                            <div class="active-mission" id="active-mission" style="display: none;"></div>
+                        </div>
+                        <div class="timer-section" id="timer-section" style="display: none;">
+                            <div class="timer-display-row">
+                                <div class="timer-display">
+                                    <span id="timer-mode">Work</span>
+                                    <span id="timer-countdown">25:00</span>
+                                </div>
+                                <button class="timer-settings-btn" id="timer-settings-btn" title="Settings">⚙</button>
+                            </div>
+                            <div class="timer-controls">
+                                <button id="start-btn">Start</button>
+                                <button id="pause-btn" style="display: none;">Pause</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel - Finished -->
+                    <div class="panel finished-panel" id="finished-panel">
+                        <h2>Finished</h2>
+                        <div class="cards-container" id="finished-container" data-zone="finished">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Modal -->
+                <div class="modal" id="edit-modal" style="display: none;">
+                    <div class="modal-content">
+                        <h3>Edit Mission</h3>
+                        <input type="text" id="edit-mission-input">
+                        <div class="modal-buttons">
+                            <button id="save-edit-btn">Save</button>
+                            <button id="cancel-edit-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timer Settings Modal -->
+                <div class="modal" id="timer-settings-modal" style="display: none;">
+                    <div class="modal-content">
+                        <h3>Timer Settings</h3>
+                        <div class="timer-settings-inputs">
+                            <div class="time-input">
+                                <label>Work Time (minutes):</label>
+                                <input type="number" id="work-time-modal" value="25" min="1" max="60">
+                            </div>
+                            <div class="time-input">
+                                <label>Rest Time (minutes):</label>
+                                <input type="number" id="rest-time-modal" value="5" min="1" max="30">
+                            </div>
+                        </div>
+                        <div class="modal-buttons">
+                            <button id="save-timer-settings-btn">Save</button>
+                            <button id="cancel-timer-settings-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- USER PROFILE PAGE -->
+            <section id="profilePage" class="page-section" style="display: none;">
+                <div id="profileContent"></div>
+            </section>
+
+            <!-- CHAT ROOM PAGE -->
+            <section id="chatPage" class="page-section" style="display: none;">
+                <div id="chatContent"></div>
+            </section>
         </main>
 
-        <footer></footer>
+        <footer>
+            <p>&copy; 2026 Fantasia &middot; Aino ❤️</p>
+        </footer>
     </div>
 
-    <script src="./src/scripts/app.js?v=2.0" defer></script>
+    <script src="./src/scripts/app.js?v=2.4" defer></script>
     <script src="./pages/js/chordProgression.js?v=2.0" defer></script>
     <script src="./pages/js/chordGenerator.js?v=2.0" defer></script>
     <script src="./pages/js/progressInfo.js?v=2.0" defer></script>
     <script src="./pages/js/musicTheory.js?v=2.0" defer></script>
+    <script src="./pages/js/pomodoro.js?v=1.0" defer></script>
+    
+    <!-- Firebase Authentication, Settings Sync & Features -->
+    <script type="module">
+        import { initAuthUI } from './src/auth/auth-ui.js';
+        import { saveSettingToCloud, saveAllSettingsToCloud, loadSettingsFromCloud, onLoginSync } from './src/auth/settings-sync.js';
+        import './src/auth/profile.js';
+        import './src/auth/chat.js';
+        
+        // Expose sync functions to non-module scripts (app.js)
+        window.cloudSync = { saveSettingToCloud, saveAllSettingsToCloud, loadSettingsFromCloud, onLoginSync };
+        
+        initAuthUI();
+    </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-

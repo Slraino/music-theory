@@ -1,0 +1,277 @@
+/* === USER PROFILE PAGE === */
+.profile-login-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--text-lebal);
+}
+
+.profile-prompt-icon {
+    font-size: 3rem;
+}
+
+.profile-loading {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-lebal);
+}
+
+.profile-card {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    background: var(--bg-soft);
+    border: 2px solid var(--theme);
+    border-radius: 0.75rem;
+    box-shadow: var(--bg-soft-shadow);
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--theme) 30%, transparent);
+}
+
+.profile-avatar-wrapper {
+    flex-shrink: 0;
+}
+
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid var(--theme);
+    object-fit: cover;
+}
+
+@media (min-width: 768px) {
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+.profile-avatar-fallback {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid var(--theme);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    background: var(--bg);
+}
+
+.profile-info {
+    min-width: 0;
+}
+
+.profile-name {
+    font-size: 1.25rem;
+    color: var(--theme);
+    margin-bottom: 0.25rem;
+    word-break: break-word;
+}
+
+.profile-email {
+    font-size: 0.75rem;
+    color: var(--text-lebal);
+    margin-bottom: 0.15rem;
+    word-break: break-all;
+}
+
+.profile-joined {
+    font-size: 0.7rem;
+    color: var(--text-lebal);
+    opacity: 0.7;
+}
+
+.profile-section {
+    margin-bottom: 1.25rem;
+}
+
+.profile-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-lebal);
+    margin-bottom: 0.4rem;
+    font-weight: bold;
+}
+
+.profile-input {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    background: var(--bg);
+    border: 1.5px solid color-mix(in srgb, var(--theme) 50%, transparent);
+    border-radius: 0.4rem;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: bold;
+    transition: border-color var(--transition);
+    box-sizing: border-box;
+}
+
+.profile-input:focus {
+    border-color: var(--theme);
+    outline: none;
+}
+
+.profile-textarea {
+    resize: vertical;
+    min-height: 60px;
+    max-height: 120px;
+}
+
+.profile-char-count {
+    display: block;
+    text-align: right;
+    font-size: 0.65rem;
+    color: var(--text-lebal);
+    opacity: 0.6;
+    margin-top: 0.2rem;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.profile-action-btn {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    background: var(--theme);
+    color: #000;
+    border: 2px solid var(--theme);
+    border-radius: 0.5rem;
+    font-weight: bold;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.profile-action-btn:hover {
+    background: rgba(220, 20, 60, 0.5);
+    color: var(--text);
+}
+
+.profile-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.profile-btn-outlined {
+    background: transparent;
+    color: var(--theme);
+}
+
+.profile-btn-outlined:hover {
+    background: var(--theme);
+    color: #000;
+}
+
+.profile-save-status {
+    text-align: center;
+    font-size: 0.8rem;
+    margin-top: 0.75rem;
+    min-height: 1.2rem;
+    font-weight: bold;
+}
+
+.profile-save-status.success {
+    color: #4caf50;
+}
+
+.profile-save-status.error {
+    color: var(--theme);
+}
+
+/* === AVATAR EMOJI PICKER === */
+.profile-avatar-wrapper {
+    position: relative;
+    cursor: pointer;
+}
+
+.profile-avatar-edit-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    font-size: 0.7rem;
+    background: var(--bg);
+    border: 1.5px solid var(--theme);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.emoji-picker-container {
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    background: var(--bg);
+    border: 1.5px solid color-mix(in srgb, var(--theme) 40%, transparent);
+    border-radius: 0.5rem;
+}
+
+.emoji-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.emoji-picker-item {
+    font-size: 1.5rem;
+    padding: 0.4rem;
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    transition: all var(--transition);
+    line-height: 1;
+}
+
+.emoji-picker-item:hover {
+    background: color-mix(in srgb, var(--theme) 15%, transparent);
+    border-color: color-mix(in srgb, var(--theme) 40%, transparent);
+    transform: scale(1.15);
+}
+
+.emoji-picker-item.selected {
+    border-color: var(--theme);
+    background: color-mix(in srgb, var(--theme) 25%, transparent);
+    transform: scale(1.1);
+}
+
+.emoji-picker-actions {
+    margin-top: 0.6rem;
+    text-align: center;
+}
+
+.emoji-picker-reset {
+    background: transparent;
+    border: 1.5px solid var(--text-lebal);
+    color: var(--text-lebal);
+    padding: 0.3rem 0.75rem;
+    border-radius: 0.3rem;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.emoji-picker-reset:hover {
+    border-color: var(--theme);
+    color: var(--theme);
+}

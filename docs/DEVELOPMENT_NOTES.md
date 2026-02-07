@@ -1,234 +1,164 @@
 # Development Notes
 
-Quick reference for adding features and understanding the codebase.
+Quick reference for adding features and understanding code patterns.
+
+> **For AI assistants:** Read [ARCHITECTURE.md](ARCHITECTURE.md) first for the full picture. This file covers common tasks.
+
+---
 
 ## Adding a New Page
 
-1. **Add section to index.html**:
+### Step 1: Add the HTML section to `index.html`
 ```html
 <section id="myNewPage" class="page-section" style="display: none;">
-    <!-- Content -->
+    <div id="myNewPageContent"></div>
 </section>
 ```
 
-2. **Add route to Router in app.js**:
+### Step 2: Add the route to Router in `app.js`
+Find the `this.pages = { ... }` object inside the Router class and add:
 ```javascript
-this.pages = {
-    'my-new-page.html': { id: 'myNewPage', title: 'My Page', showBack: true }
-}
+'my-new-page.html': { id: 'myNewPage', title: 'My Page', display: 'block', showBack: true }
 ```
 
-3. **Create page files** (optional):
-- `pages/css/myNewPage.css`
-- `pages/js/myNewPage.js`
-
-4. **Add init call in Router.initPage()**:
+### Step 3: Add init call in `Router.initPage()`
 ```javascript
 else if (page === 'my-new-page.html') {
     if (typeof initMyNewPage === 'function') initMyNewPage();
 }
 ```
 
-5. **Add cleanup if needed** in Router.cleanupPage():
+### Step 4: Add cleanup if needed in `Router.cleanupPage()`
 ```javascript
 if (typeof cleanupMyNewPage === 'function') cleanupMyNewPage();
 ```
 
-6. **Add navigation link on home page**
+### Step 5: Create page files (optional)
+- `pages/css/myNewPage.css` — Page-specific styles
+- `pages/js/myNewPage.js` — Page-specific JavaScript
 
-## CSS Utility Classes
-
-### Layout
-- `.flex-center` - Center items
-- `.flex-column` - Column direction
-- `.flex-gap-sm/md/lg` - Gap spacing
-
-### Colors
-- `.brand-text` - Brand color
-- `.brand-glow` - Text shadow
-- `.bg-dark` / `.bg-dark-strong` - Backgrounds
-
-### Borders
-- `.brand-border-thin/medium/thick`
-- `.rounded-none/sm/md/lg/xl`
-
-### Effects
-- `.transition-smooth` - 0.2s
-- `.transition-default` - 0.3s
-- `.shadow-brand` / `.shadow-brand-glow`
-
-## Config Pattern
-
-Extract magic numbers to config object at file top:
-
-```javascript
-const PageConfig = {
-    SOME_VOLUME: 0.5,
-    SOME_DELAY: 100,
-    DEFAULT_VALUE: 'default'
-};
+### Step 6: Link files in `index.html`
+```html
+<link rel="stylesheet" href="./pages/css/myNewPage.css?v=1.0">
+<script src="./pages/js/myNewPage.js" defer></script>
 ```
 
-Then use: `PageConfig.SOME_VOLUME`
+### Step 7: Add a navigation card on the home page
+Add inside the appropriate category grid in the `#home` section.
 
-## Cleanup Pattern
+---
 
-For pages with audio, timers, or event listeners:
+## Adding a New Button to the Top Bar
 
-```javascript
-function cleanupMyPage() {
-    // Stop audio
-    if (audioContext) audioContext.close();
-    
-    // Clear timers
-    if (intervalId) clearInterval(intervalId);
-    
-    // Remove listeners
-    element.removeEventListener('click', handler);
-    
-    // Reset state
-    myState = null;
-}
+If you add an icon-style button (no background), you **must** add `:not(.your-class)` to the THREE global button selectors in `app.css` to prevent it from getting the red crimson background. Search for `button:not(.back-btn)` to find them.
+
+Example — if you add a `.help-btn`:
+```css
+button:not(.back-btn):not(.settings-btn):not(... existing ...):not(.help-btn) { ... }
+```
+Do this for all three rules (base, primary, hover).
+
+---
+
+## CSS Variables
+
+All colors and transitions are defined as CSS custom properties on `:root` in `app.css`. Use them everywhere:
+
+```css
+color: var(--theme);          /* crimson */
+background: var(--bg);        /* #121212 */
+background: var(--bg-soft);   /* #1a1a1a */
+color: var(--text);           /* #e0e0e0 */
+color: var(--text-lebal);     /* #a0a0a0 (muted) */
+transition: all var(--transition); /* 0.2s ease */
 ```
 
-Register in Router.cleanupPage().
-
-## Error Handling
-
-### Audio
-```javascript
-try {
-    oscillator.start(startTime);
-} catch (error) {
-    console.warn('Audio failed:', error);
-}
+For semi-transparent theme colors:
+```css
+background: color-mix(in srgb, var(--theme) 30%, transparent);
+border-color: color-mix(in srgb, var(--theme) 50%, transparent);
 ```
 
-### Fetch
-```javascript
-try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.json();
-} catch (error) {
-    console.error('Fetch failed:', error);
-    return fallbackData;
-}
+---
+
+## Version Cache Busting
+
+When you edit a CSS or JS file, bump its version number in `index.html`:
+```html
+<!-- Before -->
+<link rel="stylesheet" href="./pages/css/profile.css?v=1.1">
+<!-- After -->
+<link rel="stylesheet" href="./pages/css/profile.css?v=1.2">
 ```
 
-## IndexedDB Usage
+This forces browsers to re-download the updated file instead of using a stale cached version.
 
-Save setting:
-```javascript
-await MusicTheoryDB.saveSetting('key', value);
-```
+---
 
-Load setting:
-```javascript
-const value = await MusicTheoryDB.getSetting('key');
-```
+## Firebase / Cloud Features
 
-Load all settings:
-```javascript
-const settings = await MusicTheoryDB.loadSettings();
-```
+### Adding a new synced setting
+1. Add the key to `SYNC_KEYS` in `settings-sync.js`
+2. Call `window.cloudSync.saveSettingToCloud('key', value)` wherever the setting changes
+3. Handle it in the `applyCloudSettings()` method of `SoundEffects` in `app.js`
 
-## File Locations
+### Adding a new Firestore collection
+1. Add read/write functions in the appropriate auth module
+2. Add security rules in `firestore.rules`
+3. Copy updated rules to Firebase Console → Firestore → Rules
+
+### Module bridge (window globals)
+Firebase modules use ES6 imports and can't be accessed by regular scripts directly. Communication happens via `window`:
+- `window.cloudSync` — Settings sync functions
+- `window.renderProfilePage` / `window.renderChatPage` — Page render functions
+- `window.cleanupChat` — Chat cleanup
+- `window.router` — SPA router instance
+- `window.loadUserProfile` — Profile data loader
+
+---
+
+## Chord Progression JSON Format
+
+See [BAR_SYSTEM_GUIDE.md](BAR_SYSTEM_GUIDE.md) for the visual guide.
+
+### Quick summary:
+| Scenario | Format |
+|----------|--------|
+| Simple 4-bar | `["1", "5", "6m", "4"]` |
+| Multi-chord in one bar | `["1", ["2", "3"], "4", "5"]` |
+| 2+ phrases | Each phrase is its own array, each bar is an array of chords |
+
+### Progression ID format (used in progressionInfo.json):
+- Bars separated by `-`
+- Chords in same bar separated by `,`
+- Example: `"6m,4,5-1-5/7-1"` → Bar 1 has 3 chords, bars 2-4 have 1 each
+
+---
+
+## File Locations Quick Reference
 
 | Purpose | Location |
 |---------|----------|
-| Core logic | src/scripts/app.js |
-| Global styles | src/styles/app.css |
-| Page JS | pages/js/*.js |
-| Page CSS | pages/css/*.css |
-| JSON data | pages/json/*.json |
-| Audio | assets/audio/ |
+| Core SPA logic | `src/scripts/app.js` |
+| Global styles | `src/styles/app.css` |
+| Firebase modules | `src/auth/*.js` |
+| Page scripts | `pages/js/*.js` |
+| Page styles | `pages/css/*.css` |
+| JSON content | `pages/json/*.json` |
+| Background music | `assets/audio/bgm/` |
+| Firestore rules | `firestore.rules` (root) |
+| Documentation | `docs/` |
 
-## chordProgression.json Format
+---
 
-### Basic Progression (1 phrase, 4 bars)
-```json
-{
-  "progression": ["4", "5", "3m", "6m"],
-  "music": []
-}
-```
+## Common Pitfalls
 
-### Progression with Multi-chord Bar
-```json
-{
-  "progression": ["4", "5", ["3m", "6m"], "1"],
-  "music": []
-}
-```
+1. **Emoji corruption:** When editing files that contain emoji (like 👤), some tools may corrupt them into `�`. Use Unicode escapes like `\u{1F464}` in JavaScript to be safe.
 
-### Progression with 2 Phrases (8+ bars)
-Each phrase on its own line for readability:
-```json
-{
-  "progression": [
-    [["4"], ["5"], ["3m"], ["6m"]],
-    [["4"], ["5"], ["1"], ["1"]]
-  ],
-  "music": []
-}
-```
+2. **Button gets red background:** If a new button unexpectedly has a crimson background, you forgot to add its class to the `:not()` exclusion chain in `app.css`. See "Adding a New Button" section above.
 
-### Progression with 3-4 Phrases
-```json
-{
-  "progression": [
-    [["1"], ["5/7"], ["6m"], ["3m/5"]],
-    [["4"], ["1/3"], ["2m"], ["5"]],
-    [["1"], ["5/7"], ["6m"], ["5m", "17"]],
-    [["4M7"], ["1/3"], ["2M7"], ["5"]]
-  ],
-  "music": []
-}
-```
+3. **Firebase won't work on file://:** Must use `http://` (Live Server or `node server/server.js`). Firebase SDK requires a proper web server.
 
-### progressionVariation Format
+4. **Chat listener not cleaning up:** Always call `window.cleanupChat()` when navigating away from the chat page, or Firestore listeners will keep running and waste reads.
 
-For songs that use a variation of the base progression.
-
-**1 phrase variation** (single line):
-```json
-"progressionVariation": ["6m", "4", "5", ["1", "5/7"]]
-```
-
-**2 phrase variation** (2 lines):
-```json
-"progressionVariation": [
-  ["4", "5", "3m", "6m"],
-  ["4", "5", "1", "1"]
-]
-```
-
-**2 phrase with multi-chord bars** (2 lines):
-```json
-"progressionVariation": [
-  [["6m7"], ["6m7", "b6m7"], ["5m7"], ["1"]],
-  [["4M7"], ["4M7"], ["3sus"], ["3"]]
-]
-```
-
-**3-4 phrase variation** (3-4 lines):
-```json
-"progressionVariation": [
-  [["4"], ["5"], ["3m"], ["6m"]],
-  [["4"], ["37", "37/#5"], ["6m"], ["5", "1"]],
-  [["4"], ["5"], ["3m"], ["6m"]],
-  [["2m"], ["5"], ["1"], ["1"]]
-]
-```
-
-### Format Rules Summary
-
-| Scenario | Format |
-|----------|--------|
-| Simple 4-bar | `["1", "2", "3", "4"]` |
-| Multi-chord in bar | `["1", ["2", "3"], "4", "5"]` |
-| 2+ phrases | Each phrase is own array, each bar is array of chords |
-| progressionVariation | Same rules, formatted for readability |
-
-**Tip**: For multi-phrase progressions, always use the fully nested format where each bar is wrapped in `[]` for consistency.
+5. **img onerror on void elements:** `<img>` is a void element — you can't set `this.innerHTML` on it. Use `this.parentElement.innerHTML` or `this.style.display='none'` instead.

@@ -252,10 +252,13 @@ async function loadDetailView() {
     // Update the header title with the clicked line
     const titleToShow = currentLineTitle || 'Unknown';
     
-    // Update page title directly
+    // Update page title directly (preserve back button)
     const pageTitleEl = document.getElementById('pageTitle');
     if (pageTitleEl) {
+        const backBtn = document.getElementById('backBtn');
+        if (backBtn) backBtn.remove();
         pageTitleEl.textContent = escapeHtml(titleToShow);
+        if (backBtn) pageTitleEl.appendChild(backBtn);
     }
     
     // Show edit button only in owner mode

@@ -1,0 +1,35 @@
+rules_version = '2';
+
+// Firestore Security Rules for Fantasia
+// Paste these into: Firebase Console → Firestore Database → Rules
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // === USER SETTINGS & PROFILE ===
+    // Users can only read/write their own data
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // === CHAT MESSAGES ===
+    // Anyone logged in can read messages
+    // Anyone logged in can create messages (with validation)
+    // Only the message author can delete their own messages
+    match /chatMessages/{messageId} {
+      allow read: if request.auth != null;
+      
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 300;
+      
+      allow delete: if request.auth != null 
+        && resource.data.uid == request.auth.uid;
+      
+      // No one can edit messages after sending
+      allow update: if false;
+    }
+  }
+}

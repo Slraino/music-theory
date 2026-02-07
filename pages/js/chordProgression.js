@@ -91,31 +91,31 @@ async function renderProgressions() {
     
     displayOrder.forEach((key) => {
         if (groups[key] && groups[key].length > 0) {
-            const groupBox = document.createElement('div');
-            groupBox.className = 'group-box';
+            const keyBox = document.createElement('div');
+            keyBox.className = 'key-box';
             // Group names no longer stored - just use the key
-            const groupTitleText = key;
+            const keyTitleText = key;
             
             const titleBox = document.createElement('div');
-            titleBox.className = 'group-title-box';
-            titleBox.setAttribute('data-group-key', key);
+            titleBox.className = 'key-title-box';
+            titleBox.setAttribute('data-key', key);
             // Toggle on hover and click (click helps mobile/touch users)
-            titleBox.onmouseenter = () => toggleGroupContent(key);
-            titleBox.onclick = () => toggleGroupContent(key);
+            titleBox.onmouseenter = () => toggleKeyContent(key);
+            titleBox.onclick = () => toggleKeyContent(key);
             titleBox.innerHTML = `
-                <span class="group-title-text">${escapeHtml(groupTitleText)}</span>
+                <span class="key-title-text">${escapeHtml(keyTitleText)}</span>
             `;
             
-            groupBox.appendChild(titleBox);
-            boxesWrapper.appendChild(groupBox);
+            keyBox.appendChild(titleBox);
+            boxesWrapper.appendChild(keyBox);
             
             const contentContainer = document.createElement('div');
-            contentContainer.className = 'group-content-container collapsed';
-            contentContainer.id = `group-content-${key}`;
-            contentContainer.setAttribute('data-group-key', key);
+            contentContainer.className = 'key-content-container collapsed';
+            contentContainer.id = `key-content-${key}`;
+            contentContainer.setAttribute('data-key', key);
             
-            const groupContentBox = document.createElement('div');
-            groupContentBox.className = 'group-content-box';
+            const keyContentBox = document.createElement('div');
+            keyContentBox.className = 'key-content-box';
             
             let allContent = '';
             
@@ -203,8 +203,8 @@ async function renderProgressions() {
                 }
             });
             
-            groupContentBox.innerHTML = allContent;
-            contentContainer.appendChild(groupContentBox);
+            keyContentBox.innerHTML = allContent;
+            contentContainer.appendChild(keyContentBox);
             contentWrapper.appendChild(contentContainer);
         }
     });
@@ -223,14 +223,14 @@ async function renderProgressions() {
         }
     });
     
-    // Auto-open the first available group so content is visible immediately
+    // Auto-open the first available key so content is visible immediately
     const firstKey = displayOrder.find(k => groups[k] && groups[k].length > 0);
     if (firstKey) {
-        toggleGroupContent(firstKey);
+        toggleKeyContent(firstKey);
     }
 
     if (currentOpenGroupCP) {
-        const previousContainer = document.getElementById(`group-content-${currentOpenGroupCP}`);
+        const previousContainer = document.getElementById(`key-content-${currentOpenGroupCP}`);
         if (previousContainer) {
             previousContainer.classList.remove('collapsed');
         }
@@ -241,17 +241,17 @@ async function renderProgressions() {
     }
 }
 
-function toggleGroupContent(key) {
+function toggleKeyContent(key) {
     if (currentOpenGroupCP === key) {
         return;
     }
     
-    const allContainers = document.querySelectorAll('.group-content-container');
+    const allContainers = document.querySelectorAll('.key-content-container');
     allContainers.forEach(container => {
         container.classList.add('collapsed');
     });
     
-    const targetContainer = document.getElementById(`group-content-${key}`);
+    const targetContainer = document.getElementById(`key-content-${key}`);
     if (targetContainer) {
         targetContainer.classList.remove('collapsed');
         currentOpenGroupCP = key;

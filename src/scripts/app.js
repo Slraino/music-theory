@@ -18,11 +18,7 @@ const AppConfig = {
     SFX_HOVER_VOLUME: 0.05,
     SFX_CLICK_VOLUME: 0.1,
     SFX_HOVER_DURATION: 0.12,
-    SFX_CLICK_DURATION: 0.15,
-    
-    // Database
-    DB_NAME: 'MusicTheoryDB',
-    DB_VERSION: 2
+    SFX_CLICK_DURATION: 0.15
 };
 
 // ==================== DATA SERVICE (Session-only cache) ====================
@@ -250,206 +246,14 @@ const LoadingManager = {
     }
 };
 
-// ==================== INDEXEDDB (Settings ONLY) ====================
-class MusicTheoryDB {
-    constructor() {
-        this.dbName = AppConfig.DB_NAME;
-        this.version = AppConfig.DB_VERSION;
-        this.db = null;
-        this.ready = false;
-        this._initPromise = null;
-    }
-
-    async init() {
-        // Return existing promise if already initializing
-        if (this._initPromise) return this._initPromise;
-        
-        this._initPromise = new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.dbName, this.version);
-
-            request.onerror = () => {
-                console.error('IndexedDB error:', request.error);
-                this._initPromise = null;
-                
-                // Handle version error by recreating database
-                if (request.error?.name === 'VersionError') {
-                    this._handleVersionError().then(resolve).catch(reject);
-                } else {
-                    reject(request.error);
-                }
-            };
-
-            request.onsuccess = () => {
-                this.db = request.result;
-                this.ready = true;
-                resolve(this.db);
-            };
-
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                
-                // Remove old content stores if they exist
-                ['progressions', 'groupNames', 'musicTheory'].forEach(store => {
-                    if (db.objectStoreNames.contains(store)) {
-                        db.deleteObjectStore(store);
-                    }
-                });
-                
-                // Only keep settings store
-                if (!db.objectStoreNames.contains('settings')) {
-                    db.createObjectStore('settings', { keyPath: 'key' });
-                }
-            };
-        });
-        
-        return this._initPromise;
-    }
-    
-    async _handleVersionError() {
-        console.log('Deleting old database and recreating...');
-        return new Promise((resolve, reject) => {
-            const deleteRequest = indexedDB.deleteDatabase(this.dbName);
-            deleteRequest.onsuccess = () => {
-                console.log('Database deleted, reinitializing...');
-                this._initPromise = null;
-                this.init().then(resolve).catch(reject);
-            };
-            deleteRequest.onerror = () => {
-                console.error('Failed to delete database:', deleteRequest.error);
-                reject(deleteRequest.error);
-            };
-        });
-    }
-
-    async set(storeName, key, value) {
-        if (storeName !== 'settings') {
-            throw new Error('Only settings store is supported');
-        }
-        if (!this.ready) await this.init();
-        
-        return new Promise((resolve, reject) => {
-            try {
-                const transaction = this.db.transaction([storeName], 'readwrite');
-                const store = transaction.objectStore(storeName);
-                const request = store.put({ key, data: value });
-                
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => resolve(value);
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    async get(storeName, key) {
-        if (storeName !== 'settings') {
-            throw new Error('Only settings store is supported');
-        }
-        if (!this.ready) await this.init();
-        
-        return new Promise((resolve, reject) => {
-            try {
-                const transaction = this.db.transaction([storeName], 'readonly');
-                const store = transaction.objectStore(storeName);
-                const request = store.get(key);
-
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => resolve(request.result?.data ?? null);
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    async remove(storeName, key) {
-        if (storeName !== 'settings') {
-            throw new Error('Only settings store is supported');
-        }
-        if (!this.ready) await this.init();
-        
-        return new Promise((resolve, reject) => {
-            try {
-                const transaction = this.db.transaction([storeName], 'readwrite');
-                const store = transaction.objectStore(storeName);
-                const request = store.delete(key);
-
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => resolve();
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    async clear(storeName) {
-        if (storeName !== 'settings') {
-            throw new Error('Only settings store is supported');
-        }
-        if (!this.ready) await this.init();
-        
-        return new Promise((resolve, reject) => {
-            try {
-                const transaction = this.db.transaction([storeName], 'readwrite');
-                const store = transaction.objectStore(storeName);
-                const request = store.clear();
-
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => resolve();
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    async migrateFromLocalStorage() {
-        try {
-            // Migrate user preferences only (NOT content data)
-            const migrations = [
-                { key: 'musicVolume', parser: parseFloat },
-                { key: 'musicEnabled', parser: (val) => val === 'true' },
-                { key: 'sfxVolume', parser: parseFloat },
-                { key: 'sfxEnabled', parser: (val) => val === 'true' }
-            ];
-
-            for (const { key, parser } of migrations) {
-                const value = localStorage.getItem(key);
-                if (value !== null) {
-                    await this.set('settings', key, parser(value));
-                }
-            }
-            
-            // Clean up deprecated content data from localStorage
-            const deprecatedKeys = [
-                'musicProgressions',
-                'progressionDetails',
-                'groupCustomNames',
-                'musicTheory',
-                'siteDescription'
-            ];
-            deprecatedKeys.forEach(key => localStorage.removeItem(key));
-            
-            console.log('✓ Migrated settings from localStorage to IndexedDB');
-        } catch (error) {
-            console.error('Failed to migrate from localStorage:', error);
-        }
-    }
-}
-
-const db = new MusicTheoryDB();
-db.init().then(() => {
-    db.migrateFromLocalStorage();
-}).catch(error => {
-    console.error('Failed to initialize IndexedDB:', error);
-});
-
 /* ==================== ROUTER ==================== */
 class Router {
     constructor() {
-        this.currentPage = 'homePage';
+        this.currentPage = 'index.html';
         this.history = []; // Navigation history stack
         this.pages = {
             'index.html': { 
-                id: 'homePage', 
+                id: 'homePage', display: 'flex', 
                 title: 'Home', 
                 showBack: false,
                 init: () => typeof loadSiteDescription === 'function' && loadSiteDescription()
@@ -479,6 +283,24 @@ class Router {
                 title: 'Chord Generator', 
                 showBack: true,
                 init: () => typeof initChordGenerator === 'function' && initChordGenerator()
+            },
+            'pomodoro.html': { 
+                id: 'pomodoroPage', 
+                title: 'Pomodoro', 
+                showBack: true,
+                init: () => typeof initPomodoro === 'function' && initPomodoro()
+            },
+            'profile.html': { 
+                id: 'profilePage', 
+                title: 'Profile', 
+                showBack: true,
+                init: () => typeof renderProfilePage === 'function' && renderProfilePage()
+            },
+            'chat.html': { 
+                id: 'chatPage', 
+                title: 'Chat Room', 
+                showBack: true,
+                init: () => typeof renderChatPage === 'function' && renderChatPage()
             }
         };
     }
@@ -494,7 +316,7 @@ class Router {
 
     init() {
         document.addEventListener('click', (e) => {
-            const link = e.target.closest('a.nav-link, a.nav-box-card');
+            const link = e.target.closest('a.nav-link, a.section-box-card');
             if (link && link.href) {
                 e.preventDefault();
                 const href = link.href.split('/').pop().split('?')[0];
@@ -568,13 +390,18 @@ class Router {
 
         const pageEl = document.getElementById(pageConfig.id);
         if (pageEl) {
-            pageEl.style.display = 'block';
+            pageEl.style.display = pageConfig.display || 'block';
         }
 
         const titleEl = document.getElementById('pageTitle');
         if (titleEl) {
             const titleText = pageConfig.title || this.formatTitleFromFilename(page);
+            const backBtn = document.getElementById('backBtn');
+            // Remove back button from DOM temporarily to preserve it
+            if (backBtn) backBtn.remove();
             titleEl.textContent = titleText;
+            // Re-append the preserved back button DOM node (keeps event listeners)
+            if (backBtn) titleEl.appendChild(backBtn);
         }
         
         const backBtn = document.getElementById('backBtn');
@@ -615,6 +442,10 @@ class Router {
         if (typeof window.cleanupChordGenerator === 'function') {
             window.cleanupChordGenerator();
         }
+        // Cleanup chat listener
+        if (typeof window.cleanupChat === 'function') {
+            window.cleanupChat();
+        }
     }
 
     initPage(page) {
@@ -629,18 +460,19 @@ let router;
 document.addEventListener('DOMContentLoaded', () => {
     router = new Router();
     router.init();
+    window.router = router; // Expose for auth modules
 });
 
 // Session ID to track which preview request is current - prevents race conditions
 let backgroundPreviewSession = 0;
 
 function ensureBackgroundVideoOverlay() {
-    let overlay = document.getElementById('bgVideoOverlay');
+    let overlay = document.getElementById('generatorYtPreview');
     if (!overlay) {
         overlay = document.createElement('div');
-        overlay.id = 'bgVideoOverlay';
-        overlay.className = 'bg-video-overlay';
-        overlay.innerHTML = '<iframe title="Background Preview" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+        overlay.id = 'generatorYtPreview';
+        overlay.className = 'generator-yt-preview';
+        overlay.innerHTML = '<iframe title="YouTube Preview" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
         document.body.appendChild(overlay);
     }
     return overlay;
@@ -703,7 +535,7 @@ window.clearBackgroundPreview = () => {
     // Clear any pending fade timers
     clearPreviewFadeTimers();
     
-    const overlay = document.getElementById('bgVideoOverlay');
+    const overlay = document.getElementById('generatorYtPreview');
     if (!overlay) return;
 
     // Hide overlay immediately to avoid lingering preview screen
@@ -887,28 +719,6 @@ class SoundEffects {
         this.sfxEnabled = true;
         this.audioElement = null;
         this.currentTrackIndex = 0;
-        this._settingsLoaded = false;
-    }
-    
-    async loadSettings() {
-        if (this._settingsLoaded) return;
-        try {
-            if (db.ready) {
-                const musicVol = await db.get('settings', 'musicVolume');
-                const musicEnabled = await db.get('settings', 'musicEnabled');
-                const sfxVol = await db.get('settings', 'sfxVolume');
-                const sfxEnabled = await db.get('settings', 'sfxEnabled');
-                
-                if (musicVol !== null) this.musicVolume = musicVol;
-                if (musicEnabled !== null) this.shouldPlayMusic = musicEnabled;
-                if (sfxVol !== null) this.sfxVolume = sfxVol;
-                if (sfxEnabled !== null) this.sfxEnabled = sfxEnabled;
-                
-                this._settingsLoaded = true;
-            }
-        } catch (e) {
-            console.warn('Failed to load audio settings from IndexedDB:', e);
-        }
     }
 
     init() {
@@ -966,8 +776,8 @@ class SoundEffects {
 
     setMusicVolume(volume) {
         this.musicVolume = Math.max(0, Math.min(1, volume / 100));
-        if (typeof db !== 'undefined' && db.ready) {
-            db.set('settings', 'musicVolume', this.musicVolume).catch(() => {});
+        if (window.cloudSync) {
+            window.cloudSync.saveSettingToCloud('musicVolume', this.musicVolume);
         }
         if (this.audioElement) {
             this.audioElement.volume = this.musicVolume;
@@ -976,15 +786,15 @@ class SoundEffects {
 
     setSfxVolume(volume) {
         this.sfxVolume = Math.max(0, Math.min(100, volume));
-        if (typeof db !== 'undefined' && db.ready) {
-            db.set('settings', 'sfxVolume', this.sfxVolume).catch(() => {});
+        if (window.cloudSync) {
+            window.cloudSync.saveSettingToCloud('sfxVolume', this.sfxVolume);
         }
     }
 
     setSfxEnabled(enabled) {
         this.sfxEnabled = enabled;
-        if (typeof db !== 'undefined' && db.ready) {
-            db.set('settings', 'sfxEnabled', enabled).catch(() => {});
+        if (window.cloudSync) {
+            window.cloudSync.saveSettingToCloud('sfxEnabled', enabled);
         }
     }
 
@@ -1024,8 +834,8 @@ class SoundEffects {
         if (!this.audioContext) this.init();
 
         this.musicPlaying = true;
-        if (typeof db !== 'undefined' && db.ready) {
-            db.set('settings', 'musicEnabled', true).catch(() => {});
+        if (window.cloudSync) {
+            window.cloudSync.saveSettingToCloud('musicEnabled', true);
         }
 
         if (!this.audioElement) {
@@ -1048,8 +858,8 @@ class SoundEffects {
 
     stopBackgroundMusic() {
         this.musicPlaying = false;
-        if (typeof db !== 'undefined' && db.ready) {
-            db.set('settings', 'musicEnabled', false).catch(() => {});
+        if (window.cloudSync) {
+            window.cloudSync.saveSettingToCloud('musicEnabled', false);
         }
         if (this.audioElement) {
             this.audioElement.pause();
@@ -1057,17 +867,56 @@ class SoundEffects {
         }
     }
 
+    /**
+     * Apply settings from cloud sync (called when user logs in)
+     * Updates internal state + UI sliders/buttons to match cloud values
+     */
+    applyCloudSettings(cloudSettings) {
+        if (!cloudSettings) return;
+
+        if (cloudSettings.musicVolume !== undefined) {
+            this.musicVolume = cloudSettings.musicVolume;
+            if (this.audioElement) this.audioElement.volume = this.musicVolume;
+            const slider = document.getElementById('volumeSlider');
+            const label = document.getElementById('volumeLabel');
+            if (slider) slider.value = Math.round(this.musicVolume * 100);
+            if (label) label.textContent = Math.round(this.musicVolume * 100) + '%';
+        }
+
+        if (cloudSettings.sfxVolume !== undefined) {
+            this.sfxVolume = cloudSettings.sfxVolume;
+            const slider = document.getElementById('sfxSlider');
+            const label = document.getElementById('sfxLabel');
+            if (slider) slider.value = Math.round(this.sfxVolume);
+            if (label) label.textContent = Math.round(this.sfxVolume) + '%';
+        }
+
+        if (cloudSettings.sfxEnabled !== undefined) {
+            this.sfxEnabled = cloudSettings.sfxEnabled;
+            const btn = document.getElementById('sfxToggleBtn');
+            if (btn) {
+                btn.classList.toggle('active', this.sfxEnabled);
+                btn.textContent = this.sfxEnabled ? '\uD83D\uDD0A' : '\uD83D\uDD07';
+            }
+        }
+
+        if (cloudSettings.musicEnabled !== undefined) {
+            this.shouldPlayMusic = cloudSettings.musicEnabled;
+        }
+
+        console.log('\u2705 Cloud settings applied');
+    }
+
     attachToElements(elements) {
         elements.forEach(el => {
+            if (el.dataset.sfxAttached) return;
+            el.dataset.sfxAttached = '1';
             el.addEventListener('mouseenter', () => this.playSoftBeepSound());
             el.addEventListener('mousedown', () => this.playClickSound());
         });
     }
 
     async initUI() {
-        // Load settings from IndexedDB first
-        await this.loadSettings();
-        
         // Attach to existing buttons
         this.attachToElements(document.querySelectorAll('button, a, .clickable-line, .back-btn, .group-title'));
 
@@ -1232,16 +1081,8 @@ function showDetail(indexOrLineText, encodedLineTitle) {
     }
 }
 
-// Load site description for home page
-function loadSiteDescription() {
-    const defaultDescription = 'Learn and explore chord progressions and music theory concepts.';
-    const savedDescription = localStorage.getItem('siteDescription') || defaultDescription;
-    
-    const siteDescElement = document.getElementById('siteDescription');
-    if (siteDescElement) {
-        siteDescElement.textContent = savedDescription;
-    }
-}
+// Load site description for home page (no-op: element removed, kept for Router reference)
+function loadSiteDescription() {}
 
 function initSettingsPanel() {
     const settingsBtn = document.getElementById('settingsBtn');
@@ -1267,6 +1108,17 @@ function initSettingsPanel() {
     settingsPanel.addEventListener('click', (e) => {
         e.stopPropagation();
     });
+
+    // Chat button - navigates to chat page
+    const chatBtn = document.getElementById('chatBtn');
+    if (chatBtn) {
+        chatBtn.addEventListener('click', () => {
+            if (window.router) {
+                window.router.navigate('chat.html');
+            }
+        });
+    }
+
 }
 
 if (document.readyState !== 'loading') {

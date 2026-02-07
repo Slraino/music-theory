@@ -1,4 +1,4 @@
-# This is a note book for owner develop ideas #
+# This is a note book for owner develop ideas, dont have to read and change it #
 
 ## What to do next ##
 app

@@ -1438,14 +1438,14 @@ function updateChordHeader(phrases) {
     if (!pageTitle) return;
     
     if (!phrases || !Array.isArray(phrases) || phrases.length === 0) {
-        pageTitle.textContent = 'Chord Generator';
+        setTitlePreserveBackBtn(pageTitle, 'Chord Generator');
         return;
     }
     
     // Only use FIRST phrase for header (the base progression)
     const firstPhrase = phrases[0];
     if (!firstPhrase || !Array.isArray(firstPhrase)) {
-        pageTitle.textContent = 'Chord Generator';
+        setTitlePreserveBackBtn(pageTitle, 'Chord Generator');
         return;
     }
     
@@ -1464,7 +1464,15 @@ function updateChordHeader(phrases) {
     });
     
     const headerText = baseDegrees.join(' - ');
-    pageTitle.textContent = headerText;
+    setTitlePreserveBackBtn(pageTitle, headerText);
+}
+
+// Set header text without destroying child elements (back button)
+function setTitlePreserveBackBtn(titleEl, text) {
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) backBtn.remove();
+    titleEl.textContent = text;
+    if (backBtn) titleEl.appendChild(backBtn);
 }
 
 // Update the progression name display

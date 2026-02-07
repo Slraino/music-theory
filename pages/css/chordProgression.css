@@ -1,5 +1,3 @@
-/* Chord Progression page styles */
-
 .progressions-list {
     display: flex;
     flex-direction: column;
@@ -38,7 +36,7 @@
     display: none;
 }
 
-.group-box {
+.key-box {
     padding: 0;
     margin: 0;
     border: none;
@@ -49,8 +47,8 @@
     flex-shrink: 0;
 }
 
-.group-title-box {
-    background: var(--brand);
+.key-title-box {
+    background: var(--theme);
     color: var(--bg);
     padding: 0;
     width: 3.125rem;
@@ -68,56 +66,56 @@
     gap: 0;
     margin-inline-end: 0;
     user-select: none;
-    transition: all var(--transition-default) cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all var(--transition) cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     z-index: 1;
 }
 
-.group-title-box:hover {
-    background: var(--brand-soft);
+.key-title-box:hover {
+    background: var(--theme-secondary);
 }
 
-/* Natural notes - white background, black text */
-.group-title-box[data-group-key="1"],
-.group-title-box[data-group-key="2"],
-.group-title-box[data-group-key="3"],
-.group-title-box[data-group-key="4"],
-.group-title-box[data-group-key="5"],
-.group-title-box[data-group-key="6"],
-.group-title-box[data-group-key="7"] {
-    background: var(--text);
-    color: var(--text-dark);
+/* Natural notes - white keys */
+.key-title-box[data-key="1"],
+.key-title-box[data-key="2"],
+.key-title-box[data-key="3"],
+.key-title-box[data-key="4"],
+.key-title-box[data-key="5"],
+.key-title-box[data-key="6"],
+.key-title-box[data-key="7"] {
+    background: var(--key-white-bg);
+    color: var(--key-white-text);
 }
 
-.group-title-box[data-group-key="1"]:hover,
-.group-title-box[data-group-key="2"]:hover,
-.group-title-box[data-group-key="3"]:hover,
-.group-title-box[data-group-key="4"]:hover,
-.group-title-box[data-group-key="5"]:hover,
-.group-title-box[data-group-key="6"]:hover,
-.group-title-box[data-group-key="7"]:hover {
-    background: var(--text-muted);
+.key-title-box[data-key="1"]:hover,
+.key-title-box[data-key="2"]:hover,
+.key-title-box[data-key="3"]:hover,
+.key-title-box[data-key="4"]:hover,
+.key-title-box[data-key="5"]:hover,
+.key-title-box[data-key="6"]:hover,
+.key-title-box[data-key="7"]:hover {
+    background: #e0e0e0;
 }
 
-/* Accidental notes - black background, white text */
-.group-title-box[data-group-key="b2"],
-.group-title-box[data-group-key="b3"],
-.group-title-box[data-group-key="#4"],
-.group-title-box[data-group-key="b6"],
-.group-title-box[data-group-key="b7"] {
-    background: var(--text-dark);
-    color: var(--text);
+/* Accidental notes - black keys */
+.key-title-box[data-key="b2"],
+.key-title-box[data-key="b3"],
+.key-title-box[data-key="#4"],
+.key-title-box[data-key="b6"],
+.key-title-box[data-key="b7"] {
+    background: var(--key-black-bg);
+    color: var(--key-black-text);
 }
 
-.group-title-box[data-group-key="b2"]:hover,
-.group-title-box[data-group-key="b3"]:hover,
-.group-title-box[data-group-key="#4"]:hover,
-.group-title-box[data-group-key="b6"]:hover,
-.group-title-box[data-group-key="b7"]:hover {
-    background: var(--bg-strong);
+.key-title-box[data-key="b2"]:hover,
+.key-title-box[data-key="b3"]:hover,
+.key-title-box[data-key="#4"]:hover,
+.key-title-box[data-key="b6"]:hover,
+.key-title-box[data-key="b7"]:hover {
+    background: var(--bg-soft);
 }
 
-.group-title-text {
+.key-title-text {
     text-align: center;
     word-wrap: break-word;
     overflow: hidden;
@@ -126,8 +124,8 @@
     line-height: 1;
 }
 
-.group-content-container {
-    background: rgba(15, 15, 15, 0.98);
+.key-content-container {
+    background: var(--bg-soft);
     border-radius: 0.5rem;
     overflow-y: auto;
     transition: opacity 0.5s ease;
@@ -137,19 +135,19 @@
     margin-inline: auto;
 }
 
-.group-content-container::-webkit-scrollbar {
+.key-content-container::-webkit-scrollbar {
     width: 0.5rem;
 }
 
-.group-content-container::-webkit-scrollbar-track {
+.key-content-container::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.group-content-container::-webkit-scrollbar-thumb {
+.key-content-container::-webkit-scrollbar-thumb {
     display: none;
 }
 
-.group-content-container.collapsed {
+.key-content-container.collapsed {
     max-height: 0;
     opacity: 0;
     margin-block-start: 0;
@@ -158,13 +156,13 @@
     visibility: hidden;
 }
 
-.group-content-box {
+.key-content-box {
     padding: 1.5625rem;
     display: flex;
     flex-direction: column;
     gap: 0.3125rem;
-    background: rgba(15, 15, 15, 0.98);
-    border-inline-start: 0.25rem solid var(--brand);
+    background: var(--bg-soft);
+    border-inline-start: 0.25rem solid var(--theme);
 }
 
 .progression-notes {
@@ -176,7 +174,7 @@
 }
 
 .styled-text {
-    color: var(--brand);
+    color: var(--theme);
     font-weight: bold;
     font-size: 1.15em;
     padding: 0.125rem 0.375rem;
@@ -184,19 +182,19 @@
 }
 
 .bullet-dot {
-    color: var(--brand);
+    color: var(--theme);
     font-weight: bold;
     font-size: 1.3em;
 }
 
 .highlight-text {
-    color: var(--brand);
+    color: var(--theme);
     font-weight: bold;
     font-size: 1.2em;
 }
 
 .crimson-text {
-    color: var(--brand);
+    color: var(--theme);
 }
 
 /* Phrase group container for multi-phrase progressions */
@@ -206,14 +204,14 @@
     gap: 0.5rem;
     padding: 0.5rem;
     border-radius: 0.5rem;
-    background: rgba(10, 10, 15, 0.92);
+    background: var(--bg);
     border: none;
     margin-block: 0.5rem;
-    transition: all var(--transition-fast);
+    transition: all var(--transition);
 }
 
 #chordProgressionPage .phrase-group:hover {
-    background: #0b0b0b;
+    background: var(--bg-soft);
 }
 
 /* Progression Grid - Bar-based layout */
@@ -225,9 +223,9 @@
     cursor: pointer;
     padding: 0.5rem;
     border-radius: 0.5rem;
-    background: rgba(10, 10, 15, 0.92);
+    background: var(--bg);
     border: none;
-    transition: all var(--transition-fast);
+    transition: all var(--transition);
 }
 
 /* Single progression (not in a phrase-group) */
@@ -237,7 +235,7 @@
 }
 
 #chordProgressionPage .progression-grid:not(.phrase-group .progression-grid):hover {
-    background: #0b0b0b;
+    background: var(--bg-soft);
 }
 
 /* Bar container - holds one or more chords */
@@ -260,7 +258,7 @@
 
 /* Individual chord within a bar */
 #chordProgressionPage .chord-item {
-    color: var(--brand);
+    color: var(--theme);
     font-weight: 600;
     font-size: 1.1em;
     white-space: nowrap;
