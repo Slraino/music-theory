@@ -4,14 +4,14 @@
 .music-link {
     color: var(--theme);
     text-decoration: none;
-    border-bottom: 1px dashed rgba(255, 23, 68, 0.5);
+    border-bottom: 1px dashed color-mix(in srgb, var(--theme) 50%, transparent);
     transition: all 0.3s ease;
     cursor: pointer;
 }
 
 .music-link:hover {
-    color: #fff;
-    border-bottom-color: #fff;
+    color: var(--text);
+    border-bottom-color: var(--text);
 }
 
 /* YouTube Preview Overlay - Generator only */
@@ -89,8 +89,8 @@
 }
 
 .icon-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--bg-soft);
+    border: 1px solid color-mix(in srgb, white 20%, transparent);
     color: var(--text);
     padding: 0.5rem 0.75rem;
     border-radius: 0.5rem;
@@ -103,8 +103,8 @@
 }
 
 .icon-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: color-mix(in srgb, var(--bg-soft) 70%, white);
+    border-color: color-mix(in srgb, white 40%, transparent);
     opacity: 1 !important;
 }
 
@@ -119,13 +119,13 @@
     font-size: 1.1rem;
     font-weight: 700;
     white-space: nowrap;
-    box-shadow: 0 0 12px var(--theme), 0 0 24px rgba(220, 20, 60, 0.4);
+    box-shadow: 0 0 12px var(--theme), 0 0 24px color-mix(in srgb, var(--theme) 40%, transparent);
     text-shadow: 0 0 8px var(--theme);
 }
 
 .progression-name-tag.variation {
-    color: salmon;
-    border-color: salmon;
+    color: var(--theme-secondary);
+    border-color: var(--theme-secondary);
     cursor: help;
     box-shadow: none;
     text-shadow: none;
@@ -133,14 +133,14 @@
 
 /* Song-specific chord display (when a song with progressionVariation is playing) */
 .phrase-container.song-specific-display {
-    border: 1px dashed rgba(100, 200, 255, 0.4);
+    border: 1px dashed color-mix(in srgb, cyan 40%, transparent);
     border-radius: 0.5rem;
     padding: 0.25rem;
-    background: rgba(100, 200, 255, 0.05);
+    background: color-mix(in srgb, var(--bg) 95%, cyan);
 }
 
 .phrase-container.song-specific-display .chord-item {
-    color: rgba(100, 200, 255, 0.9);
+    color: color-mix(in srgb, cyan 90%, white);
 }
 
 /* Reserved phrase row in base grid - invisible but reserves space */
@@ -151,7 +151,7 @@
 
 /* Phrase placeholder - visible dotted outline for adding phrases */
 .phrase-container.phrase-placeholder {
-    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border: 2px dashed color-mix(in srgb, white 20%, transparent);
     background: var(--bg);
     min-height: 3.5rem;
     display: flex;
@@ -163,7 +163,7 @@
 }
 
 .phrase-container.phrase-placeholder:hover {
-    border-color: rgba(255, 255, 255, 0.4);
+    border-color: color-mix(in srgb, white 40%, transparent);
     background: var(--bg-soft);
 }
 
@@ -173,7 +173,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.4);
+    color: color-mix(in srgb, white 40%, transparent);
     font-size: 1.2rem;
     font-weight: bold;
     transition: all 0.2s;
@@ -233,10 +233,10 @@
 .phrase-nav-icon {
     width: 1.5rem;
     height: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid color-mix(in srgb, white 30%, transparent);
     border-radius: 0.25rem;
     background: var(--bg-soft);
-    color: rgba(255, 255, 255, 0.5);
+    color: color-mix(in srgb, white 50%, transparent);
     font-size: 0.75rem;
     font-weight: 700;
     cursor: pointer;
@@ -249,13 +249,13 @@
 .phrase-nav-icon:hover {
     border-color: var(--theme);
     color: var(--theme);
-    background: rgba(255, 23, 68, 0.1);
+    background: color-mix(in srgb, var(--theme) 10%, transparent);
 }
 
 .phrase-nav-icon.active {
     border-color: var(--theme);
     color: var(--theme);
-    background: rgba(255, 23, 68, 0.2);
+    background: color-mix(in srgb, var(--theme) 20%, transparent);
 }
 
 .controls-row.phrase-reserved {
@@ -297,7 +297,7 @@
 .key-selector select {
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-soft);
     color: var(--text);
     border: 1px solid var(--theme);
     font-size: 1rem;
@@ -305,38 +305,114 @@
 }
 
 .toggle-btn {
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.75rem;
     border-radius: 0.5rem;
-    background: var(--theme);
-    color: white;
-    border: none;
-    font-size: 0.9rem;
+    background: var(--bg-soft);
+    color: var(--text);
+    border: 1px solid color-mix(in srgb, white 20%, transparent);
+    font-size: 0.85rem;
     cursor: pointer;
     font-weight: 600;
-    transition: transform var(--transition), box-shadow var(--transition);
+    white-space: nowrap;
+    transition: all 0.2s ease;
 }
 
 .toggle-btn:hover {
-    transform: translateY(-0.125rem);
-    box-shadow: 0 0.25rem 0.5rem rgba(255, 23, 68, 0.3);
+    background: color-mix(in srgb, var(--bg-soft) 70%, white);
+    border-color: color-mix(in srgb, white 40%, transparent);
+}
+
+.toggle-btn.disabled {
+    color: #888;
+    border-color: #555;
+    opacity: 0.7;
+}
+
+.toggle-btn.disabled:hover {
+    color: #aaa;
+    border-color: #777;
+}
+
+/* Auto-play group: button + hover dropdown */
+.auto-play-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.auto-play-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 200px;
+    padding-top: 4px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.auto-play-menu-inner {
+    background: var(--bg);
+    border: 1px solid color-mix(in srgb, white 20%, transparent);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+}
+
+.auto-play-group:hover .auto-play-menu {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.auto-play-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    color: var(--text);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    white-space: nowrap;
+}
+
+.auto-play-option:hover {
+    background: color-mix(in srgb, white 10%, transparent);
+}
+
+.auto-play-option.active {
+    color: var(--theme);
+}
+
+.auto-play-option .option-check {
+    width: 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--theme);
+}
+
+.auto-play-option + .auto-play-option {
+    border-top: 1px solid color-mix(in srgb, white 10%, transparent);
 }
 
 .refresh-btn.refresh-btn {
-    padding: 0.5rem 1rem;
-    background: linear-gradient(135deg, var(--theme) 0%, var(--theme-secondary) 100%);
-    border: none;
+    padding: 0.4rem 0.75rem;
+    background: var(--bg-soft);
+    border: 1px solid color-mix(in srgb, white 20%, transparent);
     border-radius: 0.5rem;
-    color: #fff;
+    color: var(--text);
     font-weight: 700;
     cursor: pointer;
-    font-size: 0.9rem;
-    box-shadow: 0 0.25rem 0.5rem rgba(255, 23, 68, 0.3);
-    transition: transform var(--transition), box-shadow var(--transition);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
 }
 
 .refresh-btn.refresh-btn:hover {
-    transform: translateY(-0.125rem);
-    box-shadow: 0 0.375rem 0.75rem rgba(255, 23, 68, 0.4);
+    background: color-mix(in srgb, var(--bg-soft) 70%, white);
+    border-color: color-mix(in srgb, white 40%, transparent);
 }
 
 #chordGeneratorPage .generator-music-container {
@@ -381,12 +457,13 @@
     align-items: stretch;
     flex-wrap: nowrap;
     width: 100%;
+    height: 4rem;
     position: relative;
-    background: var(--bg-soft);
+    background: var(--bg);
     border: none;
     border-radius: 0.5rem;
     padding: 0.5rem;
-    box-shadow: 0 0.5rem 2rem #000a;
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.67);
     overflow: visible;
 }
 
@@ -417,8 +494,8 @@
     padding: 0;
     margin: 0;
     border-radius: 0.25rem;
-    background: var(--bg-soft);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg);
+    border: 1px solid color-mix(in srgb, white 10%, transparent);
     color: var(--theme);
     font-size: 0.9em;
     font-weight: bold;
@@ -444,6 +521,7 @@
     border: none;
     border-radius: 0;
     min-width: 5rem;
+    height: 3rem;
     flex: 1 1 0;
     position: relative;
     overflow: visible;
@@ -470,11 +548,11 @@
 }
 
 #chordGeneratorPage .chord-item.substituted {
-    color: #FA8072;
+    color: var(--theme-secondary);
 }
 
 #chordGeneratorPage .chord-item:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-soft);
 }
 
 .chord-selector {
@@ -507,7 +585,7 @@
     flex-direction: column;
     gap: 0.25rem;
     min-width: 4rem;
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    border-left: 1px solid color-mix(in srgb, white 20%, transparent);
     padding-left: 0.5rem;
 }
 
@@ -517,7 +595,7 @@
 
 .chord-selector .degree-btn {
     padding: 0.5rem 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-soft);
     border: 1px solid var(--theme);
     border-radius: 0.25rem;
     color: var(--text);
@@ -534,7 +612,7 @@
 
 .chord-selector .type-btn {
     padding: 0.5rem 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-soft);
     border: 1px solid var(--theme);
     border-radius: 0.25rem;
     color: var(--text);
@@ -550,7 +628,7 @@
 }
 
 .chord-refresh {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-soft);
     border: 1px solid var(--theme);
     border-radius: 0.25rem;
     padding: 0.125rem 0.375rem;
@@ -570,5 +648,5 @@
 }
 
 #chordGeneratorPage .progression-bar:not(:first-child) {
-    border-inline-start: 0.125rem solid rgba(255,255,255,0.08);
+    border-inline-start: 0.125rem solid color-mix(in srgb, white 8%, transparent);
 }

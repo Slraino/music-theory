@@ -10,10 +10,9 @@
 
 /* Panel Styles */
 .pomodoro-container .panel {
-    background: var(--bg);
+    background: var(--bg-soft);
     border-radius: 12px;
     padding: 20px;
-    backdrop-filter: blur(10px);
     border: 1px solid rgba(220, 20, 60, 0.3);
 }
 
@@ -47,13 +46,13 @@
     align-items: center;
 }
 
-.add-card-section .add-mission-btn-icon {
-    width: 40px;
+#pomodoroPage .add-card-section .add-mission-btn-icon {
+    width: 100%;
     height: 40px;
     border: none;
     border-radius: 8px;
-    background: crimson;
-    color: white;
+    background: var(--bg);
+    color: var(--theme);
     cursor: pointer;
     font-weight: bold;
     transition: background 0.3s;
@@ -64,12 +63,43 @@
     flex-shrink: 0;
 }
 
-.add-card-section .add-mission-btn-icon:hover {
-    background: #b01030;
+#pomodoroPage .add-card-section .add-mission-btn-icon.hide {
+    display: none !important;
+}
+
+#pomodoroPage .add-card-section .add-mission-btn-icon:hover {
+    background: var(--bg-soft);
+}
+
+/* Delete zone at bottom of finished container */
+.delete-zone {
+    width: 100%;
+    height: 40px;
+    border: none;
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--theme);
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto;
+}
+
+.delete-zone:hover {
+    background: var(--bg-soft);
+}
+
+.delete-zone.drag-over {
+    background: rgba(220, 20, 60, 0.3);
+    color: white;
 }
 
 .add-card-section input {
-    flex: 1;
+    width: 100%;
     padding: 10px;
     border: none;
     border-radius: 8px;
@@ -95,11 +125,22 @@
     padding: 10px;
     overflow-y: auto;
     max-height: calc(100vh - 300px);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Push add-card-section and delete-zone to bottom */
+.cards-container .cards-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 /* Add Card Section - Now inside container */
 .cards-container .add-card-section {
-    margin-bottom: 10px;
+    margin-top: auto;
+    margin-bottom: 0;
 }
 
 /* Mission Card */
@@ -116,6 +157,9 @@
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .mission-card:hover {
@@ -132,7 +176,9 @@
     font-size: 14px;
     word-wrap: break-word;
     padding-right: 50px;
-    color: #fff;
+    color: var(--theme);
+    text-align: center;
+    width: 100%;
 }
 
 .mission-card .card-actions {
@@ -143,7 +189,7 @@
     gap: 5px;
 }
 
-.mission-card .card-actions button {
+#pomodoroPage .mission-card .card-actions button {
     width: 24px;
     height: 24px;
     border: none;
@@ -154,23 +200,24 @@
     align-items: center;
     justify-content: center;
     transition: background 0.2s;
+    padding: 0;
 }
 
-.edit-btn {
+#pomodoroPage .edit-btn {
     background: rgba(255, 255, 255, 0.3);
     color: white;
 }
 
-.edit-btn:hover {
+#pomodoroPage .edit-btn:hover {
     background: rgba(255, 255, 255, 0.5);
 }
 
-.delete-btn {
+#pomodoroPage .delete-btn {
     background: rgba(255, 0, 0, 0.5);
     color: white;
 }
 
-.delete-btn:hover {
+#pomodoroPage .delete-btn:hover {
     background: rgba(255, 0, 0, 0.7);
 }
 
@@ -280,7 +327,7 @@
     text-shadow: 0 0 20px rgba(250, 128, 114, 0.5);
 }
 
-.timer-settings-btn {
+#pomodoroPage .timer-settings-btn {
     width: 36px;
     height: 36px;
     border: 2px solid var(--theme);
@@ -299,9 +346,10 @@
     top: 50%;
     transform: translateY(-50%);
     font-weight: bold;
+    padding: 0;
 }
 
-.timer-settings-btn:hover {
+#pomodoroPage .timer-settings-btn:hover {
     background: var(--bg-soft);
     transform: translateY(-50%) scale(1.05);
 }
@@ -358,37 +406,52 @@
     gap: 15px;
 }
 
-.timer-controls button {
+#pomodoroPage .timer-controls button {
     padding: 12px 40px;
-    border: none;
+    border: 2px solid var(--theme);
     border-radius: 8px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    background: var(--bg);
+    color: var(--theme);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
-.timer-controls button:hover {
+#pomodoroPage .timer-controls button:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    background: var(--bg-soft);
 }
 
-#start-btn {
-    background: crimson;
-    color: white;
+#pomodoroPage #start-btn {
+    border-color: var(--theme);
+    color: var(--theme);
 }
 
-#start-btn:hover {
-    background: #b01030;
+#pomodoroPage #start-btn.cancel-mode {
+    border-color: var(--theme);
+    color: var(--theme);
 }
 
-#pause-btn {
-    background: salmon;
-    color: white;
+#pomodoroPage #start-btn.giveup-mode {
+    border-color: var(--theme-secondary);
+    color: var(--theme-secondary);
 }
 
-#pause-btn:hover {
-    background: #e07060;
+#pomodoroPage #pause-btn {
+    border-color: var(--theme-secondary);
+    color: var(--theme-secondary);
+}
+
+#pomodoroPage #skip-btn {
+    border-color: #888;
+    color: #888;
+}
+
+#pomodoroPage #skip-btn:hover {
+    border-color: #aaa;
+    color: #aaa;
 }
 
 /* Modal */
@@ -443,21 +506,21 @@
     font-weight: bold;
 }
 
-#save-edit-btn {
+#pomodoroPage #save-edit-btn {
     background: crimson;
     color: white;
 }
 
-#save-edit-btn:hover {
+#pomodoroPage #save-edit-btn:hover {
     background: #b01030;
 }
 
-#cancel-edit-btn {
+#pomodoroPage #cancel-edit-btn {
     background: #555;
     color: white;
 }
 
-#cancel-edit-btn:hover {
+#pomodoroPage #cancel-edit-btn:hover {
     background: #666;
 }
 

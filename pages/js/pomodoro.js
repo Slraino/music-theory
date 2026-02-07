@@ -20,8 +20,9 @@ let pomodoroState = {
     draggedCard: null,
     draggedFromZone: null,
     bgmWasPlaying: false,
-    workMinutes: 25,
-    restMinutes: 5
+    cancelTimeout: null,
+    workMinutes: 50,
+    restMinutes: 10
 };
 
 // Initialize Pomodoro - called by SPA router
@@ -36,10 +37,36 @@ function initPomodoro() {
 
 // Cleanup Pomodoro - called when leaving page
 function cleanupPomodoro() {
+    // Stop timer
     if (pomodoroState.timerInterval) {
         clearInterval(pomodoroState.timerInterval);
         pomodoroState.timerInterval = null;
     }
+    
+    // Clear cancel timeout
+    if (pomodoroState.cancelTimeout) {
+        clearTimeout(pomodoroState.cancelTimeout);
+        pomodoroState.cancelTimeout = null;
+    }
+    
+    // Move active mission back to missions field
+    if (pomodoroState.activeMission) {
+        pomodoroState.missions.push(pomodoroState.activeMission);
+        pomodoroState.activeMission = null;
+    }
+    
+    // Reset timer state
+    pomodoroState.timeRemaining = 0;
+    pomodoroState.isWorkMode = true;
+    pomodoroState.isRunning = false;
+    pomodoroState.editingCardId = null;
+    pomodoroState.draggedCard = null;
+    pomodoroState.draggedFromZone = null;
+    pomodoroState.bgmWasPlaying = false;
+    
+    // Save the updated state
+    savePomodoroToStorage();
+    
     pomodoroState.initialized = false;
 }
 
@@ -87,7 +114,17 @@ function createPomodoroCardElement(mission, zone) {
     
     const title = document.createElement('span');
     title.className = 'card-title';
-    title.textContent = mission.title;
+    // Support multi-line titles (phrase 1 / phrase 2 separated by newline)
+    if (mission.title.includes('\n')) {
+        mission.title.split('\n').forEach((line, i, arr) => {
+            title.appendChild(document.createTextNode(line));
+            if (i < arr.length - 1) {
+                title.appendChild(document.createElement('br'));
+            }
+        });
+    } else {
+        title.textContent = mission.title;
+    }
     
     const actions = document.createElement('div');
     actions.className = 'card-actions';
@@ -121,6 +158,13 @@ function createPomodoroCardElement(mission, zone) {
     card.appendChild(title);
     card.appendChild(actions);
     
+    // Double-click to edit (missions zone only)
+    if (zone === 'missions') {
+        card.addEventListener('dblclick', () => {
+            openPomodoroEditModal(mission.id);
+        });
+    }
+    
     // Drag events
     card.addEventListener('dragstart', handlePomodoroDragStart);
     card.addEventListener('dragend', handlePomodoroDragEnd);
@@ -134,10 +178,53 @@ function renderPomodoroMissions() {
     if (!container) return;
     
     container.innerHTML = '';
+
+    // Create cards list wrapper
+    const cardsList = document.createElement('div');
+    cardsList.className = 'cards-list';
+    
+    // Render all mission cards
     pomodoroState.missions.forEach(mission => {
         const card = createPomodoroCardElement(mission, 'missions');
-        container.appendChild(card);
+        cardsList.appendChild(card);
     });
+    
+    container.appendChild(cardsList);
+
+    // Add the add-card section at the BOTTOM
+    const addSection = document.createElement('div');
+    addSection.className = 'add-card-section';
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-mission-btn-icon';
+    addBtn.id = 'add-mission-btn-icon';
+    addBtn.textContent = '+';
+    const addInput = document.createElement('input');
+    addInput.type = 'text';
+    addInput.id = 'new-mission-input';
+    addInput.placeholder = 'Enter new mission...';
+    addSection.appendChild(addBtn);
+    addSection.appendChild(addInput);
+    container.appendChild(addSection);
+
+    // Re-attach event listeners
+    addBtn.onclick = () => {
+        addBtn.classList.add('hide');
+        addInput.classList.add('show');
+        addInput.focus();
+    };
+    addInput.onkeypress = (e) => {
+        if (e.key === 'Enter') {
+            addPomodoroMission();
+            addInput.classList.remove('show');
+            addBtn.classList.remove('hide');
+        }
+    };
+    addInput.onblur = () => {
+        if (!addInput.value.trim()) {
+            addInput.classList.remove('show');
+            addBtn.classList.remove('hide');
+        }
+    };
 }
 
 // Render finished
@@ -146,10 +233,62 @@ function renderPomodoroFinished() {
     if (!container) return;
     
     container.innerHTML = '';
+    
+    // Create cards list wrapper
+    const cardsList = document.createElement('div');
+    cardsList.className = 'cards-list';
+    
     pomodoroState.finished.forEach(mission => {
         const card = createPomodoroCardElement(mission, 'finished');
-        container.appendChild(card);
+        cardsList.appendChild(card);
     });
+    
+    container.appendChild(cardsList);
+
+    // Add delete zone at bottom
+    const deleteZone = document.createElement('div');
+    deleteZone.className = 'delete-zone';
+    deleteZone.textContent = '🗑️';
+    deleteZone.dataset.zone = 'delete';
+    
+    // Drag and drop events for delete zone
+    deleteZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    });
+    deleteZone.addEventListener('dragenter', (e) => {
+        e.preventDefault();
+        deleteZone.classList.add('drag-over');
+    });
+    deleteZone.addEventListener('dragleave', (e) => {
+        if (!deleteZone.contains(e.relatedTarget)) {
+            deleteZone.classList.remove('drag-over');
+        }
+    });
+    deleteZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        deleteZone.classList.remove('drag-over');
+        
+        const cardId = e.dataTransfer.getData('text/plain');
+        if (!cardId || !pomodoroState.draggedFromZone) return;
+        
+        // Delete from whichever zone it came from
+        if (pomodoroState.draggedFromZone === 'missions') {
+            pomodoroState.missions = pomodoroState.missions.filter(m => m.id !== cardId);
+        } else if (pomodoroState.draggedFromZone === 'finished') {
+            pomodoroState.finished = pomodoroState.finished.filter(m => m.id !== cardId);
+        } else if (pomodoroState.draggedFromZone === 'pomodoro') {
+            pomodoroState.activeMission = null;
+            stopPomodoroTimer();
+        }
+        
+        savePomodoroToStorage();
+        renderPomodoroMissions();
+        renderPomodoroFinished();
+        renderPomodoroActiveMission();
+    });
+    
+    container.appendChild(deleteZone);
 }
 
 // Render active mission in pomodoro zone
@@ -196,10 +335,9 @@ function addPomodoroMission() {
     };
     
     pomodoroState.missions.push(mission);
+    input.value = ''; // Clear input BEFORE re-rendering
     savePomodoroToStorage();
-    renderPomodoroMissions();
-    input.value = '';
-    input.classList.remove('show');
+    renderPomodoroMissions(); // This recreates the input element, so no need to manually hide
 }
 
 // Delete mission
@@ -415,19 +553,47 @@ function startPomodoroTimer() {
     }
     
     pomodoroState.isRunning = true;
-    if (startBtn) startBtn.style.display = 'none';
-    if (pauseBtn) pauseBtn.style.display = 'inline-block';
     
-    // Mute BGM when timer starts
+    // Show X (cancel) button for 10 seconds during work mode only
+    if (pomodoroState.isWorkMode) {
+        if (startBtn) {
+            startBtn.textContent = '✕';
+            startBtn.className = 'cancel-mode';
+            startBtn.style.display = 'inline-block';
+            startBtn.onclick = cancelPomodoroTimer;
+        }
+        if (pauseBtn) pauseBtn.style.display = 'none';
+        
+        // After 10 seconds, switch to "Give Up" button
+        pomodoroState.cancelTimeout = setTimeout(() => {
+            if (startBtn && pomodoroState.isRunning) {
+                startBtn.textContent = 'Give Up';
+                startBtn.className = 'giveup-mode';
+                startBtn.onclick = giveUpPomodoroTimer;
+                startBtn.style.display = 'inline-block';
+            }
+        }, 10000);
+    } else {
+        // Rest mode: hide all buttons immediately
+        if (startBtn) startBtn.style.display = 'none';
+        if (pauseBtn) pauseBtn.style.display = 'none';
+    }
+    
+    // Fade out BGM over 1s when timer starts
     if (typeof soundEffects !== 'undefined' && soundEffects.musicPlaying) {
         pomodoroState.bgmWasPlaying = true;
-        soundEffects.stopBackgroundMusic();
+        window.fadeBGMOut();
     }
     
     pomodoroState.timerInterval = setInterval(() => {
         pomodoroState.timeRemaining--;
         
         if (pomodoroState.timeRemaining <= 0) {
+            // Record work session completion before switching modes
+            if (pomodoroState.isWorkMode && typeof window.recordWorkSession === 'function') {
+                window.recordWorkSession(pomodoroState.workMinutes);
+            }
+            
             // Switch between work and rest
             pomodoroState.isWorkMode = !pomodoroState.isWorkMode;
             pomodoroState.timeRemaining = pomodoroState.isWorkMode 
@@ -436,10 +602,84 @@ function startPomodoroTimer() {
             
             // Play notification
             playPomodoroNotification();
+            
+            // Update button visibility based on new mode
+            const startBtn = document.getElementById('start-btn');
+            if (startBtn && pomodoroState.isRunning) {
+                // Clear existing timeout
+                if (pomodoroState.cancelTimeout) {
+                    clearTimeout(pomodoroState.cancelTimeout);
+                }
+                
+                // Show cancel button for 10 seconds
+                startBtn.textContent = '✕';
+                startBtn.className = 'cancel-mode';
+                startBtn.style.display = 'inline-block';
+                startBtn.onclick = cancelPomodoroTimer;
+                
+                // After 10 seconds, switch based on mode
+                pomodoroState.cancelTimeout = setTimeout(() => {
+                    if (startBtn && pomodoroState.isRunning) {
+                        if (pomodoroState.isWorkMode) {
+                            startBtn.textContent = 'Give Up';
+                            startBtn.className = 'giveup-mode';
+                            startBtn.onclick = giveUpPomodoroTimer;
+                            startBtn.style.display = 'inline-block';
+                        } else {
+                            startBtn.style.display = 'none';
+                        }
+                    }
+                }, 10000);
+            }
         }
         
         updatePomodoroTimerDisplay();
     }, 1000);
+}
+
+// Cancel timer within the 10-second cancel window - no penalty
+function cancelPomodoroTimer() {
+    if (pomodoroState.cancelTimeout) {
+        clearTimeout(pomodoroState.cancelTimeout);
+        pomodoroState.cancelTimeout = null;
+    }
+    stopPomodoroTimer();
+    resetPomodoroTimerDisplay();
+    
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn) {
+        startBtn.textContent = 'Start';
+        startBtn.className = '';
+        startBtn.style.display = 'inline-block';
+        startBtn.onclick = startPomodoroTimer;
+    }
+}
+
+// Give up - returns mission to missions list
+function giveUpPomodoroTimer() {
+    if (pomodoroState.cancelTimeout) {
+        clearTimeout(pomodoroState.cancelTimeout);
+        pomodoroState.cancelTimeout = null;
+    }
+    
+    // Move active mission back to missions
+    if (pomodoroState.activeMission) {
+        pomodoroState.missions.push(pomodoroState.activeMission);
+        pomodoroState.activeMission = null;
+    }
+    
+    stopPomodoroTimer();
+    
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn) {
+        startBtn.textContent = 'Start';
+        startBtn.className = '';
+        startBtn.onclick = startPomodoroTimer;
+    }
+    
+    savePomodoroToStorage();
+    renderPomodoroMissions();
+    renderPomodoroActiveMission();
 }
 
 function pausePomodoroTimer() {
@@ -451,13 +691,22 @@ function pausePomodoroTimer() {
         clearInterval(pomodoroState.timerInterval);
         pomodoroState.timerInterval = null;
     }
-    if (startBtn) startBtn.style.display = 'inline-block';
+    if (pomodoroState.cancelTimeout) {
+        clearTimeout(pomodoroState.cancelTimeout);
+        pomodoroState.cancelTimeout = null;
+    }
+    if (startBtn) {
+        startBtn.textContent = 'Start';
+        startBtn.className = '';
+        startBtn.style.display = 'inline-block';
+        startBtn.onclick = startPomodoroTimer;
+    }
     if (pauseBtn) pauseBtn.style.display = 'none';
     
-    // Restore BGM if it was playing before
+    // Restore BGM with 1s fade-in if it was playing before
     if (pomodoroState.bgmWasPlaying && typeof soundEffects !== 'undefined' && !soundEffects.musicPlaying) {
-        soundEffects.playBackgroundMusic();
         pomodoroState.bgmWasPlaying = false;
+        window.fadeBGMIn();
     }
 }
 
@@ -473,63 +722,47 @@ function resetPomodoroTimer() {
 }
 
 function playPomodoroNotification() {
-    // Simple beep notification
+    // Gentle chime notification (pleasant C major chord arpeggio)
     try {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
+        const now = audioContext.currentTime;
         
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
+        // Play a soft C major arpeggio: C5, E5, G5 (523Hz, 659Hz, 784Hz)
+        const notes = [
+            { freq: 523.25, start: 0, duration: 0.8 },      // C5
+            { freq: 659.25, start: 0.15, duration: 0.8 },   // E5
+            { freq: 783.99, start: 0.3, duration: 1.0 }     // G5
+        ];
         
-        oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
-        
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.5);
+        notes.forEach(note => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = note.freq;
+            oscillator.type = 'sine';
+            
+            // Soft attack and gentle decay
+            const startTime = now + note.start;
+            const endTime = startTime + note.duration;
+            
+            gainNode.gain.setValueAtTime(0, startTime);
+            gainNode.gain.linearRampToValueAtTime(0.15, startTime + 0.05); // Gentle attack
+            gainNode.gain.exponentialRampToValueAtTime(0.01, endTime);     // Smooth fade
+            
+            oscillator.start(startTime);
+            oscillator.stop(endTime);
+        });
     } catch (e) {
         console.log('Audio notification not available');
     }
-    
-    // Also show alert
-    const message = pomodoroState.isWorkMode ? 'Break time is over! Time to work!' : 'Good job! Time for a break!';
-    alert(message);
 }
 
 // Setup Event Listeners
 function setupPomodoroEventListeners() {
-    // Add mission with new UI
-    const addBtn = document.getElementById('add-mission-btn-icon');
-    const newInput = document.getElementById('new-mission-input');
-    
-    if (addBtn) {
-        addBtn.onclick = () => {
-            const input = document.getElementById('new-mission-input');
-            if (input.classList.contains('show')) {
-                // If input is visible, add the mission
-                addPomodoroMission();
-            } else {
-                // If input is hidden, show it
-                input.classList.add('show');
-                input.focus();
-            }
-        };
-    }
-    
-    if (newInput) {
-        newInput.onkeypress = (e) => {
-            if (e.key === 'Enter') addPomodoroMission();
-        };
-        newInput.onblur = () => {
-            // Hide input if empty after blur
-            if (!newInput.value.trim()) {
-                newInput.classList.remove('show');
-            }
-        };
-    }
+    // Note: add-mission-btn and new-mission-input listeners are set in renderPomodoroMissions()
     
     // Drop zones
     const missionsContainer = document.getElementById('missions-container');
@@ -551,7 +784,6 @@ function setupPomodoroEventListeners() {
     const settingsBtn = document.getElementById('timer-settings-btn');
     
     if (startBtn) startBtn.onclick = startPomodoroTimer;
-    if (pauseBtn) pauseBtn.onclick = pausePomodoroTimer;
     
     // Settings button opens modal
     if (settingsBtn) {
@@ -599,3 +831,22 @@ function setupPomodoroEventListeners() {
 // Make initPomodoro available globally for the router
 window.initPomodoro = initPomodoro;
 window.cleanupPomodoro = cleanupPomodoro;
+
+// External function to add mission from other pages (like chord generator)
+window.addPomodoroMissionFromExternal = function(title) {
+    if (!title || !title.trim()) return;
+    
+    const mission = {
+        id: generatePomodoroId(),
+        title: title.trim(),
+        createdAt: new Date().toISOString()
+    };
+    
+    pomodoroState.missions.push(mission);
+    savePomodoroToStorage();
+    
+    // Only re-render if pomodoro page is active
+    if (document.getElementById('pomodoroPage').style.display !== 'none') {
+        renderPomodoroMissions();
+    }
+};

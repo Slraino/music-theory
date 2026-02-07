@@ -11,11 +11,11 @@
     --key-black-bg: black; --key-black-text: white;
     
     /* Background Colors */
-    --bg: color-mix(in srgb, black 85%, transparent);
-    --bg-shadow: 0 4px 12px color-mix(in srgb, black 60%, transparent);
+    --bg: rgba(0, 0, 0, 0.9);
+    --bg-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     
-    --bg-soft: color-mix(in srgb, #121212 70%, transparent);
-    --bg-soft-shadow: 0 6px 16px color-mix(in srgb, black 40%, transparent);
+    --bg-soft: rgba(0, 0, 0, 0.7);
+    --bg-soft-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
     
     /* Text Colors */
     --text: var(--theme);
@@ -80,7 +80,7 @@
 body {
     font-family: Verdana, Geneva, 'DejaVu Sans', sans-serif;
     font-weight: bold;
-    background: var(--bg) url('../../assets/image/bg.gif') no-repeat center center;
+    background: black url('../../assets/image/bg.gif') no-repeat center center;
     background-size: cover;
     background-attachment: fixed;
     min-height: 100dvh;
@@ -270,7 +270,7 @@ body.show-floating-title .floating-title {
 
 /* === BUTTONS === */
 .btn-base,
-button:not(.back-btn):not(.settings-btn):not(.settings-close-btn):not(.sound-btn):not(.icon-btn):not(.phrase-remove-btn):not(.chord-control-btn):not(.phrase-nav-icon):not(.auth-btn):not(.chat-btn) {
+button:not(.back-btn):not(.settings-btn):not(.settings-close-btn):not(.sound-btn):not(.icon-btn):not(.phrase-remove-btn):not(.chord-control-btn):not(.phrase-nav-icon):not(.auth-btn):not(.chat-btn):not(.rank-btn):not(.rank-close-btn) {
     cursor: pointer;
     font-weight: bold;
     transition: all var(--transition);
@@ -279,7 +279,7 @@ button:not(.back-btn):not(.settings-btn):not(.settings-close-btn):not(.sound-btn
 
 /* Primary filled button */
 .btn-primary,
-button:not(.back-btn):not(.settings-btn):not(.settings-close-btn):not(.sound-btn):not(.icon-btn):not(.phrase-remove-btn):not(.chord-control-btn):not(.phrase-nav-icon):not(.auth-btn):not(.chat-btn) {
+button:not(.back-btn):not(.settings-btn):not(.settings-close-btn):not(.sound-btn):not(.icon-btn):not(.phrase-remove-btn):not(.chord-control-btn):not(.phrase-nav-icon):not(.auth-btn):not(.chat-btn):not(.toggle-btn):not(.refresh-btn):not(.rank-btn):not(.rank-close-btn) {
     background: var(--theme);
     color: #000;
     padding: 0.75rem 1.875rem;
@@ -287,7 +287,7 @@ button:not(.back-btn):not(.settings-btn):not(.settings-close-btn):not(.sound-btn
 }
 
 .btn-primary:hover,
-button:not(.back-btn):not(.settings-btn):not(.settings-close-btn):not(.sound-btn):not(.icon-btn):not(.phrase-remove-btn):not(.chord-control-btn):not(.phrase-nav-icon):not(.auth-btn):not(.chat-btn):hover {
+button:not(.back-btn):not(.settings-btn):not(.settings-close-btn):not(.sound-btn):not(.icon-btn):not(.phrase-remove-btn):not(.chord-control-btn):not(.phrase-nav-icon):not(.auth-btn):not(.chat-btn):not(.toggle-btn):not(.refresh-btn):not(.rank-btn):not(.rank-close-btn):hover {
     background: rgba(220, 20, 60, 0.5);
 }
 
@@ -380,6 +380,22 @@ button.back-btn:hover {
 }
 
 .chat-btn:hover {
+    transform: scale(1.15);
+}
+
+/* Rank button - same style as chat button */
+.rank-btn {
+    color: var(--theme);
+    padding: 0.5rem 0.75rem;
+    font-size: 1.25rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all var(--transition);
+    background: none;
+    border: none;
+}
+
+.rank-btn:hover {
     transform: scale(1.15);
 }
 

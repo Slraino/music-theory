@@ -3,11 +3,7 @@ const AppConfig = {
     // Audio settings
     DEFAULT_MUSIC_VOLUME: 0.15,
     DEFAULT_SFX_VOLUME: 50,
-    VOLUME_FADE_STEP: 0.1,
-    VOLUME_FADE_INTERVAL: 100,
-    YOUTUBE_BGM_FADE_IN_DELAY: 2000,
-    YOUTUBE_BGM_FADE_IN_DURATION: 1000,
-    YOUTUBE_FADE_INTERVAL: 500,
+    BGM_FADE_DURATION: 1000,
     TRACK_RETRY_DELAY: 2000,
     TRACK_END_DELAY: 500,
     
@@ -63,7 +59,6 @@ const DataService = {
             
             // Cache in memory for this session only
             this.chordProgressions = progressions;
-            console.log(`✓ Loaded ${progressions.length} progression groups from chordProgression.json`);
             return progressions;
         } catch (error) {
             console.error('Failed to load chordProgression.json:', error);
@@ -101,7 +96,6 @@ const DataService = {
             
             // Cache in memory for this session only
             this.musicTheory = data;
-            console.log(`✓ Loaded ${data.length} music theory topics from musicTheory.json`);
             return data;
         } catch (error) {
             console.error('Failed to load musicTheory.json:', error);
@@ -132,7 +126,6 @@ const DataService = {
             
             // Cache in memory for this session only
             this.progressionInfo = data;
-            console.log('✓ Loaded progression info from progressionInfo.json');
             return data;
         } catch (error) {
             console.error('Failed to load progressionInfo.json:', error);
@@ -163,7 +156,6 @@ const DataService = {
 
             // Cache in memory for this session only
             this.chordGeneratorData = data;
-            console.log('✓ Loaded chord generator data from chordGenerator.json');
             return data;
         } catch (error) {
             console.error('Failed to load chordGenerator.json:', error);
@@ -194,7 +186,6 @@ const DataService = {
 
             // Cache in memory for this session only
             this.systemTransfer = data;
-            console.log('✓ Loaded systemTransfer.json');
             return data;
         } catch (error) {
             console.error('Failed to load systemTransfer.json:', error);
@@ -442,6 +433,10 @@ class Router {
         if (typeof window.cleanupChordGenerator === 'function') {
             window.cleanupChordGenerator();
         }
+        // Cleanup pomodoro timer
+        if (typeof window.cleanupPomodoro === 'function') {
+            window.cleanupPomodoro();
+        }
         // Cleanup chat listener
         if (typeof window.cleanupChat === 'function') {
             window.cleanupChat();
@@ -488,7 +483,6 @@ function buildBackgroundYoutubeUrl(videoId, clipStart = 0) {
 let backgroundPreviewAutoStopTimeout;
 
 window.setBackgroundPreview = (videoId, clipStart = 0, duration = 15) => {
-    if (window.videoPreviewEnabled === false) return;
     
     // Increment session to invalidate any pending requests
     backgroundPreviewSession++;
@@ -634,64 +628,72 @@ function finalizeBackgroundPreviewClear(overlay) {
     overlay.classList.remove('is-active');
 }
 
-let youTubeVolumeCheckInterval;
-let musicFadeInInterval; // Track fadeIn interval to prevent stacking
+// ==================== GLOBAL BGM FADE ====================
+let bgmFadeInterval = null;
+let bgmFadedOut = false; // Track if BGM was actually faded out by us
+
+/**
+ * Fade out BGM over duration ms, then pause audio.
+ * @param {number} duration - fade duration in ms (default 1000)
+ * @param {boolean} pause - whether to pause audio after fade (default true)
+ */
+window.fadeBGMOut = function(duration, pause = true) {
+    if (bgmFadeInterval) { clearInterval(bgmFadeInterval); bgmFadeInterval = null; }
+    if (!soundEffects || !soundEffects.audioElement || !soundEffects.musicPlaying) return;
+    bgmFadedOut = true;
+    const audio = soundEffects.audioElement;
+    const startVol = audio.volume;
+    if (startVol <= 0) { if (pause) { soundEffects.musicPlaying = false; audio.pause(); } return; }
+    const steps = 20;
+    const stepTime = (duration || AppConfig.BGM_FADE_DURATION) / steps;
+    const stepSize = startVol / steps;
+    let step = 0;
+    bgmFadeInterval = setInterval(() => {
+        step++;
+        audio.volume = Math.max(0, startVol - stepSize * step);
+        if (step >= steps) {
+            clearInterval(bgmFadeInterval);
+            bgmFadeInterval = null;
+            if (pause) { soundEffects.musicPlaying = false; audio.pause(); }
+        }
+    }, stepTime);
+};
+
+/**
+ * Fade in BGM over duration ms, resuming playback.
+ * @param {number} duration - fade duration in ms (default 1000)
+ */
+window.fadeBGMIn = function(duration) {
+    if (bgmFadeInterval) { clearInterval(bgmFadeInterval); bgmFadeInterval = null; }
+    // Only fade in if BGM was actually faded out by us
+    if (!bgmFadedOut) return;
+    bgmFadedOut = false;
+    if (!soundEffects || !soundEffects.audioElement) return;
+    const audio = soundEffects.audioElement;
+    const targetVol = soundEffects.musicVolume;
+    audio.volume = 0;
+    soundEffects.musicPlaying = true;
+    audio.play().catch(() => {});
+    const steps = 20;
+    const stepTime = (duration || AppConfig.BGM_FADE_DURATION) / steps;
+    const stepSize = targetVol / steps;
+    let step = 0;
+    bgmFadeInterval = setInterval(() => {
+        step++;
+        audio.volume = Math.min(targetVol, stepSize * step);
+        if (step >= steps) {
+            clearInterval(bgmFadeInterval);
+            bgmFadeInterval = null;
+        }
+    }, stepTime);
+};
 
 function startYouTubeVolumeControl(iframe) {
-    stopYouTubeVolumeControl();
-    
-    youTubeVolumeCheckInterval = setInterval(() => {
-        try {
-            if (soundEffects && soundEffects.audioElement && soundEffects.musicPlaying) {
-                // Fade out music to 0% volume
-                let currentVol = soundEffects.audioElement.volume;
-                if (currentVol > 0) {
-                    soundEffects.audioElement.volume = Math.max(0, currentVol - AppConfig.VOLUME_FADE_STEP);
-                }
-            }
-        } catch (e) {
-            // Ignore errors
-        }
-    }, AppConfig.YOUTUBE_FADE_INTERVAL);
+    window.fadeBGMOut();
 }
 
 function stopYouTubeVolumeControl() {
-    clearInterval(youTubeVolumeCheckInterval);
-    
-    // Clear any existing fadeIn to prevent stacking
-    if (musicFadeInInterval) {
-        clearInterval(musicFadeInInterval);
-        musicFadeInInterval = null;
-    }
-    
-    // Wait 2 seconds, then check if no preview is playing before fading in BGM
-    setTimeout(() => {
-        // Check if a YouTube preview is currently active
-        const overlay = document.getElementById('bgVideoOverlay');
-        const isPreviewActive = overlay && overlay.classList.contains('is-active');
-        
-        if (isPreviewActive) {
-            // Don't restore BGM if a preview is still playing
-            return;
-        }
-        
-        // Restore music volume with 1s fade-in
-        if (soundEffects && soundEffects.audioElement && soundEffects.musicPlaying) {
-            const targetVol = soundEffects.musicVolume;
-            const duration = AppConfig.YOUTUBE_BGM_FADE_IN_DURATION;
-            const steps = Math.max(1, Math.round(duration / AppConfig.VOLUME_FADE_INTERVAL));
-            const stepSize = targetVol / steps;
-            
-            musicFadeInInterval = setInterval(() => {
-                if (soundEffects.audioElement.volume < targetVol) {
-                    soundEffects.audioElement.volume = Math.min(targetVol, soundEffects.audioElement.volume + stepSize);
-                } else {
-                    clearInterval(musicFadeInInterval);
-                    musicFadeInInterval = null;
-                }
-            }, AppConfig.VOLUME_FADE_INTERVAL);
-        }
-    }, AppConfig.YOUTUBE_BGM_FADE_IN_DELAY);
+    window.fadeBGMIn();
 }
 
 /* ==================== SOUND EFFECTS ==================== */

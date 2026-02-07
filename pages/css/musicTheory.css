@@ -137,9 +137,9 @@
 }
 
 .theory-badge:hover {
-    background: linear-gradient(135deg, var(--theme) 0%, #DC143C 100%);
+    background: color-mix(in srgb, var(--bg-soft) 70%, white);
     color: var(--text);
-    box-shadow: 0 0.25rem 0.75rem rgba(255, 23, 68, 0.5);
+    box-shadow: 0 0.25rem 0.75rem rgba(255, 23, 68, 0.3);
     transform: translateY(-0.125rem);
 }
 

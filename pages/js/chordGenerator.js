@@ -79,6 +79,7 @@ let currentProgressionName = null; // Track current progression name for variati
 let currentProgressionChords = null; // Track current base chords for header display
 let currentPhraseView = 0; // 0 = phrases 1-2, 1 = phrases 3-4
 let allCurrentPhrases = []; // Store all phrases (up to 4) for navigation
+let autoPlayMode = 'progression'; // 'progression' = play songs matching current progression, 'music' = random from all
 
 function rebuildProgressionFromPhrases(phrases) {
     currentBars = [];
@@ -187,14 +188,25 @@ function showSongChords(song, progressionName) {
         // Convert progressionVariation to phrases format
         const songPhrases = normalizePhrases(song.progressionVariation);
         
-        console.log('showSongChords - progressionVariation:', JSON.stringify(song.progressionVariation));
-        console.log('showSongChords - normalized to', songPhrases.length, 'phrases:', JSON.stringify(songPhrases));
-        
         // Update the visual display only (not currentBars - that's the "real" progression)
         updateChordGridVisualOnly(songPhrases);
         
-        // Show variation message in tooltip, keep progression name visible
-        showVariationMessage(progressionName, songPhrases);
+        // Check if the first phrase of the variation matches the base progression's first phrase
+        // If so, skip the variation tooltip since it's essentially the same
+        const baseFirstPhrase = allCurrentPhrases[0];
+        const varFirstPhrase = songPhrases[0];
+        const firstPhraseMatches = baseFirstPhrase && varFirstPhrase &&
+            baseFirstPhrase.length === varFirstPhrase.length &&
+            baseFirstPhrase.every((bar, i) => {
+                const varBar = varFirstPhrase[i];
+                if (!Array.isArray(bar) || !Array.isArray(varBar)) return String(bar) === String(varBar);
+                return bar.length === varBar.length && bar.every((ch, j) => String(ch) === String(varBar[j]));
+            });
+        
+        if (!firstPhraseMatches) {
+            // Show variation message - use song's own progressionName if it has one
+            showVariationMessage(progressionName, songPhrases, song);
+        }
         
         return true;
     } catch (error) {
@@ -213,9 +225,10 @@ function restoreSongChords() {
     visualOnlyPhrases = [];
     visualOnlyPhraseView = 0;
     
-    // Restore the visual display with full interactivity (not visual-only)
-    // Use currentBars which contains the original progression data
-    updateChordGrid([currentBars]);
+    // Restore the visual display with full interactivity
+    // Use allCurrentPhrases which preserves the phrase structure
+    const viewPhrases = allCurrentPhrases.slice(currentPhraseView * 2, currentPhraseView * 2 + 2);
+    updateChordGrid(viewPhrases);
     
     // Restore original progression name display
     restoreProgressionNameDisplay();
@@ -224,11 +237,19 @@ function restoreSongChords() {
 }
 
 // Show variation message when a progressionVariation song is playing
-function showVariationMessage(progressionName, songPhrases) {
+function showVariationMessage(progressionName, songPhrases, song) {
     const container = document.getElementById('progressionNameDisplay');
     if (!container) return;
 
-    // Keep the progression name visible, but apply variation styling
+    // If the song has its own progressionName, display that directly in crimson (no tooltip)
+    const songOwnName = song && song.progressionName;
+    if (songOwnName && Array.isArray(songOwnName) && songOwnName.length > 0) {
+        const displayName = songOwnName.join(' ');
+        container.innerHTML = `<span class="progression-name-tag">${escapeHtml(displayName)}</span>`;
+        return;
+    }
+
+    // Otherwise show base progression name with variation styling + tooltip
     updateProgressionNameDisplay(progressionName || [], songPhrases || [], true);
 
     // Ensure the progression name tag has the variation class
@@ -1020,22 +1041,12 @@ async function initChordGenerator() {
                                 }
                             }); // Don't filter out empty bars - they should render as empty
                             
-                            // Debug: log progressions with 8+ bars
-                            if (bars.length >= 8) {
-                                console.log('8+ bar progression found:', bars.length, 'bars -', prog.progression.slice(0, 4).join(', '));
-                            }
-                            
                             // Store raw bars for header display
                             const rawBars = JSON.parse(JSON.stringify(bars));
                             
                             // Split into phrases if 8+ bars
                             const phrases = splitIntoPhrases(bars);
                             const rawPhrases = splitIntoPhrases(rawBars);
-                            
-                            // Debug: verify phrase split
-                            if (bars.length >= 8) {
-                                console.log('  Split into', phrases.length, 'phrases');
-                            }
                             
                             // Apply diatonic mapping to phrases for comparison
                             const mappedPhrases = applyDiatonicMapping(phrases);
@@ -1052,16 +1063,11 @@ async function initChordGenerator() {
             }
         });
         
-        // Fallback if no progressions found
-        if (allProgressions.length === 0) {
-            allProgressions = [
-                { phrases: [[['1'], ['4'], ['5'], ['1']]] },
-                { phrases: [[['6m'], ['2m'], ['5'], ['1']]] }
-            ];
-        }
+        // No fallback - user wants no default progression
         
         renderChordGeneratorPage();
-        refreshChords();
+        // Show empty phrase structure (4 empty bars) without loading a progression
+        renderEmptyPhraseGrid();
         
         // Add keyboard shortcut for refresh (R key)
         setupChordGeneratorKeyboardShortcuts();
@@ -1108,18 +1114,26 @@ function renderChordGeneratorPage() {
             </div>
             <button class="refresh-btn" onclick="refreshChords()" title="Refresh progression (R)">🔄 Refresh</button>
             <div class="controls-right">
-                <div>
-                    <label>Key:</label>
-                    <select id="keySelect" onchange="changeKey(this.value)">
-                        ${KEYS.map(key => `<option value="${key}" ${key === selectedKey ? 'selected' : ''}>${key}</option>`).join('')}
-                    </select>
+                <button class="toggle-btn" id="addMissionBtn" onclick="addChordProgressionToPomodoro()" title="Add current progression as Pomodoro mission">
+                    ➕ Add Mission
+                </button>
+                <div class="auto-play-group">
+                    <button id="generatorPreviewToggle" class="toggle-btn disabled" onclick="toggleGeneratorPreview()">
+                        🚫 Auto Playing
+                    </button>
+                    <div class="auto-play-menu" id="autoPlayMenu">
+                        <div class="auto-play-menu-inner">
+                        <div class="auto-play-option${autoPlayMode === 'progression' ? ' active' : ''}" onclick="setAutoPlayMode('progression')" title="Auto-play picks songs that use the current chord progression">
+                            <span class="option-check">${autoPlayMode === 'progression' ? '✓' : ''}</span>
+                            Plays by Progression
+                        </div>
+                        <div class="auto-play-option${autoPlayMode === 'music' ? ' active' : ''}" onclick="setAutoPlayMode('music')" title="Auto-play picks a random song from all progressions and switches to its progression">
+                            <span class="option-check">${autoPlayMode === 'music' ? '✓' : ''}</span>
+                            Plays by Music
+                        </div>
+                        </div>
+                    </div>
                 </div>
-                <button class="toggle-btn" onclick="toggleDisplay()">
-                    ${showDegrees ? 'Show Notes' : 'Show Degrees'}
-                </button>
-                <button id="generatorPreviewToggle" class="toggle-btn" onclick="toggleGeneratorPreview()" style="background: linear-gradient(135deg, #666 0%, #888 100%);">
-                    🚫 Preview
-                </button>
             </div>
         </div>
         <div id="progressionDisplay" class="progression-grid"></div>
@@ -1128,8 +1142,7 @@ function renderChordGeneratorPage() {
         </div>
     `;
     
-    // Setup tooltip on preview button
-    window.setupPreviewButtonTooltip();
+
 }
 
 // Change key handler
@@ -1178,62 +1191,74 @@ window.toggleGeneratorPreview = function() {
     if (btn) {
         // Toggle the state (default is false/disabled)
         window.generatorPreviewEnabled = !window.generatorPreviewEnabled;
-        // Also update the global videoPreviewEnabled used by setBackgroundPreview
-        window.videoPreviewEnabled = window.generatorPreviewEnabled;
         
         if (window.generatorPreviewEnabled) {
-            btn.style.background = 'linear-gradient(135deg, #FF6B6B 0%, #FF8A80 100%)';
-            btn.textContent = '🎬 Preview';
+            btn.textContent = '🎬 Auto Playing';
+            btn.classList.remove('disabled');
         } else {
-            btn.style.background = 'linear-gradient(135deg, #666 0%, #888 100%)';
-            btn.textContent = '🚫 Preview';
+            btn.textContent = '🚫 Auto Playing';
+            btn.classList.add('disabled');
             // Clear any active preview when disabling
             if (window.clearBackgroundPreview) {
                 window.clearBackgroundPreview();
             }
+            // Cancel auto-play timer
+            if (window.generatorMusicTimeout) {
+                clearTimeout(window.generatorMusicTimeout);
+                window.generatorMusicTimeout = null;
+            }
+            // Restore full original chord display (both phrases)
+            restoreSongChords();
         }
     }
 }
 
-// Add tooltip to preview button
-window.setupPreviewButtonTooltip = function() {
-    const btn = document.getElementById('generatorPreviewToggle');
-    if (!btn) return;
-    
-    let tooltip = null;
-    
-    btn.addEventListener('mouseenter', function() {
-        if (window.generatorPreviewEnabled !== true) {
-            if (!tooltip) {
-                tooltip = document.createElement('div');
-                tooltip.style.cssText = `
-                    position: fixed;
-                    background: rgba(0, 0, 0, 0.95);
-                    color: #fff;
-                    padding: 10px 14px;
-                    border-radius: 4px;
-                    font-size: 0.9em;
-                    z-index: 10000;
-                    pointer-events: none;
-                    white-space: nowrap;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-                `;
-                tooltip.textContent = '▶ Enable if YouTube Premium or no Ads';
-                document.body.appendChild(tooltip);
-            }
-            
-            const rect = btn.getBoundingClientRect();
-            tooltip.style.left = (rect.left + rect.width / 2 - 80) + 'px';
-            tooltip.style.top = (rect.top - 40) + 'px';
-            tooltip.style.display = 'block';
+// Set auto-play mode
+window.setAutoPlayMode = function(mode) {
+    autoPlayMode = mode;
+    // Update menu checkmarks
+    const menu = document.getElementById('autoPlayMenu');
+    if (menu) {
+        menu.querySelectorAll('.auto-play-option').forEach(opt => {
+            const isActive = opt.textContent.trim().toLowerCase().includes(mode === 'progression' ? 'progression' : 'music');
+            opt.classList.toggle('active', isActive);
+            const check = opt.querySelector('.option-check');
+            if (check) check.textContent = isActive ? '✓' : '';
+        });
+    }
+
+    // If auto-play is currently active, restart with new mode
+    if (window.generatorPreviewEnabled) {
+        if (window.generatorMusicTimeout) {
+            clearTimeout(window.generatorMusicTimeout);
+            window.generatorMusicTimeout = null;
         }
-    });
-    
-    btn.addEventListener('mouseleave', function() {
-        if (tooltip) {
-            tooltip.style.display = 'none';
+        if (typeof window.clearBackgroundPreview === 'function') {
+            window.clearBackgroundPreview();
         }
-    });
+        restoreSongChords();
+        autoPlayRandomMusic();
+    }
+}
+
+// Pick a weighted random index from allProgressions, avoiding excludeIndex
+function pickWeightedRandomIndex(excludeIndex) {
+    if (allProgressions.length <= 1) return 0;
+    const weights = [];
+    let totalWeight = 0;
+    for (let i = 0; i < allProgressions.length; i++) {
+        const pickCount = progressionPickCounts.get(i) || 0;
+        let weight = 1 / (pickCount + 1);
+        if (i === excludeIndex) weight *= 0.1;
+        weights.push(weight);
+        totalWeight += weight;
+    }
+    let random = Math.random() * totalWeight;
+    for (let i = 0; i < weights.length; i++) {
+        random -= weights[i];
+        if (random <= 0) return i;
+    }
+    return 0;
 }
 
 function refreshChords() {
@@ -1308,10 +1333,6 @@ function refreshChords() {
     lastProgressionIndex = randomIndex;
     const randomProgression = allProgressions[randomIndex];
     
-    // Debug: log what we're loading
-    console.log('refreshChords - loading progression:', randomIndex);
-    console.log('  Raw phrases structure:', JSON.stringify(randomProgression.phrases).substring(0, 200));
-    
     // Reset modification flag when loading a new progression
     isProgressionModified = false;
     
@@ -1319,13 +1340,21 @@ function refreshChords() {
     currentPhraseView = 0;
     
     // Phrases are already diatonic-mapped when loaded, use directly
-    const displayPhrases = randomProgression.phrases;
+    let displayPhrases = randomProgression.phrases.map(p => p.map(b => [...b]));
     
-    // Debug: verify phrase structure
-    console.log('  displayPhrases count:', displayPhrases.length);
-    displayPhrases.forEach((p, i) => {
-        console.log('    Phrase', i + 1, ':', p.length, 'bars');
-    });
+    // If only 1 phrase, pick a second random progression for phrase 2
+    if (displayPhrases.length === 1 && allProgressions.length > 1) {
+        let secondIndex = pickWeightedRandomIndex(randomIndex);
+        const secondProg = allProgressions[secondIndex];
+        if (secondProg && secondProg.phrases && secondProg.phrases.length > 0) {
+            const secondPhrase = secondProg.phrases[0].map(b => [...b]);
+            // Match bar count to phrase 1
+            const barsNeeded = displayPhrases[0].length;
+            while (secondPhrase.length < barsNeeded) secondPhrase.push(['1']);
+            if (secondPhrase.length > barsNeeded) secondPhrase.length = barsNeeded;
+            displayPhrases.push(secondPhrase);
+        }
+    }
     
     // Store all phrases for navigation (up to 4 phrases)
     allCurrentPhrases = displayPhrases.map(phrase => phrase.map(bar => [...bar]));
@@ -1684,8 +1713,10 @@ function renderGeneratorMusic(musicList, progressionName) {
     container.innerHTML = html;
     setupGeneratorMusicHoverHandlers(container);
     
-    // Auto-start a random music preview
-    autoPlayRandomMusic();
+    // Auto-start a random music preview (skip if suppressed by loadProgressionByIndex)
+    if (!window._suppressAutoPlay) {
+        autoPlayRandomMusic();
+    }
 }
 
 function setupGeneratorMusicHoverHandlers(container) {
@@ -1693,7 +1724,6 @@ function setupGeneratorMusicHoverHandlers(container) {
     container.dataset.musicHoverBound = 'true';
 
     let currentVideoId = null;
-    let disabledTooltip = null;
 
     const handleMouseOver = (event) => {
         const link = event.target.closest('.music-link');
@@ -1705,56 +1735,34 @@ function setupGeneratorMusicHoverHandlers(container) {
             clearTimeout(window.generatorMusicTimeout);
             window.generatorMusicTimeout = null;
         }
+        // Cancel any pending mouseout resume timer
+        if (window._mouseoutResumeTimeout) {
+            clearTimeout(window._mouseoutResumeTimeout);
+            window._mouseoutResumeTimeout = null;
+        }
 
         const videoId = link.dataset.videoId;
         const clipStart = link.dataset.start || '0';
         const songIndex = parseInt(link.dataset.songIndex);
         const hasProgressionVariation = link.dataset.hasProgressionVariation === 'true';
 
-        // Show song-specific chords on hover (regardless of preview setting)
+        // Show song-specific chords on hover (always, even if auto-play is off)
         if (hasProgressionVariation && !isNaN(songIndex) && currentMusicList && currentMusicList[songIndex]) {
             try {
                 showSongChords(currentMusicList[songIndex], currentMusicProgressionName);
             } catch (error) {
                 console.error('Error showing song chords:', error);
             }
-        }
-
-        // Check if preview is enabled in chord generator (default is disabled)
-        if (window.generatorPreviewEnabled !== true) {
-            // Show disabled tooltip
-            if (!disabledTooltip) {
-                disabledTooltip = document.createElement('div');
-                disabledTooltip.className = 'preview-disabled-tooltip';
-                disabledTooltip.textContent = '▶ Enable if YouTube Premium or no Ads';
-                disabledTooltip.style.cssText = `
-                    position: fixed;
-                    background: rgba(0, 0, 0, 0.95);
-                    color: #fff;
-                    padding: 10px 14px;
-                    border-radius: 4px;
-                    font-size: 0.9em;
-                    z-index: 10000;
-                    pointer-events: none;
-                    white-space: nowrap;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-                `;
-                document.body.appendChild(disabledTooltip);
+        } else {
+            // No variation: show only phrase 1 in visual-only mode
+            if (!originalPhrases) {
+                originalPhrases = getCurrentPhrases();
             }
-            
-            const rect = link.getBoundingClientRect();
-            const left = rect.left + rect.width / 2 - 80;
-            const top = rect.top - 40;
-            disabledTooltip.style.left = left + 'px';
-            disabledTooltip.style.top = top + 'px';
-            disabledTooltip.style.display = 'block';
-            return;
+            const phrase1Only = [allCurrentPhrases[0]];
+            updateChordGridVisualOnly(phrase1Only);
         }
 
-        if (disabledTooltip) {
-            disabledTooltip.style.display = 'none';
-        }
-
+        // Always play preview on hover
         if (typeof window.setBackgroundPreview === 'function') {
             window.setBackgroundPreview(videoId, clipStart);
             currentVideoId = videoId;
@@ -1769,24 +1777,30 @@ function setupGeneratorMusicHoverHandlers(container) {
         // No longer manually hovering
         window.isManuallyHovering = false;
         
-        // Hide tooltip on mouseout
-        if (disabledTooltip) {
-            disabledTooltip.style.display = 'none';
-        }
-        
         // Restore original chords if a song-specific display was shown
         restoreSongChords();
-        
-        // Only clear video preview and resume auto-play if preview is enabled
-        if (window.generatorPreviewEnabled !== true) return;
         
         // Clear video preview when not hovering
         if (typeof window.clearBackgroundPreview === 'function') {
             window.clearBackgroundPreview();
         }
         
-        // Resume auto-play after hover ends
-        setTimeout(() => autoPlayRandomMusic(), 1000);
+        // Resume auto-play after hover ends (only if auto-playing is enabled)
+        if (window.generatorPreviewEnabled === true) {
+            // Cancel any previous mouseout resume timer
+            if (window._mouseoutResumeTimeout) {
+                clearTimeout(window._mouseoutResumeTimeout);
+                window._mouseoutResumeTimeout = null;
+            }
+            const genAtMouseOut = progressionGeneration;
+            window._mouseoutResumeTimeout = setTimeout(() => {
+                window._mouseoutResumeTimeout = null;
+                // Only resume if the progression hasn't changed since mouseout
+                if (genAtMouseOut === progressionGeneration) {
+                    autoPlayRandomMusic();
+                }
+            }, 1000);
+        }
     };
 
     container.addEventListener('mouseover', handleMouseOver, { passive: true });
@@ -1802,11 +1816,39 @@ function buildYoutubeEmbedUrl(videoId, clipStart = 0, autoplay = false) {
 }
 
 // Auto-play a random music from the current list
+// Global pool for "plays by music" mode
+let allMusicPool = [];
+let allMusicPoolQueue = [];
+
+function buildAllMusicPool() {
+    allMusicPool = [];
+    allProgressions.forEach((prog, progIndex) => {
+        if (prog.music && Array.isArray(prog.music)) {
+            prog.music.forEach(song => {
+                if (song && song.youtubeId) {
+                    allMusicPool.push({ song, progIndex, progressionName: prog.progressionName });
+                }
+            });
+        }
+    });
+    allMusicPoolQueue = buildShuffledQueue(allMusicPool.length);
+}
+
 function autoPlayRandomMusic() {
-    if (!currentMusicList || currentMusicList.length === 0) return;
     if (window.generatorPreviewEnabled !== true) return;
     // Don't auto-play if user is manually hovering over a song
     if (window.isManuallyHovering) return;
+
+    if (autoPlayMode === 'music') {
+        autoPlayByMusic();
+    } else {
+        autoPlayByProgression();
+    }
+}
+
+// Original mode: play songs matching current progression
+function autoPlayByProgression() {
+    if (!currentMusicList || currentMusicList.length === 0) return;
     
     // Capture current generation at start of this call
     const myGeneration = progressionGeneration;
@@ -1824,60 +1866,153 @@ function autoPlayRandomMusic() {
         const randomSong = currentMusicList[nextIndex];
         if (!randomSong) return;
         
-        const clipStart = randomSong.clipStart || 0;
-        
-        // Determine clip duration based on number of phrases
-        // Use song's progressionVariation phrase count if available, otherwise use base progression
-        // 1 phrase = 15s, 2 phrases = 25s, 3+ phrases = 35s
-        let phraseCount = allCurrentPhrases.length;
-        
-        // If song has progressionVariation, count its phrases instead
-        if (randomSong.progressionVariation) {
-            const songPhrases = normalizePhrases(randomSong.progressionVariation);
-            phraseCount = songPhrases.length;
-        }
-        
-        let clipDuration = 15;
-        if (phraseCount === 2) {
-            clipDuration = 25;
-        } else if (phraseCount > 2) {
-            clipDuration = 35;
-        }
-        
-        console.log('autoPlayRandomMusic - phraseCount:', phraseCount, 'clipDuration:', clipDuration + 's');
-        
-        // Check if progression changed since we started (stale callback)
-        if (myGeneration !== progressionGeneration) {
-            console.log('autoPlayRandomMusic - stale callback, generation mismatch');
-            return;
-        }
-        
-        // Show song-specific chords if available
-        if (randomSong.progressionVariation) {
-            showSongChords(randomSong, currentMusicProgressionName);
-        } else {
-            // Restore original chords if previous song had custom chords
-            restoreSongChords();
-        }
-        
-        if (typeof window.setBackgroundPreview === 'function') {
-            // Pass duration to setBackgroundPreview so it knows when to auto-stop
-            window.setBackgroundPreview(randomSong.youtubeId, clipStart, clipDuration);
-            
-            // Schedule next random music after clip duration
-            if (window.generatorMusicTimeout) {
-                clearTimeout(window.generatorMusicTimeout);
-            }
-            const scheduledGeneration = progressionGeneration;
-            window.generatorMusicTimeout = setTimeout(() => {
-                // Only auto-play if still on the same progression
-                if (scheduledGeneration === progressionGeneration) {
-                    autoPlayRandomMusic();
-                }
-            }, clipDuration * 1000);
-        }
+        playSongAutoPlay(randomSong, myGeneration);
     } catch (error) {
-        console.error('Error in autoPlayRandomMusic:', error);
+        console.error('Error in autoPlayByProgression:', error);
+    }
+}
+
+// New mode: pick random song from all progressions, switch progression to match
+function autoPlayByMusic() {
+    try {
+        // Build pool if empty
+        if (allMusicPool.length === 0) {
+            buildAllMusicPool();
+        }
+        if (allMusicPool.length === 0) return;
+        
+        if (allMusicPoolQueue.length === 0) {
+            allMusicPoolQueue = buildShuffledQueue(allMusicPool.length);
+        }
+        
+        const nextIdx = allMusicPoolQueue.shift();
+        const entry = allMusicPool[nextIdx];
+        if (!entry) return;
+        
+        const { song, progIndex, progressionName } = entry;
+        
+        // Switch to the progression that contains this song
+        loadProgressionByIndex(progIndex);
+        
+        // Now play the song
+        const myGeneration = progressionGeneration;
+        playSongAutoPlay(song, myGeneration);
+    } catch (error) {
+        console.error('Error in autoPlayByMusic:', error);
+    }
+}
+
+// Load a specific progression by index (for "plays by music" mode)
+function loadProgressionByIndex(progIndex) {
+    if (progIndex < 0 || progIndex >= allProgressions.length) return;
+    
+    progressionGeneration++;
+    
+    // Cancel any pending auto-play timer from the previous progression
+    if (window.generatorMusicTimeout) {
+        clearTimeout(window.generatorMusicTimeout);
+        window.generatorMusicTimeout = null;
+    }
+    
+    // Restore original chords if needed
+    if (originalPhrases) {
+        restoreSongChords();
+    }
+    originalPhrases = null;
+    currentlyPlayingSong = null;
+    
+    const prog = allProgressions[progIndex];
+    let displayPhrases = prog.phrases.map(p => p.map(b => [...b]));
+    
+    // If only 1 phrase, pick a second random for phrase 2
+    if (displayPhrases.length === 1 && allProgressions.length > 1) {
+        let secondIndex = pickWeightedRandomIndex(progIndex);
+        const secondProg = allProgressions[secondIndex];
+        if (secondProg && secondProg.phrases && secondProg.phrases.length > 0) {
+            const secondPhrase = secondProg.phrases[0].map(b => [...b]);
+            const barsNeeded = displayPhrases[0].length;
+            while (secondPhrase.length < barsNeeded) secondPhrase.push(['1']);
+            if (secondPhrase.length > barsNeeded) secondPhrase.length = barsNeeded;
+            displayPhrases.push(secondPhrase);
+        }
+    }
+    
+    allCurrentPhrases = displayPhrases.map(phrase => phrase.map(bar => [...bar]));
+    
+    currentBars = [];
+    currentParents = [];
+    isSubstituted = [];
+    displayPhrases.forEach(phrase => {
+        phrase.forEach(bar => {
+            currentBars.push(bar);
+            const parents = bar.map(chord => getDiatonicParent(chord));
+            currentParents.push(parents);
+            isSubstituted.push(bar.map(chord => !isChordDiatonic(chord)));
+        });
+    });
+    
+    currentProgressionName = prog.progressionName;
+    currentProgressionChords = displayPhrases;
+    lastProgressionIndex = progIndex;
+    currentPhraseView = 0;
+    
+    updateChordHeader(prog.rawPhrases || prog.phrases);
+    const viewPhrases = displayPhrases.slice(0, 2);
+    updateChordGrid(viewPhrases);
+    // Suppress auto-play from renderGeneratorMusic (we'll play the specific song after)
+    window._suppressAutoPlay = true;
+    renderGeneratorMusic(prog.music || [], prog.progressionName);
+    window._suppressAutoPlay = false;
+    updateProgressionNameDisplay(prog.progressionName, displayPhrases);
+}
+
+// Shared play logic for both modes
+function playSongAutoPlay(song, myGeneration) {
+    const clipStart = song.clipStart || 0;
+    
+    // Determine clip duration based on number of phrases
+    let phraseCount = 1; // Default: show only phrase 1 for non-variation songs
+    if (song.progressionVariation) {
+        const songPhrases = normalizePhrases(song.progressionVariation);
+        phraseCount = songPhrases.length;
+    }
+    
+    let clipDuration = 15;
+    if (phraseCount === 2) {
+        clipDuration = 25;
+    } else if (phraseCount > 2) {
+        clipDuration = 35;
+    }
+    
+    // Check if progression changed since we started (stale callback)
+    if (myGeneration !== progressionGeneration) return;
+    
+    // Show song-specific chords if available, otherwise show only phrase 1
+    if (song.progressionVariation) {
+        showSongChords(song, currentMusicProgressionName);
+    } else {
+        // No variation: show only phrase 1 in visual-only (non-interactive) mode
+        if (!originalPhrases) {
+            originalPhrases = getCurrentPhrases();
+        }
+        currentlyPlayingSong = song;
+        const phrase1Only = [allCurrentPhrases[0]];
+        updateChordGridVisualOnly(phrase1Only);
+        restoreProgressionNameDisplay();
+    }
+    
+    if (typeof window.setBackgroundPreview === 'function') {
+        window.setBackgroundPreview(song.youtubeId, clipStart, clipDuration);
+        
+        if (window.generatorMusicTimeout) {
+            clearTimeout(window.generatorMusicTimeout);
+        }
+        const scheduledGeneration = progressionGeneration;
+        window.generatorMusicTimeout = setTimeout(() => {
+            if (scheduledGeneration === progressionGeneration) {
+                autoPlayRandomMusic();
+            }
+        }, clipDuration * 1000);
     }
 }
 
@@ -2020,13 +2155,31 @@ function hideAddIndicator() {
     }
 }
 
+// Render empty phrase grid with 2 placeholder phrases (shown on first load)
+function renderEmptyPhraseGrid() {
+    const display = document.getElementById('progressionDisplay');
+    if (!display) return;
+    
+    display.innerHTML = '';
+    
+    // Show 2 placeholder phrases with + icons
+    for (let p = 0; p < 2; p++) {
+        const placeholder = createPlaceholderPhrase(4, () => {
+            refreshChords();
+        });
+        display.appendChild(placeholder);
+    }
+    
+    // Show "No music examples yet." in music container
+    const musicContainer = document.getElementById('generatorMusic');
+    if (musicContainer) {
+        musicContainer.innerHTML = '<p class="detail-line" style="color: #888;">No music examples yet.</p>';
+    }
+}
+
 function updateChordGrid(phrases) {
     const display = document.getElementById('progressionDisplay');
     if (!display) return;
-
-    // Debug: log what's being rendered
-    console.log('updateChordGrid - phrases count:', phrases.length);
-    phrases.forEach((p, i) => console.log('  Phrase', i + 1, '- bars:', p.length, '-', p.map(b => b.join(',')).join(' | ')));
 
     display.innerHTML = '';
     let barGlobalIndex = 0;
@@ -2368,10 +2521,29 @@ function addNewPhrase() {
 
     const barsPerPhrase = (allCurrentPhrases[0] && allCurrentPhrases[0].length) ? allCurrentPhrases[0].length : 4;
     
-    // Create new phrase with default chords
-    const newPhrase = [];
-    for (let i = 0; i < barsPerPhrase; i++) {
-        newPhrase.push(['1']);
+    // Pick a random progression from the loaded data
+    let newPhrase = [];
+    if (allProgressions.length > 0) {
+        const randomProg = allProgressions[Math.floor(Math.random() * allProgressions.length)];
+        // Use the first phrase from the random progression
+        const sourcePhrases = randomProg.phrases;
+        if (sourcePhrases && sourcePhrases.length > 0) {
+            const sourcePhrase = sourcePhrases[0];
+            // Deep copy and match bar count
+            for (let i = 0; i < barsPerPhrase; i++) {
+                if (i < sourcePhrase.length) {
+                    newPhrase.push([...sourcePhrase[i]]);
+                } else {
+                    newPhrase.push(['1']);
+                }
+            }
+        }
+    }
+    // Fallback if no progressions loaded
+    if (newPhrase.length === 0) {
+        for (let i = 0; i < barsPerPhrase; i++) {
+            newPhrase.push(['1']);
+        }
     }
     
     allCurrentPhrases.push(newPhrase);
@@ -2665,5 +2837,56 @@ function cleanupChordGenerator() {
     chordSelectorOpen = false;
 }
 
+// Add current chord progression to Pomodoro as mission
+function addChordProgressionToPomodoro() {
+    if (!allCurrentPhrases || allCurrentPhrases.length === 0) {
+        alert('No progression loaded to add!');
+        return;
+    }
+    
+    // Build degree text for each phrase
+    const phraseLines = allCurrentPhrases.map(phrase => {
+        const degrees = [];
+        phrase.forEach(bar => {
+            if (Array.isArray(bar) && bar.length > 0) {
+                const chord = bar[0];
+                const match = chord.match(/^([b#]*)([1-7])/);
+                if (match) {
+                    degrees.push(match[1] + match[2]);
+                }
+            }
+        });
+        return degrees.join(' ');
+    }).filter(line => line.length > 0);
+    
+    if (phraseLines.length === 0) {
+        alert('No progression loaded to add!');
+        return;
+    }
+    
+    // Join phrases with newline (phrase 2 appears on a new line in the card)
+    const progressionText = phraseLines.join('\n');
+    
+    // Check if pomodoro functions are available
+    if (typeof window.addPomodoroMissionFromExternal !== 'function') {
+        alert('Pomodoro page must be loaded first!');
+        return;
+    }
+    
+    // Add mission to pomodoro
+    window.addPomodoroMissionFromExternal(progressionText);
+    
+    // Play confirmation sound
+    if (typeof soundEffects !== 'undefined') {
+        soundEffects.playClickSound();
+    }
+    
+    // Navigate to Pomodoro page
+    if (window.router && typeof window.router.navigate === 'function') {
+        window.router.navigate('pomodoro.html');
+    }
+}
+
 // Export cleanup function for router to call
 window.cleanupChordGenerator = cleanupChordGenerator;
+window.addChordProgressionToPomodoro = addChordProgressionToPomodoro;

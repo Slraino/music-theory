@@ -171,12 +171,12 @@
       },
       {
         "progression": ["6", "3", "4", "7"],
-        "progressionName": [],
+        "progressionName": ["634進行"],
         "music": []
       },
       {
         "progression": ["6", "3", "4", "5"],
-
+        "progressionName": ["634進行"],
         "music": [
           { "artist": "ヨルシカ", "title": "逃亡", "genre": "Jpop", 
             "youtubeId": "LiStvz5SWMc",  "clipStart": 119 
@@ -209,7 +209,7 @@
       },
       {
         "progression": ["6", "3", "4", "1"],
-        "progressionName": [],
+        "progressionName": ["634進行"],
         "music": [
           { "artist": "ヨルシカ", "title": "透明エレジー", "genre": "Jpop", 
             "youtubeId": "U2-K_eFGtJM", "clipStart": 27 
@@ -400,7 +400,7 @@
         "music": []
       },
       {
-        "progression": ["4", "b7", "1", ""],
+        "progression": ["4", "b7", "1", "1"],
         "progressionName":["Back Door Progression"],
         "music": []
       },
@@ -626,7 +626,7 @@
       },
       {
         "progression": ["4", "3", "6", "5"],
-        "progressionName": [],
+        "progressionName": ["436進行"],
         "music": [
           { "artist": "YOASOBI", "title": "夜に駆ける", "genre": "Jpop", 
             "youtubeId": "by4SYYWlhEs", "clipStart": 75, 
@@ -648,7 +648,7 @@
       },
       {
         "progression": ["4", "3", "6", "1"],
-        "progressionName": [],
+        "progressionName": ["436進行"],
         "music": [
           { "artist": "Ado", "title": "うっせぇわ", "genre": "Jpop", 
             "youtubeId": "Qp3b-RXtz4w", "clipStart": 51 
@@ -669,7 +669,7 @@
       },
       {
         "progression": ["4", "3m", "6m", "#4o"],
-        "progressionName": [],
+        "progressionName": ["436進行"],
         "music": []
       },
       {
@@ -1008,7 +1008,7 @@
         "music": []
       },
       {
-        "progression": ["1", "7", "b7", "6", "b6", "5", "4", "5"],
+        "progression": ["1", "7", "b7", "6"],
         "progressionName": [],
         "music": [
           {  
@@ -1025,7 +1025,7 @@
         ]
       },
       {
-        "progression": ["1", "7", "6", "5", "4", "3", "2", "5"],
+        "progression": ["1", "7", "6", "5"],
         "progressionName": ["卡農進行"],
         "music": [
           { "artist": "GReeeeN", "title": "キセキ", "genre": "Jpop",  
@@ -1115,7 +1115,16 @@
       {
         "progression": ["1", "4", "6", "5"],
         "progressionName": ["50s Progression"],
-        "music": []
+        "music": [
+          { "artist": "Andy Zhan",  "title": "romance no.3", "genre": "Modern", 
+            "youtubeId": "DbQsK211Jto",  "clipStart": 0,
+            "progressionVariation": [
+              ["1", ["4m6", "37(b9)"], "6m9", ["3/5", "1"]],
+              ["4(9)", ["5(9)/4", "1"], "Em7", ["5sus(b9)", "5+6"]]
+            ],
+            "theory": ["Modal Interchange", "Secondary Dominant"]
+          }
+        ]
       },
       {
         "progression": ["1", "4", "5", "6"],
@@ -1141,14 +1150,6 @@
               ["6m", "2/#4", "4/5", "5"]
             ],
             "theory": ["Modal Interchange"]
-          },
-          { "artist": "Andy Zhan",  "title": "romance no.3", "genre": "Modern", 
-            "youtubeId": "DbQsK211Jto",  "clipStart": 0,
-            "progressionVariation": [
-              ["1", ["4m6", "37(b9)"], "6m9", ["3/5", "1"]],
-              ["4(9)", ["5(9)/4", "1"], "Em7", ["5sus(b9)", "5+6"]]
-            ],
-            "theory": ["Modal Interchange", "Secondary Dominant"]
           }
         ]
       },

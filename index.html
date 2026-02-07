@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://www.gstatic.com https://firebaseapp.com https://firebaseio.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com; frame-src 'self' https://www.youtube.com https://youtube.com https://fantasia-3c631.firebaseapp.com;">
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="crimson">
     <meta name="description" content="Fantasia music theory tools: chord generator, chord progressions, and theory explorer.">
@@ -15,6 +16,7 @@
     <link rel="stylesheet" href="./pages/css/pomodoro.css?v=1.2">
     <link rel="stylesheet" href="./pages/css/profile.css?v=1.1">
     <link rel="stylesheet" href="./pages/css/chat.css?v=1.1">
+    <link rel="stylesheet" href="./pages/css/rank.css?v=1.0">
 </head>
 <body>
     <div class="container">
@@ -22,6 +24,7 @@
         <div class="top-bar">
             <div class="top-bar-left">
                 <button id="chatBtn" class="chat-btn" title="Chat Room">💬</button>
+                <button id="rankBtn" class="rank-btn" title="Leaderboard">🏆</button>
             </div>
             <div class="top-bar-right">
                 <button id="settingsBtn" class="settings-btn" title="Settings">⚙️</button>
@@ -49,6 +52,19 @@
                         <input type="range" id="sfxSlider" class="sound-slider" min="0" max="100" value="50">
                         <span id="sfxLabel" class="sound-label">50%</span>
                     </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rank Panel -->
+        <div id="rankPanel" class="rank-panel" style="display: none;">
+            <div class="rank-panel-content">
+                <div class="rank-header">
+                    <h2>🏆 Leaderboard</h2>
+                    <button class="rank-close-btn" id="rankCloseBtn" title="Close">✕</button>
+                </div>
+                <div class="rank-list" id="rankList">
+                    <div class="rank-loading">Loading...</div>
                 </div>
             </div>
         </div>
@@ -198,7 +214,7 @@
                             <div class="timer-display-row">
                                 <div class="timer-display">
                                     <span id="timer-mode">Work</span>
-                                    <span id="timer-countdown">25:00</span>
+                                    <span id="timer-countdown">50:00</span>
                                 </div>
                                 <button class="timer-settings-btn" id="timer-settings-btn" title="Settings">⚙</button>
                             </div>
@@ -236,11 +252,11 @@
                         <div class="timer-settings-inputs">
                             <div class="time-input">
                                 <label>Work Time (minutes):</label>
-                                <input type="number" id="work-time-modal" value="25" min="1" max="60">
+                                <input type="number" id="work-time-modal" value="50" min="1" max="60">
                             </div>
                             <div class="time-input">
                                 <label>Rest Time (minutes):</label>
-                                <input type="number" id="rest-time-modal" value="5" min="1" max="30">
+                                <input type="number" id="rest-time-modal" value="10" min="1" max="30">
                             </div>
                         </div>
                         <div class="modal-buttons">
@@ -278,13 +294,18 @@
     <script type="module">
         import { initAuthUI } from './src/auth/auth-ui.js';
         import { saveSettingToCloud, saveAllSettingsToCloud, loadSettingsFromCloud, onLoginSync } from './src/auth/settings-sync.js';
+        import { initRankPanel, recordWorkSession } from './src/scripts/rank.js';
         import './src/auth/profile.js';
         import './src/auth/chat.js';
         
         // Expose sync functions to non-module scripts (app.js)
         window.cloudSync = { saveSettingToCloud, saveAllSettingsToCloud, loadSettingsFromCloud, onLoginSync };
         
+        // Expose rank functions
+        window.recordWorkSession = recordWorkSession;
+        
         initAuthUI();
+        initRankPanel();
     </script>
 </body>
 </html>
