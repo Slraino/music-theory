@@ -1,26 +1,59 @@
 // Rank/Leaderboard System
+// Global monthly leaderboard — all users can see, resets each month
 import { db, collection, doc, getDoc, setDoc, updateDoc, query, orderBy, limit, getDocs, increment } from '../auth/firebase-config.js';
 import { getCurrentUser } from '../auth/auth.js';
 
-// Track work session completion
+// Get current month key (e.g. "2026-02")
+function getCurrentMonthKey() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}`;
+}
+
+// Get display label for month (e.g. "February 2026")
+function getMonthLabel(monthKey) {
+    const [year, month] = monthKey.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1);
+    return date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+}
+
+// Track work session completion — saves to global leaderboard collection
 export async function recordWorkSession(minutes) {
     const user = getCurrentUser();
     if (!user) return;
 
-    try {
-        const userRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userRef);
+    const monthKey = getCurrentMonthKey();
+    // Doc ID = month_uid (e.g. "2026-02_abc123") so each user has one entry per month
+    const docId = `${monthKey}_${user.uid}`;
 
-        if (userDoc.exists()) {
-            await updateDoc(userRef, {
-                totalWorkMinutes: increment(minutes),
+    try {
+        const entryRef = doc(db, 'leaderboard', docId);
+        const entryDoc = await getDoc(entryRef);
+
+        // Load avatar emoji from profile if available
+        let avatarEmoji = '';
+        try {
+            if (window.loadUserProfile) {
+                const profile = await window.loadUserProfile();
+                if (profile?.avatarEmoji) avatarEmoji = profile.avatarEmoji;
+            }
+        } catch (e) { /* ignore */ }
+
+        if (entryDoc.exists()) {
+            await updateDoc(entryRef, {
+                totalMinutes: increment(minutes),
+                displayName: user.displayName || 'Anonymous',
+                avatarEmoji: avatarEmoji,
                 lastActive: new Date()
             });
         } else {
-            await setDoc(userRef, {
+            await setDoc(entryRef, {
+                uid: user.uid,
+                month: monthKey,
                 displayName: user.displayName || 'Anonymous',
-                photoURL: user.photoURL || '',
-                totalWorkMinutes: minutes,
+                avatarEmoji: avatarEmoji,
+                totalMinutes: minutes,
                 lastActive: new Date()
             });
         }
@@ -29,22 +62,26 @@ export async function recordWorkSession(minutes) {
     }
 }
 
-// Fetch leaderboard data
+// Fetch leaderboard for current month
 async function fetchLeaderboard(maxResults = 10) {
+    const monthKey = getCurrentMonthKey();
+
     try {
-        const usersRef = collection(db, 'users');
-        const q = query(usersRef, orderBy('totalWorkMinutes', 'desc'), limit(maxResults));
+        const leaderboardRef = collection(db, 'leaderboard');
+        // Query only current month entries, sorted by minutes
+        const q = query(leaderboardRef, orderBy('totalMinutes', 'desc'), limit(50));
         const snapshot = await getDocs(q);
-        
+
         const leaderboard = [];
-        snapshot.forEach(doc => {
-            leaderboard.push({
-                uid: doc.id,
-                ...doc.data()
-            });
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            // Only include current month entries
+            if (data.month === monthKey) {
+                leaderboard.push(data);
+            }
         });
-        
-        return leaderboard;
+
+        return leaderboard.slice(0, maxResults);
     } catch (error) {
         console.error('Error fetching leaderboard:', error);
         return [];
@@ -58,11 +95,23 @@ async function renderLeaderboard() {
 
     rankList.innerHTML = '<div class="rank-loading">Loading...</div>';
 
+    // Show current month in header
+    const rankHeader = document.querySelector('.rank-header h2');
+    if (rankHeader) {
+        rankHeader.textContent = `\u{1F3C6} ${getMonthLabel(getCurrentMonthKey())}`;
+    }
+
     const currentUser = getCurrentUser();
     const leaderboard = await fetchLeaderboard(10);
 
     if (leaderboard.length === 0) {
-        rankList.innerHTML = '<div class="rank-loading">No data available</div>';
+        rankList.innerHTML = `
+            <div class="rank-empty">
+                <div class="rank-empty-icon">\u23F1\uFE0F</div>
+                <div class="rank-empty-text">No rankings yet this month</div>
+                <div class="rank-empty-hint">Complete a Pomodoro session to earn your rank!</div>
+            </div>
+        `;
         return;
     }
 
@@ -79,7 +128,13 @@ async function renderLeaderboard() {
         if (index === 0) position.classList.add('first');
         else if (index === 1) position.classList.add('second');
         else if (index === 2) position.classList.add('third');
-        position.textContent = `#${index + 1}`;
+        // Medal emoji for top 3
+        const medals = ['\u{1F947}', '\u{1F948}', '\u{1F949}'];
+        position.textContent = index < 3 ? medals[index] : `#${index + 1}`;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'rank-avatar';
+        avatar.textContent = user.avatarEmoji || '\u{1F464}';
 
         const userName = document.createElement('div');
         userName.className = 'rank-user';
@@ -87,9 +142,12 @@ async function renderLeaderboard() {
 
         const score = document.createElement('div');
         score.className = 'rank-score';
-        score.textContent = `${user.totalWorkMinutes || 0} min`;
+        const hours = Math.floor((user.totalMinutes || 0) / 60);
+        const mins = (user.totalMinutes || 0) % 60;
+        score.textContent = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
         item.appendChild(position);
+        item.appendChild(avatar);
         item.appendChild(userName);
         item.appendChild(score);
         rankList.appendChild(item);

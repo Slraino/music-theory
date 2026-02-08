@@ -120,3 +120,33 @@
     font-size: 0.9rem;
     font-weight: bold;
 }
+
+/* Avatar in leaderboard */
+.rank-avatar {
+    font-size: 1.5rem;
+    min-width: 1.8rem;
+    text-align: center;
+}
+
+/* Empty state */
+.rank-empty {
+    text-align: center;
+    padding: 2.5rem 1rem;
+}
+
+.rank-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+}
+
+.rank-empty-text {
+    color: var(--theme);
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.rank-empty-hint {
+    color: var(--text-lebal);
+    font-size: 0.9rem;
+}
