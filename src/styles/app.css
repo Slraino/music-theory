@@ -2,6 +2,10 @@
     font-size: 12px; /* Smaller base for mobile */
     color-scheme: dark;
     
+    /* Force consistent color rendering in Electron */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    
     /* Theme Coloring */
     --theme: crimson;
     --theme-secondary: Salmon;

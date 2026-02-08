@@ -24,6 +24,13 @@ Thumbs.db
 # Build output
 dist/
 build/
+out/
+
+# Electron specific
+electron/dist/
+*.exe
+*.dmg
+*.AppImage
 
 # IDE
 *.swp

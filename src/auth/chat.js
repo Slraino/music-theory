@@ -247,3 +247,4 @@ function escChatHtml(text) {
 // Expose to global scope for Router
 window.renderChatPage = renderChatPage;
 window.cleanupChat = stopMessageListener;
+
