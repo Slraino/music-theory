@@ -1,10 +1,10 @@
 // Authentication Module
-import { auth, googleProvider, signInWithPopup, signOut, onAuthStateChanged } from './firebase-config.js';
+import { auth, googleProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from './firebase-config.js';
 
 // Current user state
 let currentUser = null;
 
-// Sign in with Google
+// Sign in with Google — tries popup first, falls back to redirect if blocked
 export async function signInWithGoogle() {
     try {
         const result = await signInWithPopup(auth, googleProvider);
@@ -12,9 +12,17 @@ export async function signInWithGoogle() {
         console.log('✅ Signed in:', user.displayName);
         return user;
     } catch (error) {
-        console.error('❌ Sign-in error:', error.message);
-        alert('Sign-in failed: ' + error.message);
-        return null;
+        console.error('⚠️ Popup sign-in failed, trying redirect...', error.message);
+        try {
+            // Redirect-based sign-in works even when third-party cookies are blocked
+            await signInWithRedirect(auth, googleProvider);
+            // Page will reload — result is handled by handleRedirectResult() on next load
+            return null;
+        } catch (redirectError) {
+            console.error('❌ Sign-in error:', redirectError.message);
+            alert('Sign-in failed: ' + redirectError.message);
+            return null;
+        }
     }
 }
 
@@ -30,8 +38,21 @@ export async function signOutUser() {
     }
 }
 
+// Handle redirect result on page load (for when signInWithRedirect was used)
+async function handleRedirectResult() {
+    try {
+        const result = await getRedirectResult(auth);
+        if (result && result.user) {
+            console.log('✅ Signed in via redirect:', result.user.displayName);
+        }
+    } catch (error) {
+        console.error('❌ Redirect sign-in error:', error.message);
+    }
+}
+
 // Listen for auth state changes
 export function initAuthListener(callback) {
+    handleRedirectResult(); // Check for pending redirect sign-in
     onAuthStateChanged(auth, (user) => {
         currentUser = user;
         if (callback) callback(user);
