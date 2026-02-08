@@ -1696,8 +1696,8 @@ function renderGeneratorMusic(musicList, progressionName) {
             
             // Create link with separate tooltip in document (include songIndex for progressionVariation lookup)
             titleLinks.push(`<a class="music-link" data-tooltip="${tooltipId}" data-video-id="${item.youtubeId}" data-start="${item.clipStart || 0}" data-song-index="${item.songIndex}" data-has-progression-variation="${item.hasProgressionVariation}">${safeTitle}</a>`);
-            html += `<div class="music-tooltip" id="${tooltipId}" style="display: none;">
-                <iframe width="560" height="315" src="${escapeHtml(iframeUrl)}" 
+            html += `<div class="music-tooltip" id="${tooltipId}" style="display: none;" data-iframe-url="${escapeHtml(iframeUrl)}">
+                <iframe width="560" height="315" 
                     title="${safeTitle}" frameborder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                     allowfullscreen></iframe>

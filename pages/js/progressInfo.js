@@ -455,9 +455,9 @@ function formatMusicByArtist(musicList) {
                 const iframeUrl = buildYoutubeEmbedUrl(item.youtubeId, item.clipStart || 0, false);
                 const tooltipId = `tooltip-${Math.random().toString(36).substr(2, 9)}`;
                 
-                // Create link with separate tooltip in document
-                html += `<div class="music-tooltip" id="${tooltipId}" style="display: none;">
-                    <iframe width="560" height="315" src="${escapeHtml(iframeUrl)}" 
+                // Create link with separate tooltip in document (src deferred to prevent unwanted audio)
+                html += `<div class="music-tooltip" id="${tooltipId}" style="display: none;" data-iframe-url="${escapeHtml(iframeUrl)}">
+                    <iframe width="560" height="315" 
                         title="${safeTitle}" frameborder="0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen></iframe>
