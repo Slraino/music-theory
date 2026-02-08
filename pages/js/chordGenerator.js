@@ -1333,6 +1333,9 @@ function refreshChords() {
     lastProgressionIndex = randomIndex;
     const randomProgression = allProgressions[randomIndex];
     
+    // Remember current phrase count if user has modified it
+    const userPhraseCount = isProgressionModified ? allCurrentPhrases.length : null;
+    
     // Reset modification flag when loading a new progression
     isProgressionModified = false;
     
@@ -1342,8 +1345,9 @@ function refreshChords() {
     // Phrases are already diatonic-mapped when loaded, use directly
     let displayPhrases = randomProgression.phrases.map(p => p.map(b => [...b]));
     
-    // If only 1 phrase, pick a second random progression for phrase 2
-    if (displayPhrases.length === 1 && allProgressions.length > 1) {
+    // If user hasn't modified phrase count, add 2nd phrase if needed
+    // If user HAS modified (e.g., removed phrase 2), respect that choice
+    if (displayPhrases.length === 1 && allProgressions.length > 1 && userPhraseCount !== 1) {
         let secondIndex = pickWeightedRandomIndex(randomIndex);
         const secondProg = allProgressions[secondIndex];
         if (secondProg && secondProg.phrases && secondProg.phrases.length > 0) {
