@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        // Redirect /music-theory/chat.html → /music-theory/#chat.html
+        const path = window.location.pathname;
+        const segments = path.split('/').filter(s => s);
+        
+        // Get the last segment (e.g., "chat.html")
+        const lastSegment = segments[segments.length - 1];
+        
+        // If it looks like a page route, redirect to hash-based URL
+        if (lastSegment && lastSegment.endsWith('.html')) {
+            const baseUrl = window.location.origin + '/music-theory/';
+            window.location.replace(baseUrl + '#' + lastSegment);
+        } else {
+            // Otherwise go to home
+            window.location.replace(window.location.origin + '/music-theory/');
+        }
+    </script>
+</head>
+<body>
+    <p style="text-align: center; margin-top: 50px; font-family: sans-serif; color: #666;">
+        Redirecting...
+    </p>
+</body>
+</html>
